@@ -17,6 +17,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(dspr-gameserver
-        main.cpp)
+        main.cpp
+        Game.h Game.cpp
+        Player.h Player.cpp
+        Grid.h Grid.cpp
+        Tile.h Tile.cpp
+        StringUtils.h MapUtils.h)
 
 target_link_libraries (dspr-gameserver LINK_PUBLIC libuWS libssl libz)
