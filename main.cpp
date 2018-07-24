@@ -19,11 +19,11 @@ int main()
         ws->send("auth/1.0/gametoken|\r\n", uWS::BINARY);//the \r\n makes it happen on EMSC! Don't remove!
     });
 
-    h.onMessage([&h](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
+    h.onMessage([&h, &gameMap](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
     {
         std::string msgString = std::string(data, length);
         std::vector <std::string> parts = StringUtils::split(msgString, '|');
-        if (parts.at(0).compare("auth/1.0/gametoken")){
+        if (parts.at(0).compare("auth/1.0/gametoken") == 0){
             std::string token = parts.at(1);
             if (MapUtils::mapContains(gameMap, token)){
                 Game* game = gameMap.at(token);

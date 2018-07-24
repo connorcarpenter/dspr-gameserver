@@ -31,7 +31,12 @@ int Grid::getRandom(int max){
     return std::rand()/((RAND_MAX + 1u)/max);
 }
 
-void Grid::sendGrid(Player* player) {
+void Grid::sendGrid(Player* player)
+{
+    std::stringstream msg0;
+    msg0 << "grid/1.0/give|" << this->width << "," << this->height << "\r\n";
+    player->getWs()->send(msg0.str().c_str(), uWS::BINARY);
+
     for (int j = 0; j < this->height; j += 1)
     {
         for (int i = 0;i<this->width;i+=1)
@@ -43,7 +48,7 @@ void Grid::sendGrid(Player* player) {
 
             tile = this->tileArrayB[(j*this->width)+i];
             std::stringstream msg2;
-            msg2 << "tile/1.0/give|" << (i*2) << "," << (j*2) << "," << tile->frame << "\r\n";
+            msg2 << "tile/1.0/give|" << ((i*2)+1) << "," << ((j*2)+1) << "," << tile->frame << "\r\n";
             player->getWs()->send(msg2.str().c_str(), uWS::BINARY);
         }
     }
@@ -57,14 +62,14 @@ Tile **Grid::initializeTileArray(int width, int height) {
         {
             int randomNumber = getRandom(100);
             int frameIndex = 5;
-            if (randomNumber < 97) frameIndex = 4;
-            if (randomNumber < 94) frameIndex = 3;
-            if (randomNumber < 91) frameIndex = 8;
-            if (randomNumber < 86) frameIndex = 7;
-            if (randomNumber < 81) frameIndex = 6;
-            if (randomNumber < 76) frameIndex = 2;
-            if (randomNumber < 66) frameIndex = 1;
-            if (randomNumber < 56) frameIndex = 0;
+            if (randomNumber < 99) frameIndex = 4;
+            if (randomNumber < 98) frameIndex = 3;
+            if (randomNumber < 97) frameIndex = 8;
+            if (randomNumber < 95) frameIndex = 7;
+            if (randomNumber < 93) frameIndex = 6;
+            if (randomNumber < 91) frameIndex = 2;
+            if (randomNumber < 70) frameIndex = 1;
+            if (randomNumber < 50) frameIndex = 0;
 
             output[(j*width)+i] = new Tile(frameIndex);
         }

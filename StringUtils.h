@@ -3,6 +3,8 @@
 // Created by connor on 7/23/18.
 //
 
+#include <sstream>
+
 class StringUtils {
 public:
     static std::vector <std::string> split(const std::string &s, char delimiter)

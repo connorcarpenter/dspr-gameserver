@@ -7,7 +7,7 @@
 void Game::addPlayer(std::string token, uWS::WebSocket<1> *ws)
 {
     Player* p = new Player(token, ws);
-    playerMap.insert(p);
+    playerMap.insert(std::pair<std::string, Player*>(token, p));
     this->grid->sendGrid(p);
 }
 

@@ -7,7 +7,7 @@
 class MapUtils { ;
 public:
     template<typename K, typename V>
-    static bool mapContains(std::map<K, V> myMap, K key){
+    static bool mapContains(const std::map<K, V>& myMap, K key){
         auto it = myMap.find(key);
         if(it != myMap.end())
             return true;
