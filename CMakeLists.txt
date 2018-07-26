@@ -18,6 +18,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(dspr-gameserver
         main.cpp
+        GameServer.h GameServer.cpp
+        Message.h Message.cpp
         Game.h Game.cpp
         Player.h Player.cpp
         Grid.h Grid.cpp
