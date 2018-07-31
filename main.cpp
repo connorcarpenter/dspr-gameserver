@@ -5,6 +5,8 @@
 #include "MapUtils.h"
 #include "GameServer.h"
 
+using namespace DsprGameServer;
+
 int main()
 {
     //game setup

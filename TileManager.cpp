@@ -5,17 +5,17 @@
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
-#include "Grid.h"
+#include "TileManager.h"
 #include "GameServer.h"
 
-Grid::Grid(int width, int height) {
+TileManager::TileManager(int width, int height) {
     this->width = width;
     this->height = height;
     this->tileArrayA = initializeTileArray(this->width, this->height);
     this->tileArrayB = initializeTileArray(this->width, this->height);
 }
 
-Grid::~Grid() {
+TileManager::~TileManager() {
     for (int j = 0; j < this->height; j += 1)
     {
         for (int i = 0;i<this->width;i+=1)
@@ -29,11 +29,11 @@ Grid::~Grid() {
     delete[] this->tileArrayB;
 }
 
-int Grid::getRandom(int max){
+int TileManager::getRandom(int max){
     return std::rand()/((RAND_MAX + 1u)/max);
 }
 
-void Grid::sendGrid(Player* player)
+void TileManager::sendGrid(Player* player)
 {
     std::stringstream msg0;
     msg0 << "grid/1.0/give|" << this->width << "," << this->height << "\r\n";
@@ -59,7 +59,7 @@ void Grid::sendGrid(Player* player)
     }
 }
 
-Tile **Grid::initializeTileArray(int width, int height) {
+Tile **TileManager::initializeTileArray(int width, int height) {
     Tile** output = new Tile*[width * height];
     for (int j = 0; j < height; j += 1)
     {

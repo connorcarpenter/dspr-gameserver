@@ -4,11 +4,13 @@
 
 #include "Player.h"
 
-Player::Player(std::string token, uWS::WebSocket<1> *ws) {
-    this->ws = ws;
-    this->token = token;
-}
+namespace DsprGameServer {
+    Player::Player(std::string token, uWS::WebSocket<1> *ws) {
+        this->ws = ws;
+        this->token = token;
+    }
 
-uWS::WebSocket<1> *Player::getWs() {
-    return this->ws;
+    uWS::WebSocket<1> *Player::getWs() {
+        return this->ws;
+    }
 }

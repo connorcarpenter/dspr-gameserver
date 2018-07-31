@@ -4,6 +4,8 @@
 
 #include "Tile.h"
 
-Tile::Tile(int frame) {
-    this->frame = frame;
+namespace DsprGameServer {
+    Tile::Tile(int frame) {
+        this->frame = frame;
+    }
 }

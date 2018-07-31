@@ -7,11 +7,15 @@
 #include <uWS/WebSocketProtocol.h>
 #include <uWS/WebSocket.h>
 
-class Message {
-public:
-    Message(uWS::WebSocket<uWS::SERVER> *ws, std::string str);
-    void send();
-private:
-    uWS::WebSocket<uWS::SERVER> *ws;
-    std::string str;
-};
+namespace DsprGameServer {
+    class Message {
+    public:
+        Message(uWS::WebSocket<uWS::SERVER> *ws, std::string str);
+
+        void send();
+
+    private:
+        uWS::WebSocket<uWS::SERVER> *ws;
+        std::string str;
+    };
+}

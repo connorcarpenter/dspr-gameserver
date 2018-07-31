@@ -7,15 +7,20 @@
 #include <uWS/WebSocket.h>
 #include <map>
 #include "Player.h"
-#include "Grid.h"
+#include "TileManager.h"
 
-class Game {
+namespace DsprGameServer {
+    class Game {
 
-public:
-    Game();
-    ~Game();
-    void addPlayer(std::string token, uWS::WebSocket<1>* ws);
-private:
-    std::map<std::string, Player*> playerMap;
-    Grid* grid = nullptr;
-};
+    public:
+        Game();
+
+        ~Game();
+
+        void addPlayer(std::string token, uWS::WebSocket<1> *ws);
+
+    private:
+        std::map<std::string, Player *> playerMap;
+        TileManager *grid = nullptr;
+    };
+}

@@ -22,7 +22,8 @@ add_executable(dspr-gameserver
         Message.h Message.cpp
         Game.h Game.cpp
         Player.h Player.cpp
-        Grid.h Grid.cpp
+        TileManager.h TileManager.cpp
+        UnitManager.h UnitManager.cpp
         Tile.h Tile.cpp
         StringUtils.h MapUtils.h)
 
