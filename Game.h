@@ -8,6 +8,7 @@
 #include <map>
 #include "Player.h"
 #include "TileManager.h"
+#include "UnitManager.h"
 
 namespace DsprGameServer {
     class Game {
@@ -21,6 +22,7 @@ namespace DsprGameServer {
 
     private:
         std::map<std::string, Player *> playerMap;
-        TileManager *grid = nullptr;
+        TileManager* tileManager = nullptr;
+        UnitManager* unitManager = nullptr;
     };
 }

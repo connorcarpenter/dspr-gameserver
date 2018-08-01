@@ -23,8 +23,6 @@ namespace DsprGameServer {
         Tile **tileArrayA = nullptr;
         Tile **tileArrayB = nullptr;
 
-        int getRandom(int max);
-
         Tile **initializeTileArray(int width, int height);
     };
 }

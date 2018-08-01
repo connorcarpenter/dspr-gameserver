@@ -25,6 +25,7 @@ add_executable(dspr-gameserver
         TileManager.h TileManager.cpp
         UnitManager.h UnitManager.cpp
         Tile.h Tile.cpp
-        StringUtils.h MapUtils.h)
+        Unit.h Unit.cpp
+        StringUtils.h MapUtils.h MathUtils.h)
 
 target_link_libraries (dspr-gameserver LINK_PUBLIC libuWS libssl libz)
