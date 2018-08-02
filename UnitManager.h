@@ -6,6 +6,7 @@
 
 #include <map>
 #include <queue>
+#include <list>
 #include "Unit.h"
 #include "Player.h"
 
@@ -16,6 +17,7 @@ namespace DsprGameServer {
         ~UnitManager();
         void sendUnits(DsprGameServer::Player *pPlayer);
         Unit* createUnit();
+        void receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY);
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;

@@ -32,21 +32,21 @@ namespace DsprGameServer {
     void TileManager::sendGrid(Player* player)
     {
         std::stringstream msg0;
-        msg0 << "grid/1.0/give|" << this->width << "," << this->height << "\r\n";
+        msg0 << "grid/1.0/create|" << this->width << "," << this->height << "\r\n";
         GameServer::get().queueMessage(player->getWs(), msg0.str());
 
         for (int j = 0; j < this->height; j += 1) {
             for (int i = 0; i < this->width; i += 1) {
                 Tile *tile = this->tileArrayA[(j * this->width) + i];
                 std::stringstream msg1;
-                msg1 << "tile/1.0/give|" << (i * 2) << "," << (j * 2) << "," << tile->frame << "\r\n";
+                msg1 << "tile/1.0/create|" << (i * 2) << "," << (j * 2) << "," << tile->frame << "\r\n";
                 GameServer::get().queueMessage(player->getWs(), msg1.str());
             }
 
             for (int i = 0; i < this->width; i += 1) {
                 Tile *tile = this->tileArrayB[(j * this->width) + i];
                 std::stringstream msg2;
-                msg2 << "tile/1.0/give|" << ((i * 2) + 1) << "," << ((j * 2) + 1) << "," << tile->frame << "\r\n";
+                msg2 << "tile/1.0/create|" << ((i * 2) + 1) << "," << ((j * 2) + 1) << "," << tile->frame << "\r\n";
                 GameServer::get().queueMessage(player->getWs(), msg2.str());
             }
         }
