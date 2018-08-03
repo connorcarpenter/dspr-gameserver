@@ -18,6 +18,11 @@ namespace DsprGameServer {
         void sendUnits(DsprGameServer::Player *pPlayer);
         Unit* createUnit();
         void receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY);
+
+        void updateUnits();
+
+        void sendUnitUpdates(Player *player);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;

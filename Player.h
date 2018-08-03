@@ -11,7 +11,7 @@ namespace DsprGameServer {
     public:
         explicit Player(std::string token, uWS::WebSocket<1> *ws);
 
-        uWS::WebSocket<1> *getWs();
+        uWS::WebSocket<1> * getWs();
 
     private:
         uWS::WebSocket<1> *ws = nullptr;

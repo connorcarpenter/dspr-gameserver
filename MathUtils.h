@@ -11,5 +11,13 @@ namespace DsprGameServer {
         static int getRandom(int max) {
             return std::rand() / ((RAND_MAX + 1u) / max);
         }
+        static int Sign(int value){
+            if (value < 0)return -1;
+            return 1;
+        }
+        static int SignOrZero(int value) {
+            if (value == 0) return 0;
+            return MathUtils::Sign(value);
+        }
     };
 }

@@ -10,8 +10,7 @@ using namespace DsprGameServer;
 int main()
 {
     //game setup
-    std::map<std::string, Game*> gameMap;
-    gameMap.insert(std::pair<std::string, Game*>("player1code", new Game()));
+
 
     //network stuff
 
@@ -25,14 +24,14 @@ int main()
 
     h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> *ws, int code, char *message, size_t length)
     {
-        int i = 12;
+        std::cout << "dspr-gameserver: disconnection" << std::endl;
     });
 
     h.onError([](void *user) {
-        int i = 12;
+        std::cout << "dspr-gameserver: error" << std::endl;
     });
 
-    h.onMessage([&h, &gameMap](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
+    h.onMessage([&h](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
     {
         std::string msgString = std::string(data, length);
 
@@ -46,14 +45,14 @@ int main()
         std::string playerToken = parts.at(1);
 
         // Validate the playertoken
-        if (!MapUtils::mapContains(gameMap, playerToken))
+        if (!MapUtils::mapContains(GameServer::get().playerCodeToGameMap, playerToken))
         {
             std::cout << "dspr-gameserver: Received invalid playertoken: " << playerToken << std::endl;
             return;
         }
 
         // Get the game associated with the token
-        Game* game = gameMap.at(playerToken);
+        Game* game = GameServer::get().playerCodeToGameMap.at(playerToken);
 
         // Process message
         if (parts.at(0).compare("auth/1.0/gametoken") == 0)
@@ -63,6 +62,19 @@ int main()
         }
         else if (parts.at(0).compare("unit/1.0/order") == 0)
         {
+            auto unitIdListStrings = StringUtils::split(parts[2], ',');
+            auto orderStrings = StringUtils::split(parts[3], ',');
+
+            std::list<int> unitIdList;
+            for (const auto &str : unitIdListStrings){
+                unitIdList.push_front(stoi(str));
+            }
+
+            int x = stoi(orderStrings[0]);
+            int y = stoi(orderStrings[1]);
+
+            game->receiveUnitOrder(unitIdList, x, y);
+
             std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;
         }
     });
@@ -70,7 +82,7 @@ int main()
     auto timer = new Timer(h.getLoop());
     timer->start([](Timer* timer){
         GameServer::get().step();
-    }, 200, 200);
+    }, GameServer::get().tickMs, GameServer::get().tickMs);
 
     h.getDefaultGroup<uWS::SERVER>().startAutoPing(30000);
     if (h.listen("localhost", 3173)) {

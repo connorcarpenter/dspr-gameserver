@@ -31,22 +31,44 @@ namespace DsprGameServer
             Unit* unit = unitPair.second;
 
             std::stringstream msg;
-            msg << "unit/1.0/create|" << id << "," << unit->x << "," << unit->y << "\r\n";
+            msg << "unit/1.0/create|" << id << "," << unit->position->x << "," << unit->position->y << "\r\n";
             GameServer::get().queueMessage(player->getWs(), msg.str());
         }
     }
 
     Unit *UnitManager::createUnit()
     {
-        Unit* newUnit = new Unit();
-        newUnit->id = (int) unitMap.size();
-        newUnit->x = (MathUtils::getRandom(10)+2)*2;
-        newUnit->y = (MathUtils::getRandom(10)+2)*2;
+        Unit* newUnit = new Unit((int) unitMap.size(), (MathUtils::getRandom(10)+2)*2, (MathUtils::getRandom(10)+2)*2);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
     }
 
     void UnitManager::receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY)
     {
+        for (const auto& i : idList)
+        {
+            Unit* unit = unitMap.at(i);
+            unit->moveTarget->x = tileX;
+            unit->moveTarget->y = tileY;
+        }
+    }
 
+    void UnitManager::updateUnits()
+    {
+        for(const auto& unitPair : unitMap)
+        {
+            Unit* unit = unitPair.second;
+            unit->update();
+        }
+
+
+    }
+
+    void UnitManager::sendUnitUpdates(Player* player)
+    {
+        for(const auto& unitPair : unitMap)
+        {
+            Unit* unit = unitPair.second;
+            unit->sendUpdate(player);
+        }
     }
 }

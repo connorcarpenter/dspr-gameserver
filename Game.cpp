@@ -23,11 +23,27 @@ namespace DsprGameServer
         }
     }
 
+    void Game::update()
+    {
+        // update units
+        this->unitManager->updateUnits();
+
+        // send updates to each player
+        for (const auto &playerPair : playerMap) {
+            if (playerPair.second != nullptr)
+                this->unitManager->sendUnitUpdates(playerPair.second);
+        }
+    }
+
     void Game::addPlayer(std::string token, uWS::WebSocket<1> *ws)
     {
         Player* p = new Player(token, ws);
         playerMap.insert(std::pair<std::string, Player *>(token, p));
         this->tileManager->sendGrid(p);
         this->unitManager->sendUnits(p);
+    }
+
+    void Game::receiveUnitOrder(const std::list<int> &idList, int tileX, int tileY) {
+        this->unitManager->receiveUnitOrder(idList, tileX, tileY);
     }
 }

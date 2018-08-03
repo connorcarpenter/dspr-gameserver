@@ -6,6 +6,7 @@
 
 #include <queue>
 #include "Message.h"
+#include "Game.h"
 
 namespace DsprGameServer {
 
@@ -16,14 +17,18 @@ namespace DsprGameServer {
 
         void queueMessage(uWS::WebSocket<uWS::SERVER> *ws, std::string str);
 
-        static GameServer &get() {
+        static GameServer& get() {
             static GameServer gameServer;
             return gameServer;
         }
 
-    private:
-        GameServer() {};
-        std::queue<Message *> messageQueue;
-    };
+        std::map<std::string, Game*> playerCodeToGameMap;
 
+        int tickMs = 200;
+    private:
+        GameServer();
+        std::queue<Message *> messageQueue;
+        std::list<Game*> gameList;
+
+    };
 }

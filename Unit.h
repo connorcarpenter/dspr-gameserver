@@ -4,11 +4,29 @@
 // Created by connor on 8/1/18.
 //
 
-namespace DsprGameServer {
-    class Unit {
+#include "Point.h"
+#include "Synced.h"
+#include "Player.h"
+
+namespace DsprGameServer
+{
+    class Unit
+    {
     public:
+        Unit(int id, int x, int y);
+        ~Unit();
         int id = -1;
-        int x = 0;
-        int y = 0;
+        Point* position = nullptr;
+        Synced<Point>* nextPosition = nullptr;
+        Point* moveTarget = nullptr;
+
+        int walkSpeed = 10;
+        int walkAmount = 0;
+
+        void update();
+
+        void sendUpdate(DsprGameServer::Player* player);
+
+        bool anyVarIsDirty();
     };
 }

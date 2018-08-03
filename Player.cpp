@@ -10,7 +10,8 @@ namespace DsprGameServer {
         this->token = token;
     }
 
-    uWS::WebSocket<1> *Player::getWs() {
+    uWS::WebSocket<1> * Player::getWs()
+    {
         return this->ws;
     }
 }
