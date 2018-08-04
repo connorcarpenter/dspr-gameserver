@@ -13,7 +13,9 @@ namespace DsprGameServer {
             std::string token;
             std::istringstream tokenStream(s);
             while (std::getline(tokenStream, token, delimiter)) {
-                tokens.push_back(token);
+                auto newStr = trimEnd(token, "\r");
+                tokens.push_back(*newStr);
+                delete newStr;
             }
             return tokens;
         }
@@ -24,6 +26,16 @@ namespace DsprGameServer {
             } else {
                 return false;
             }
+        }
+
+        static std::string* trimEnd(std::string const &fullString, std::string const &ending) {
+            if (endsWith(fullString, ending))
+            {
+                std::string* newStr = new std::string(fullString.substr(0, fullString.length() - ending.length()));
+                return newStr;
+            }
+
+            return new std::string(fullString);
         }
     };
 }

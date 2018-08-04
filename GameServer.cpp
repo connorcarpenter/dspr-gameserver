@@ -8,9 +8,9 @@ namespace DsprGameServer
 {
     GameServer::GameServer()
     {
-        auto onlyGame = new Game();
+        this->onlyGame = new Game();
         gameList.push_back(onlyGame);
-        playerCodeToGameMap.insert(std::pair<std::string, Game*>("player1code", onlyGame));
+
     }
 
     void GameServer::step()
@@ -36,5 +36,9 @@ namespace DsprGameServer
     {
         auto newMsg = new Message(ws, std::move(str));
         messageQueue.push(newMsg);
+    }
+
+    void GameServer::addPlayer(std::string playerToken) {
+        playerCodeToGameMap.insert(std::pair<std::string, Game*>(playerToken, this->onlyGame));
     }
 }

@@ -29,7 +29,7 @@ namespace DsprGameServer
         if (!this->position->Equals(this->nextPosition->get()))
         {
             this->walkAmount += this->walkSpeed;
-            if (this->walkAmount >= 100)
+            if (this->walkAmount >= 1000)
             {
                 walkAmount = 0;
                 this->position->Set(this->nextPosition->get());
@@ -44,11 +44,11 @@ namespace DsprGameServer
             {
                 difx *= 2;
                 dify *= 2;
-                walkSpeed = 6;
+                walkSpeed = walkSpeedDiagonal;
             }
             else
             {
-                walkSpeed = 10;
+                walkSpeed = walkSpeedStraight;
             }
 
             this->nextPosition->get()->Set(this->position->x + difx, this->position->y + dify);
@@ -65,8 +65,13 @@ namespace DsprGameServer
         if (this->nextPosition->isDirty())
         {
             msg << "|" << this->nextPosition->serialize();
-            this->nextPosition->clean();
         }
+
+        //next synced variable should follow this format
+//        if (this->nextPosition->isDirty())
+//        {
+//            msg << "&" << this->nextPosition->serialize();
+//        }
 
         msg << "\r\n";
         GameServer::get().queueMessage(player->getWs(), msg.str());
@@ -77,5 +82,9 @@ namespace DsprGameServer
         if (this->nextPosition->isDirty()) return true;
         //more synced vars here
         return false;
+    }
+
+    void Unit::cleanAllVars() {
+        this->nextPosition->clean();
     }
 }

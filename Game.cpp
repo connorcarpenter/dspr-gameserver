@@ -33,6 +33,9 @@ namespace DsprGameServer
             if (playerPair.second != nullptr)
                 this->unitManager->sendUnitUpdates(playerPair.second);
         }
+
+        // clean units vars
+        this->unitManager->cleanAllUnits();
     }
 
     void Game::addPlayer(std::string token, uWS::WebSocket<1> *ws)

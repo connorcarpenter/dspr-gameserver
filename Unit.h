@@ -20,7 +20,9 @@ namespace DsprGameServer
         Synced<Point>* nextPosition = nullptr;
         Point* moveTarget = nullptr;
 
-        int walkSpeed = 10;
+        const int walkSpeedStraight = 500;
+        const int walkSpeedDiagonal = (int) (walkSpeedStraight / 1.4f);
+        int walkSpeed = 0;
         int walkAmount = 0;
 
         void update();
@@ -28,5 +30,7 @@ namespace DsprGameServer
         void sendUpdate(DsprGameServer::Player* player);
 
         bool anyVarIsDirty();
+
+        void cleanAllVars();
     };
 }

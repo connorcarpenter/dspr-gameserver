@@ -9,10 +9,7 @@ using namespace DsprGameServer;
 
 int main()
 {
-    //game setup
-
-
-    //network stuff
+    std::string bffToken = "nwlrbbmqbhcdacon";
 
     uWS::Hub h;
 
@@ -31,7 +28,7 @@ int main()
         std::cout << "dspr-gameserver: error" << std::endl;
     });
 
-    h.onMessage([&h](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
+    h.onMessage([&h, &bffToken](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
     {
         std::string msgString = std::string(data, length);
 
@@ -41,6 +38,17 @@ int main()
             msgString = msgString.substr(0, msgString.length()-1);
 
         std::vector <std::string> parts = StringUtils::split(msgString, '|');
+
+        // Add new player
+        if (parts.at(0).compare("player/1.0/add") == 0)
+        {
+            if (parts.at(1).compare(bffToken) == 0)
+            {
+                GameServer::get().addPlayer(parts.at(2));
+                std::cout << "dspr-gameserver: Received new player" << std::endl;
+            }
+            return;
+        }
 
         std::string playerToken = parts.at(1);
 

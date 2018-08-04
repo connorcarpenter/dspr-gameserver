@@ -59,8 +59,6 @@ namespace DsprGameServer
             Unit* unit = unitPair.second;
             unit->update();
         }
-
-
     }
 
     void UnitManager::sendUnitUpdates(Player* player)
@@ -69,6 +67,14 @@ namespace DsprGameServer
         {
             Unit* unit = unitPair.second;
             unit->sendUpdate(player);
+        }
+    }
+
+    void UnitManager::cleanAllUnits()
+    {
+        for(const auto& unitPair : unitMap)
+        {
+            unitPair.second->cleanAllVars();
         }
     }
 }

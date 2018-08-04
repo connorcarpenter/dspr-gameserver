@@ -23,6 +23,8 @@ namespace DsprGameServer {
 
         void sendUnitUpdates(Player *player);
 
+        void cleanAllUnits();
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
