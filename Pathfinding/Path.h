@@ -6,14 +6,18 @@
 
 #include "PathTile.h"
 
-#include <unordered_set>
+#include <unordered_map>
 
 namespace DsprGameServer
 {
     class Path
     {
-        std::unordered_set<PathTile, PathTileHasher> startTiles;
-        std::unordered_set<PathTile, PathTileHasher> pathTiles;
-        std::unordered_set<PathTile, PathTileHasher> endTiles;
+    public:
+        Path(bool pathFound);
+        ~Path();
+        bool pathFound = true;
+        std::unordered_map<int, PathTile*> startTiles;
+        std::unordered_map<int, PathTile*> pathTiles;
+        std::unordered_map<int, PathTile*> endTiles;
     };
 }

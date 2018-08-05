@@ -88,7 +88,8 @@ namespace DsprGameServer
         this->nextPosition->clean();
     }
 
-    void Unit::startPath(std::shared_ptr<DsprGameServer::Path> path) {
+    void Unit::startPath(std::shared_ptr<DsprGameServer::Path> path)
+    {
         this->path = path;
     }
 }

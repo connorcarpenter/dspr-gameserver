@@ -36,6 +36,6 @@ namespace DsprGameServer
 
         void startPath(std::shared_ptr<Path> path);
 
-        std::shared_ptr<Path> path;
+        std::shared_ptr<Path> path = nullptr;
     };
 }

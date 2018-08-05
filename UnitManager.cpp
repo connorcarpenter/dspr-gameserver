@@ -6,15 +6,15 @@
 #include "UnitManager.h"
 #include "MathUtils.h"
 #include "GameServer.h"
-#include "Pathfinding/LinearPathfinder.h"
+#include "Pathfinding/AStarPathfinder.h"
 
 namespace DsprGameServer
 {
-    UnitManager::UnitManager()
+    UnitManager::UnitManager(TileManager* tileManager)
     {
         createUnit();
 
-        this->pathfinder = new LinearPathfinder();
+        this->pathfinder = new AStarPathfinder(tileManager);
     }
 
     UnitManager::~UnitManager()

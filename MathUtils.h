@@ -19,5 +19,14 @@ namespace DsprGameServer {
             if (value == 0) return 0;
             return MathUtils::Sign(value);
         }
+        static int Abs(int value) {
+            return value * Sign(value);
+        }
+        static int Min(int value1, int value2) {
+            return (value1 < value2) ? value1 : value2;
+        }
+        static int Max(int value1, int value2) {
+            return (value1 > value2) ? value1 : value2;
+        }
     };
 }

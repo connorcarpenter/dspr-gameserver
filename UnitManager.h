@@ -9,12 +9,13 @@
 #include <list>
 #include "Unit.h"
 #include "Player.h"
-#include "Pathfinding/Pathfinder.h"
+#include "TileManager.h"
+#include "Pathfinding/AStarPathfinder.h"
 
 namespace DsprGameServer {
     class UnitManager {
     public:
-        UnitManager();
+        UnitManager(TileManager* tileManager);
         ~UnitManager();
         void sendUnits(DsprGameServer::Player *pPlayer);
         Unit* createUnit();
@@ -29,6 +30,6 @@ namespace DsprGameServer {
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
-        Pathfinder* pathfinder = nullptr;
+        AStarPathfinder* pathfinder = nullptr;
     };
 }
