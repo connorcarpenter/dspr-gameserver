@@ -6,12 +6,15 @@
 #include "UnitManager.h"
 #include "MathUtils.h"
 #include "GameServer.h"
+#include "Pathfinding/LinearPathfinder.h"
 
 namespace DsprGameServer
 {
     UnitManager::UnitManager()
     {
         createUnit();
+
+        this->pathfinder = new LinearPathfinder();
     }
 
     UnitManager::~UnitManager()
@@ -21,6 +24,8 @@ namespace DsprGameServer
             Unit* unit = unitPair.second;
             delete unit;
         }
+
+        delete this->pathfinder;
     }
 
     void UnitManager::sendUnits(DsprGameServer::Player* player)
@@ -36,7 +41,7 @@ namespace DsprGameServer
         }
     }
 
-    Unit *UnitManager::createUnit()
+    Unit* UnitManager::createUnit()
     {
         Unit* newUnit = new Unit((int) unitMap.size(), (MathUtils::getRandom(10)+2)*2, (MathUtils::getRandom(10)+2)*2);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
@@ -44,11 +49,20 @@ namespace DsprGameServer
 
     void UnitManager::receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY)
     {
+        std::list<std::pair<int, int>> unitPositionsList;
+
         for (const auto& i : idList)
         {
             Unit* unit = unitMap.at(i);
-            unit->moveTarget->x = tileX;
-            unit->moveTarget->y = tileY;
+            unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
+        }
+
+        auto path = this->pathfinder->findPath(unitPositionsList, (int) unitPositionsList.size(), tileX, tileY);
+
+        for (const auto& i : idList)
+        {
+            Unit* unit = unitMap.at(i);
+            unit->startPath(path);
         }
     }
 

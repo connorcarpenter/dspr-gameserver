@@ -28,6 +28,12 @@ add_executable(dspr-gameserver
         Unit.h Unit.cpp
         Point.h Point.cpp
         Synced.h
-        StringUtils.h MapUtils.h MathUtils.h)
+        StringUtils.h MapUtils.h MathUtils.h
+
+        Pathfinding/AStarPathfinder.h Pathfinding/AStarPathfinder.cpp
+        Pathfinding/LinearPathfinder.h Pathfinding/LinearPathfinder.cpp
+        Pathfinding/Path.h Pathfinding/Path.cpp
+        Pathfinding/Pathfinder.h Pathfinding/Pathfinder.cpp
+        Pathfinding/PathTile.h Pathfinding/PathTile.cpp)
 
 target_link_libraries (dspr-gameserver LINK_PUBLIC libuWS libssl libz)

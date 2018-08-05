@@ -9,6 +9,7 @@
 #include <list>
 #include "Unit.h"
 #include "Player.h"
+#include "Pathfinding/Pathfinder.h"
 
 namespace DsprGameServer {
     class UnitManager {
@@ -28,5 +29,6 @@ namespace DsprGameServer {
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
+        Pathfinder* pathfinder = nullptr;
     };
 }

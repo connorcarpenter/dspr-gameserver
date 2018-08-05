@@ -3,12 +3,14 @@
 //
 
 #include "Game.h"
+#include "Pathfinding/Pathfinder.h"
 
 namespace DsprGameServer
 {
     Game::Game()
     {
         tileManager = new TileManager(32, 32);
+        Pathfinder::setMapWidth(32);
         unitManager = new UnitManager();
     }
 

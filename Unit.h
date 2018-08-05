@@ -7,6 +7,7 @@
 #include "Point.h"
 #include "Synced.h"
 #include "Player.h"
+#include "Pathfinding/Path.h"
 
 namespace DsprGameServer
 {
@@ -32,5 +33,9 @@ namespace DsprGameServer
         bool anyVarIsDirty();
 
         void cleanAllVars();
+
+        void startPath(std::shared_ptr<Path> path);
+
+        std::shared_ptr<Path> path;
     };
 }

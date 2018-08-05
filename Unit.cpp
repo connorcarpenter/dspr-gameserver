@@ -87,4 +87,8 @@ namespace DsprGameServer
     void Unit::cleanAllVars() {
         this->nextPosition->clean();
     }
+
+    void Unit::startPath(std::shared_ptr<DsprGameServer::Path> path) {
+        this->path = path;
+    }
 }
