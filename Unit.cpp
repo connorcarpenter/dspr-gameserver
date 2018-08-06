@@ -6,6 +6,7 @@
 #include "Unit.h"
 #include "MathUtils.h"
 #include "GameServer.h"
+#include "Pathfinding/PathTile.h"
 
 namespace DsprGameServer
 {
@@ -38,31 +39,26 @@ namespace DsprGameServer
 
         if (this->walkAmount == 0 && this->followingPath)
         {
-            PathTile* nextTile = this->path->getPathTile(this->currentPathTile->getNextTile());
+            PathTile* nextTile = this->currentPathTile->nextTile;
             if (nextTile == nullptr)
             {
-                //maybe next tile is end!
-                nextTile = this->path->getEndTile(this->currentPathTile->getNextTile());
-                if (nextTile == nullptr) {
-                    auto i = 1/0; //error!
-                } else {
+                //maybe this tile is end!
+                if (this->path->tileIsEnd(this->currentPathTile)){
                     this->followingPath = false;
                 }
-            }
-            currentPathTile = nextTile;
-            int difx = currentPathTile->x - this->position->x;
-            int dify = currentPathTile->y - this->position->y;
-            if (difx == 2 || dify == 2)
-            {
-                walkSpeed = walkSpeedDiagonal;
-            }
-            else
-            {
-                walkSpeed = walkSpeedStraight;
-            }
+            } else {
+                currentPathTile = nextTile;
+                int difx = currentPathTile->x - this->position->x;
+                int dify = currentPathTile->y - this->position->y;
+                if (difx == 2 || dify == 2) {
+                    walkSpeed = walkSpeedDiagonal;
+                } else {
+                    walkSpeed = walkSpeedStraight;
+                }
 
-            this->nextPosition->get()->Set(this->position->x + difx, this->position->y + dify);
-            this->nextPosition->dirty();
+                this->nextPosition->get()->Set(this->position->x + difx, this->position->y + dify);
+                this->nextPosition->dirty();
+            }
         }
     }
 

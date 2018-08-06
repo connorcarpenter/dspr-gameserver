@@ -32,6 +32,7 @@ add_executable(dspr-gameserver
 
         Pathfinding/AStarPathfinder.h Pathfinding/AStarPathfinder.cpp
         Pathfinding/Path.h Pathfinding/Path.cpp
+        Pathfinding/PathNode.h Pathfinding/PathNode.cpp
         Pathfinding/PathTile.h Pathfinding/PathTile.cpp)
 
 target_link_libraries (dspr-gameserver LINK_PUBLIC libuWS libssl libz)

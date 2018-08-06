@@ -7,10 +7,13 @@
 #include "Point.h"
 #include "Synced.h"
 #include "Player.h"
-#include "Pathfinding/Path.h"
+//#include "Pathfinding/Path.h"
 
 namespace DsprGameServer
 {
+    class Path;
+    class PathTile;
+
     class Unit
     {
     public:

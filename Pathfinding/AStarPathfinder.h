@@ -4,6 +4,7 @@
 // Created by connor on 8/4/18.
 //
 
+#include <queue>
 #include <unordered_map>
 #include <list>
 #include <bits/unordered_map.h>
@@ -12,10 +13,13 @@
 
 namespace DsprGameServer
 {
+    class PathNode;
+    class PathNodeComparator;
+
     class AStarPathfinder
     {
     public:
-        AStarPathfinder(DsprGameServer::TileManager *tileManager);
+        AStarPathfinder(DsprGameServer::TileManager* tileManager);
 
         std::shared_ptr<Path> findPath(const std::list<std::pair<int,int>>& unitPositions, int unitNumber, int targetX, int targetY);
 
@@ -24,10 +28,13 @@ namespace DsprGameServer
         static int mapWidth;
     private:
         TileManager* tileManager = nullptr;
-        std::unordered_map<int, PathTile*>* getNeighbors(const PathTile *parentTile, int targetX, int targetY);
-        PathTile* findSmallestF(std::unordered_map<int, PathTile*>* list);
 
-        void tryAddNeighbor(std::unordered_map<int, PathTile *> *neighborMap, const PathTile *parentTile,
-                       int tileX, int tileY, int targetX, int targetY, float cost);
+        std::list<PathNode*>* getNeighbors(PathNode* parent, int targetX, int targetY);
+
+        void tryAddNeighbor(std::list<PathNode*>* neighborList, PathNode* parentTile,
+                       int tileX, int y, int targetX, int targetY, float cost);
+
+        void cleanUp(std::list<PathNode *> *nodes, std::unordered_map<int, PathNode *> *map,
+                     std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* heap, std::unordered_map<int, PathNode *> *map2);
     };
 }

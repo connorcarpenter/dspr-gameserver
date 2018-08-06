@@ -4,7 +4,10 @@
 
 #include <unordered_map>
 #include <bits/unordered_map.h>
+#include <set>
+#include <queue>
 #include "AStarPathfinder.h"
+#include "PathTile.h"
 
 namespace DsprGameServer
 {
@@ -17,122 +20,130 @@ namespace DsprGameServer
                                      int targetX,
                                      int targetY)
     {
-        PathTile* endTile = new PathTile(targetX, targetY);
-
-        //pathfinding
-        auto closed_list = new std::unordered_map<int, PathTile*>();
-        auto open_list = new std::unordered_map<int, PathTile*>();
+        auto closedMap = new std::unordered_map<int, PathNode*>();
+        auto openHeap = new std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>();
+        auto openMap = new std::unordered_map<int, PathNode*>();
+        auto nodes = new std::list<PathNode*>();
 
         for (auto startPosition : unitPositions)
         {
-            auto newTile = new PathTile(startPosition.first, startPosition.second, targetX, targetY);
-            open_list->emplace(newTile->getTileId(), newTile);
+            auto newNode = new PathNode(startPosition.first, startPosition.second, nullptr, 0, targetX, targetY);
+            openHeap->push(newNode);
+            openMap->emplace(newNode->getId(), newNode);
+            nodes->push_back(newNode);
         }
 
-        while(!open_list->empty())
+        while(openMap->size() > 0)
         {
-            PathTile* currentTile = findSmallestF(open_list);
-            if (currentTile->x == endTile->x && currentTile->y == endTile->y)
+            PathNode* currentNode = openHeap->top(); /*and then delete it*/ openHeap->pop();
+            openMap->erase(currentNode->getId());
+            if (currentNode->x == targetX && currentNode->y == targetY)
             {
-                //work backwards from current node to start
+                ///solution is found! now just create the path structure
                 auto path = std::make_shared<Path>(true);
-                for (auto startPosition : unitPositions)
+
+                //create end tile
+                auto lastTile = new PathTile(currentNode->x, currentNode->y);
+                path->addEndTile(lastTile);
+
+                //work backwards from current tile to find path
+                while(currentNode->parent != nullptr)
                 {
-                    auto newTile = new PathTile(startPosition.first, startPosition.second);
-                    path->startTiles.emplace(newTile->getTileId(), newTile);
+                    auto prevNode = currentNode->parent;
+                    auto prevTile = new PathTile(prevNode->x, prevNode->y);
+                    prevTile->nextTile = lastTile;
+
+                    if (prevNode->parent == nullptr)
+                    {
+                        //prevNode is now a starting tile
+                        path->addStartTile(prevTile);
+                    }
+                    else
+                    {
+                        path->addPathTile(prevTile);
+                    }
+
+                    currentNode = prevNode;
+                    lastTile = prevTile;
                 }
 
-                auto copiedTile = new PathTile(currentTile);
-                path->endTiles.emplace(copiedTile->getTileId(), copiedTile);
-
-                while(path->startTiles.count(currentTile->previousTileId) == 0)
-                {
-                    auto prevTile = closed_list->at(currentTile->previousTileId);
-                    prevTile->setNextTile(currentTile->getTileId());
-                    currentTile = prevTile;
-                    path->pathTiles.emplace(currentTile->getTileId(), currentTile);
-                }
-
-                auto startTile = path->startTiles.at(currentTile->previousTileId);
-                startTile->setNextTile(currentTile->getTileId());
+                cleanUp(nodes, closedMap, openHeap, openMap);
 
                 return path;
             }
-            open_list->erase(currentTile->getTileId());
-            closed_list->emplace(currentTile->getTileId(), currentTile);
 
-            std::unordered_map<int, PathTile*> neighbors = *getNeighbors(currentTile, targetX, targetY);
-            for(auto newTilePair : neighbors)
+            std::list<PathNode*>* neighbors = getNeighbors(currentNode, targetX, targetY);
+            for(auto newNode : *neighbors)
             {
-                auto newTile = newTilePair.second;
-                if (closed_list->count(newTile->getTileId()) != 0)
-                    continue;
-                if (open_list->count(newTile->getTileId()) == 0)
+                if (closedMap->count(newNode->getId()) != 0)
                 {
-                    open_list->emplace(newTile->getTileId(), newTile);
+                    delete newNode;
+                    continue;
+                }
+
+                if (openMap->count(newNode->getId()) == 0)
+                {
+                    openHeap->push(newNode);
+                    openMap->emplace(newNode->getId(), newNode);
+                    nodes->push_back(newNode);
                 }
                 else
                 {
-                    auto findIt = open_list->find(newTile->getTileId());
-                    PathTile* actualNode = findIt.operator*().second;
-                    if (newTile->g < actualNode->g)
+                    auto existingNode = openMap->at(newNode->getId());
+
+                    if (newNode->g < existingNode->g)
                     {
-                        actualNode->g = newTile->g;
-                        actualNode->h = newTile->h;
-                        actualNode->setPreviousTile(newTile->previousTileId);
+                        existingNode->g = newNode->g;
+                        existingNode->h = newNode->h;
+                        existingNode->parent = newNode->parent;
                     }
+
+                    delete newNode;
+                    continue;
                 }
             }
+
+            //clean up neighbor list
+            delete neighbors;
+
+            closedMap->emplace(currentNode->getId(), currentNode);
         }
+
+        cleanUp(nodes, closedMap, openHeap, openMap);
 
         return std::make_shared<Path>(false);
     }
 
-    std::unordered_map<int, PathTile*>* AStarPathfinder::getNeighbors(const PathTile *parentTile, int targetX, int targetY)
+    std::list<PathNode*>* AStarPathfinder::getNeighbors(PathNode* parent, int targetX, int targetY)
     {
-        auto neighbors = new std::unordered_map<int, PathTile*>();
+        auto neighbors = new std::list<PathNode*>();
 
-        tryAddNeighbor(neighbors, parentTile, 2,  0, targetX, targetY, 1.414f);
-        tryAddNeighbor(neighbors, parentTile,-2,  0, targetX, targetY, 1.414f);
-        tryAddNeighbor(neighbors, parentTile, 0,  2, targetX, targetY, 1.414f);
-        tryAddNeighbor(neighbors, parentTile, 0, -2, targetX, targetY, 1.414f);
+        tryAddNeighbor(neighbors, parent, 2,  0, targetX, targetY, 1.414f);
+        tryAddNeighbor(neighbors, parent,-2,  0, targetX, targetY, 1.414f);
+        tryAddNeighbor(neighbors, parent, 0,  2, targetX, targetY, 1.414f);
+        tryAddNeighbor(neighbors, parent, 0, -2, targetX, targetY, 1.414f);
 
-        tryAddNeighbor(neighbors, parentTile, 1,  1, targetX, targetY, 1.0f);
-        tryAddNeighbor(neighbors, parentTile,-1, -1, targetX, targetY, 1.0f);
-        tryAddNeighbor(neighbors, parentTile, 1, -1, targetX, targetY, 1.0f);
-        tryAddNeighbor(neighbors, parentTile,-1,  1, targetX, targetY, 1.0f);
+        tryAddNeighbor(neighbors, parent, 1,  1, targetX, targetY, 1.0f);
+        tryAddNeighbor(neighbors, parent,-1, -1, targetX, targetY, 1.0f);
+        tryAddNeighbor(neighbors, parent, 1, -1, targetX, targetY, 1.0f);
+        tryAddNeighbor(neighbors, parent,-1,  1, targetX, targetY, 1.0f);
 
         return neighbors;
     }
 
-    void AStarPathfinder::tryAddNeighbor(std::unordered_map<int, PathTile*>* neighborMap, const PathTile* parentTile,
-                                             int tileX, int tileY, int targetX, int targetY, float cost)
+    void AStarPathfinder::tryAddNeighbor(std::list<PathNode*>* neighborList, PathNode* parent,
+                                             int xAdj, int yAdj, int targetX, int targetY, float cost)
     {
-        int x = parentTile->x + tileX;
-        int y = parentTile->y + tileY;
+
+        int x = parent->x + xAdj;
+        int y = parent->y + yAdj;
         auto tile = tileManager->getTileAt(x, y);
         if (tile == nullptr) return;
         if (!tile->walkable) return;
 
-        auto newPathTile = new PathTile(x, y, parentTile, cost, targetX, targetY);
-        neighborMap->emplace(newPathTile->getTileId(), newPathTile);
+        auto newPathNode = new PathNode(x, y, parent, cost, targetX, targetY);
+        neighborList->push_front(newPathNode);
     };
-
-    PathTile* AStarPathfinder::findSmallestF(std::unordered_map<int, PathTile*>* list)
-    {
-        float minTileVal = 99999;
-        PathTile* result = nullptr;
-        for(auto tile : *list)
-        {
-            if(tile.second->getF() < minTileVal)
-            {
-                minTileVal = tile.second->getF();
-                result = tile.second;
-            }
-        }
-
-        return result;
-    }
 
     int AStarPathfinder::mapWidth = 0;
 
@@ -142,5 +153,20 @@ namespace DsprGameServer
 
     int AStarPathfinder::getMapWidth() {
         return AStarPathfinder::mapWidth;
+    }
+
+    void AStarPathfinder::cleanUp(std::list<PathNode *> *nodes,
+                                  std::unordered_map<int, PathNode*>* map,
+                                  std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* heap,
+                                  std::unordered_map<int, PathNode*>* map2) {
+        for (auto node : *nodes)
+        {
+            delete node;
+        }
+        delete nodes;
+
+        delete map;
+        delete map2;
+        delete heap;
     }
 }
