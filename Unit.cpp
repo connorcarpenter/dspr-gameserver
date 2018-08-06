@@ -36,14 +36,24 @@ namespace DsprGameServer
             }
         }
 
-        if (this->walkAmount == 0 && !this->position->Equals(this->moveTarget))
+        if (this->walkAmount == 0 && this->followingPath)
         {
-            int difx = MathUtils::SignOrZero(this->moveTarget->x - this->position->x);
-            int dify = MathUtils::SignOrZero(this->moveTarget->y - this->position->y);
-            if (difx == 0 || dify == 0)
+            PathTile* nextTile = this->path->getPathTile(this->currentPathTile->getNextTile());
+            if (nextTile == nullptr)
             {
-                difx *= 2;
-                dify *= 2;
+                //maybe next tile is end!
+                nextTile = this->path->getEndTile(this->currentPathTile->getNextTile());
+                if (nextTile == nullptr) {
+                    auto i = 1/0; //error!
+                } else {
+                    this->followingPath = false;
+                }
+            }
+            currentPathTile = nextTile;
+            int difx = currentPathTile->x - this->position->x;
+            int dify = currentPathTile->y - this->position->y;
+            if (difx == 2 || dify == 2)
+            {
                 walkSpeed = walkSpeedDiagonal;
             }
             else
@@ -91,5 +101,8 @@ namespace DsprGameServer
     void Unit::startPath(std::shared_ptr<DsprGameServer::Path> path)
     {
         this->path = path;
+        this->followingPath = true;
+        this->currentPathTile = this->path->getStartTile(this->position->x, this->position->y);
+
     }
 }

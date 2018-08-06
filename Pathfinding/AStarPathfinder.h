@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <list>
+#include <bits/unordered_map.h>
 #include "../TileManager.h"
 #include "Path.h"
 
@@ -26,5 +27,7 @@ namespace DsprGameServer
         std::unordered_map<int, PathTile*>* getNeighbors(const PathTile *parentTile, int targetX, int targetY);
         PathTile* findSmallestF(std::unordered_map<int, PathTile*>* list);
 
+        void tryAddNeighbor(std::unordered_map<int, PathTile *> *neighborMap, const PathTile *parentTile,
+                       int tileX, int tileY, int targetX, int targetY, float cost);
     };
 }

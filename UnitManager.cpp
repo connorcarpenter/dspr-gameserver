@@ -12,9 +12,11 @@ namespace DsprGameServer
 {
     UnitManager::UnitManager(TileManager* tileManager)
     {
-        createUnit();
+        this->tileManager = tileManager;
 
         this->pathfinder = new AStarPathfinder(tileManager);
+
+        createUnit();
     }
 
     UnitManager::~UnitManager()
@@ -43,7 +45,7 @@ namespace DsprGameServer
 
     Unit* UnitManager::createUnit()
     {
-        Unit* newUnit = new Unit((int) unitMap.size(), (MathUtils::getRandom(10)+2)*2, (MathUtils::getRandom(10)+2)*2);
+        Unit* newUnit = new Unit((int) unitMap.size(), (MathUtils::getRandom(tileManager->width))*2, (MathUtils::getRandom(tileManager->height))*2);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
     }
 

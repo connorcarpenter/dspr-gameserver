@@ -43,9 +43,18 @@ namespace DsprGameServer
         this->nextTileId = tileId;
     }
 
+//    int PathTile::getTileId()
+//    {
+//        return getTileId(this->x, this->y);
+//    }
+
     int PathTile::getTileId() const
     {
-        return (this->y*AStarPathfinder::getMapWidth()) + this->x;
+        return getTileId(this->x, this->y);
+    }
+
+    int PathTile::getTileId(int x, int y) {
+        return (y*AStarPathfinder::getMapWidth()) + x;
     }
 
     void PathTile::setPreviousTile(int tileId)
@@ -62,6 +71,10 @@ namespace DsprGameServer
         int d_max = MathUtils::Max(MathUtils::Abs(this->x - endX), MathUtils::Abs(this->y - endY));
         int d_min = MathUtils::Min(MathUtils::Abs(this->x - endX), MathUtils::Abs(this->y - endY));
         return (1.414f * d_min) + (d_max - d_min);
+    }
+
+    int PathTile::getNextTile() {
+        return this->nextTileId;
     }
 
 

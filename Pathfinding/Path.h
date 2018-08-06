@@ -19,5 +19,8 @@ namespace DsprGameServer
         std::unordered_map<int, PathTile*> startTiles;
         std::unordered_map<int, PathTile*> pathTiles;
         std::unordered_map<int, PathTile*> endTiles;
+        PathTile* getStartTile(int x, int y);
+        PathTile* getPathTile(int id);
+        PathTile* getEndTile(int id);
     };
 }

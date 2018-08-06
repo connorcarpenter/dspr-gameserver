@@ -22,6 +22,7 @@ namespace DsprGameServer
         void setNextTile(int tileId);
         void setPreviousTile(int tileId);
         int getTileId() const;
+        static int getTileId(int x, int y);
         float getF()const;
         float getH(int endX, int endY);
 
@@ -30,42 +31,12 @@ namespace DsprGameServer
         float g = 0;
         float h = 0;
         int previousTileId = -1;
+
+        int getNextTile();
+
     private:
         int nextTileId = -1;
-    };
 
-    struct PathTileHasher
-    {
-        size_t operator() (const PathTile &tile) const
-        {
-            return (size_t) tile.getTileId();
-        }
 
-        size_t operator() (const PathTile* tile) const
-        {
-            return (size_t) tile->getTileId();
-        }
-    };
-
-    class PathTileComparator
-    {
-    public:
-        int operator() (const PathTile& p1, const PathTile& p2)
-        {
-            return p1.getF() > p2.getF();
-        }
-    };
-
-    class PathTilePred
-    {
-    public:
-        bool operator() (const PathTile& p1, const PathTile& p2) const
-        {
-            return p1.getTileId() == p2.getTileId();
-        }
-        bool operator() (const PathTile* p1, const PathTile* p2) const
-        {
-            return p1->getTileId() == p1->getTileId();
-        }
     };
 }

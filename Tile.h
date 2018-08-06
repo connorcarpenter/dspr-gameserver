@@ -10,5 +10,6 @@ namespace DsprGameServer {
         Tile(int frame);
 
         int frame;
+        bool walkable = true;
     };
 }

@@ -37,5 +37,7 @@ namespace DsprGameServer
         void startPath(std::shared_ptr<Path> path);
 
         std::shared_ptr<Path> path = nullptr;
+        bool followingPath = false;
+        PathTile* currentPathTile = nullptr;
     };
 }

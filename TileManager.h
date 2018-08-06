@@ -16,13 +16,22 @@ namespace DsprGameServer {
 
         void sendGrid(Player *player);
 
-    private:
+        Tile* getTileAt(int x, int y);
+
         int width;
         int height;
+    private:
+
 
         Tile **tileArrayA = nullptr;
         Tile **tileArrayB = nullptr;
 
         Tile **initializeTileArray(int width, int height);
+
+        int getGridIndex(int x, int y);
+
+        int getTileIndex(int gridIndex, int x, int y);
+
+        void makeRandomWall();
     };
 }

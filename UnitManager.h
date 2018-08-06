@@ -31,5 +31,6 @@ namespace DsprGameServer {
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
         AStarPathfinder* pathfinder = nullptr;
+        TileManager* tileManager = nullptr;
     };
 }
