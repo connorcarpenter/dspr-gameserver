@@ -44,8 +44,17 @@ namespace DsprGameServer
         endTiles.emplace(tile->getTileId(), tile);
     }
 
+    void Path::addTargetTile(PathTile* tile)
+    {
+        targetTile = tile;
+    }
+
     void Path::addPathTile(PathTile* tile)
     {
         pathTiles.push_back(tile);
+    }
+
+    PathTile *Path::getTargetTile() {
+        return targetTile;
     }
 }

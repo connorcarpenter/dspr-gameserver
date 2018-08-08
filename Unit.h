@@ -22,12 +22,14 @@ namespace DsprGameServer
         int id = -1;
         Point* position = nullptr;
         Synced<Point>* nextPosition = nullptr;
-        Point* moveTarget = nullptr;
+        Synced<Point>* moveTarget = nullptr;
 
-        const int walkSpeedStraight = 500;
-        const int walkSpeedDiagonal = (int) (walkSpeedStraight / 1.4f);
+        const int walkMax = 6;
+        const int walkSpeedStraight = walkMax / 2;
+        const int walkSpeedDiagonal = walkMax / 3;
         int walkSpeed = 0;
         int walkAmount = 0;
+
 
         void update();
 
@@ -42,5 +44,6 @@ namespace DsprGameServer
         std::shared_ptr<Path> path = nullptr;
         bool followingPath = false;
         PathTile* currentPathTile = nullptr;
+
     };
 }

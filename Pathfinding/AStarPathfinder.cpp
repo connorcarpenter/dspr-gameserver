@@ -45,6 +45,7 @@ namespace DsprGameServer
                 //create end tile
                 auto lastTile = new PathTile(currentNode->x, currentNode->y);
                 path->addEndTile(lastTile);
+                path->addTargetTile(lastTile);
 
                 //work backwards from current tile to find path
                 while(currentNode->parent != nullptr)
@@ -118,15 +119,15 @@ namespace DsprGameServer
     {
         auto neighbors = new std::list<PathNode*>();
 
-        tryAddNeighbor(neighbors, parent, 2,  0, targetX, targetY, 1.414f);
-        tryAddNeighbor(neighbors, parent,-2,  0, targetX, targetY, 1.414f);
-        tryAddNeighbor(neighbors, parent, 0,  2, targetX, targetY, 1.414f);
-        tryAddNeighbor(neighbors, parent, 0, -2, targetX, targetY, 1.414f);
+        tryAddNeighbor(neighbors, parent, 2,  0, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent,-2,  0, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent, 0,  2, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent, 0, -2, targetX, targetY, this->diagonalCost);
 
-        tryAddNeighbor(neighbors, parent, 1,  1, targetX, targetY, 1.0f);
-        tryAddNeighbor(neighbors, parent,-1, -1, targetX, targetY, 1.0f);
-        tryAddNeighbor(neighbors, parent, 1, -1, targetX, targetY, 1.0f);
-        tryAddNeighbor(neighbors, parent,-1,  1, targetX, targetY, 1.0f);
+        tryAddNeighbor(neighbors, parent, 1,  1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent,-1, -1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent, 1, -1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent,-1,  1, targetX, targetY, this->straightCost);
 
         return neighbors;
     }

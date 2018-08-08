@@ -16,7 +16,7 @@ namespace DsprGameServer
         this->height = height;
         this->tileArrayA = initializeTileArray(this->width, this->height);
         this->tileArrayB = initializeTileArray(this->width, this->height);
-        for(int i=0;i<32;i+=1)
+        for(int i=0;i<40;i+=1)
             this->makeRandomWall();
     }
 

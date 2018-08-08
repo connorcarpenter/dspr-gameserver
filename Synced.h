@@ -14,15 +14,23 @@ namespace DsprGameServer
     public:
         explicit Synced(const std::string& name, T* newObj)
         {
-            this->obj = newObj;
+            this->internal = newObj;
             this->varName = name;
         }
 
-        T * get() const {
-            return this->obj;
+        ~Synced()
+        {
+            delete this->internal;
         }
 
+        T* obj() {
+            return this->internal;
+        }
 
+        T* dirtyObj() {
+            this->dirty();
+            return this->internal;
+        }
 
         void dirty() {
             this->dataIsDirty = true;
@@ -40,12 +48,12 @@ namespace DsprGameServer
             std::string newStr;
             newStr.append(varName);
             newStr.append(":");
-            newStr.append(obj->serialize());
+            newStr.append(internal->serialize());
             return newStr;
         }
 
     private:
-        T* obj;
+        T* internal;
         bool dataIsDirty = false;
         std::string varName;
     };

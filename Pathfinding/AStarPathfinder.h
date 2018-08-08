@@ -36,5 +36,8 @@ namespace DsprGameServer
 
         void cleanUp(std::list<PathNode *> *nodes, std::unordered_map<int, PathNode *> *map,
                      std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* heap, std::unordered_map<int, PathNode *> *map2);
+
+        const float straightCost = 2;
+        const float diagonalCost = 3;
     };
 }

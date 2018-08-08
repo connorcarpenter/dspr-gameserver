@@ -16,7 +16,8 @@ namespace DsprGameServer
 
         this->pathfinder = new AStarPathfinder(tileManager);
 
-        createUnit();
+        for (int i = 0; i<6; i++)
+            createUnit();
     }
 
     UnitManager::~UnitManager()

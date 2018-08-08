@@ -19,12 +19,18 @@ namespace DsprGameServer
         bool pathFound = true;
         PathTile* getStartTile(int x, int y);
         bool tileIsEnd(PathTile* tile);
+        PathTile* getTargetTile();
         void addStartTile(PathTile* tile);
         void addEndTile(PathTile* tile);
         void addPathTile(PathTile* tile);
+
+        void addTargetTile(PathTile *tile);
+
     private:
         std::unordered_map<int, PathTile*> startTiles;
         std::list<PathTile*> pathTiles;
         std::unordered_map<int, PathTile*> endTiles;
+        PathTile* targetTile = nullptr;
+
     };
 }
