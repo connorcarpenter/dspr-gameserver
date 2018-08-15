@@ -6,11 +6,14 @@
 
 #include "Tile.h"
 #include "Player.h"
+#include "Game.h"
 
 namespace DsprGameServer {
+    class Game;
+
     class TileManager {
     public:
-        TileManager(int width, int height);
+        TileManager(Game* game, int width, int height);
 
         ~TileManager();
 
@@ -33,5 +36,7 @@ namespace DsprGameServer {
         int getTileIndex(int gridIndex, int x, int y);
 
         void makeRandomWall();
+
+        Game *game = nullptr;
     };
 }

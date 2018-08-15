@@ -7,54 +7,27 @@
 
 namespace DsprGameServer
 {
-    Path::Path(bool pathFound)
+    Path::Path(int targetX, int targetY)
     {
-        this->pathFound = pathFound;
+        this->targetX = targetX;
+        this->targetY = targetY;
     }
 
     Path::~Path()
     {
-        for(auto tile : startTiles)
-            delete tile.second;
-        for(auto tile : pathTiles)
-            delete tile;
-        for(auto tile : endTiles)
+        for(auto tile : tiles)
             delete tile.second;
     }
 
-    PathTile* Path::getStartTile(int x, int y)
+    PathTile* Path::getTile(int x, int y)
     {
         int tileId = PathTile::getTileId(x,y);
-        if (startTiles.count(tileId) == 0) return nullptr;
-        return startTiles.at(tileId);
+        if (tiles.count(tileId) == 0) return nullptr;
+        return tiles.at(tileId);
     }
 
-    bool Path::tileIsEnd(PathTile *tile)
+    void Path::addTile(PathTile *tile)
     {
-        return (endTiles.count(tile->getTileId()) != 0);
-    }
-
-    void Path::addStartTile(PathTile* tile)
-    {
-        startTiles.emplace(tile->getTileId(), tile);
-    }
-
-    void Path::addEndTile(PathTile* tile)
-    {
-        endTiles.emplace(tile->getTileId(), tile);
-    }
-
-    void Path::addTargetTile(PathTile* tile)
-    {
-        targetTile = tile;
-    }
-
-    void Path::addPathTile(PathTile* tile)
-    {
-        pathTiles.push_back(tile);
-    }
-
-    PathTile *Path::getTargetTile() {
-        return targetTile;
+        tiles.emplace(tile->getTileId(), tile);
     }
 }

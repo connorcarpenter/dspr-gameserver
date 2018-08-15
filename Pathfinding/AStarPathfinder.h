@@ -19,16 +19,14 @@ namespace DsprGameServer
     class AStarPathfinder
     {
     public:
-        AStarPathfinder(DsprGameServer::TileManager* tileManager);
+        AStarPathfinder(Game *game);
 
-        std::shared_ptr<Path> findPath(const std::list<std::pair<int,int>>& unitPositions, int unitNumber, int targetX, int targetY);
+        std::shared_ptr<Path> findPath(const std::list<std::pair<int, int>> &unitPositions, int targetX, int targetY);
 
         static void setMapWidth(int width);
         static int getMapWidth();
         static int mapWidth;
     private:
-        TileManager* tileManager = nullptr;
-
         std::list<PathNode*>* getNeighbors(PathNode* parent, int targetX, int targetY);
 
         void tryAddNeighbor(std::list<PathNode*>* neighborList, PathNode* parentTile,
@@ -39,5 +37,14 @@ namespace DsprGameServer
 
         const float straightCost = 2;
         const float diagonalCost = 3;
+
+        Game* game = nullptr;
+
+        void completeOtherStartTiles(std::shared_ptr<Path> shared_ptr, std::unordered_map<int, PathNode *> *pMap,
+                                 std::unordered_map<int, PathNode *> *pUnordered_map,
+                                 std::priority_queue<PathNode *, std::vector<PathNode *>, PathNodeComparator> *pQueue,
+                                 std::list<PathNode *> *pList);
+
+        void addToPath(std::shared_ptr<Path> path, int startX, int startY, int targetX, int targetY);
     };
 }

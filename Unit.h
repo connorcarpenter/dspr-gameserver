@@ -7,17 +7,19 @@
 #include "Point.h"
 #include "Synced.h"
 #include "Player.h"
+#include "Game.h"
 //#include "Pathfinding/Path.h"
 
 namespace DsprGameServer
 {
+    class Game;
     class Path;
     class PathTile;
 
     class Unit
     {
     public:
-        Unit(int id, int x, int y);
+        Unit(Game *game, int id, int x, int y);
         ~Unit();
         int id = -1;
         Point* position = nullptr;
@@ -44,6 +46,7 @@ namespace DsprGameServer
         std::shared_ptr<Path> path = nullptr;
         bool followingPath = false;
         PathTile* currentPathTile = nullptr;
-
+    private:
+        Game* game = nullptr;
     };
 }

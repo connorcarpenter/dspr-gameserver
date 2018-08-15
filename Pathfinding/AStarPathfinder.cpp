@@ -11,66 +11,88 @@
 
 namespace DsprGameServer
 {
-    AStarPathfinder::AStarPathfinder(DsprGameServer::TileManager *tileManager) {
-        this->tileManager = tileManager;
+    AStarPathfinder::AStarPathfinder(Game *game) {
+        this->game = game;
     }
 
-    std::shared_ptr<Path> AStarPathfinder::findPath(const std::list<std::pair<int,int>>& unitPositions,
-                                     int unitNumber,
-                                     int targetX,
-                                     int targetY)
+    std::shared_ptr<Path>
+    AStarPathfinder::findPath(const std::list<std::pair<int, int>> &unitPositions, int targetX, int targetY)
+    {
+        auto path = std::make_shared<Path>(targetX, targetY);
+
+        for (auto startPosition : unitPositions)
+        {
+            addToPath(path, startPosition.first, startPosition.second, targetX, targetY);
+        }
+
+        return path;
+    }
+
+    void AStarPathfinder::addToPath(std::shared_ptr<Path> path,
+                                     int startX, int startY,
+                                     int targetX, int targetY)
     {
         auto closedMap = new std::unordered_map<int, PathNode*>();
         auto openHeap = new std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>();
         auto openMap = new std::unordered_map<int, PathNode*>();
         auto nodes = new std::list<PathNode*>();
 
-        for (auto startPosition : unitPositions)
-        {
-            auto newNode = new PathNode(startPosition.first, startPosition.second, nullptr, 0, targetX, targetY);
-            openHeap->push(newNode);
-            openMap->emplace(newNode->getId(), newNode);
-            nodes->push_back(newNode);
-        }
+        //put first node into openHeap/Map
+        auto startNode = new PathNode(startX, startY, nullptr, 0, targetX, targetY);
+        openHeap->push(startNode);
+        openMap->emplace(startNode->getId(), startNode);
+        nodes->push_back(startNode);
 
         while(openMap->size() > 0)
         {
             PathNode* currentNode = openHeap->top(); /*and then delete it*/ openHeap->pop();
             openMap->erase(currentNode->getId());
-            if (currentNode->x == targetX && currentNode->y == targetY)
+            if (!path->foundEnd)
             {
-                ///solution is found! now just create the path structure
-                auto path = std::make_shared<Path>(true);
-
-                //create end tile
-                auto lastTile = new PathTile(currentNode->x, currentNode->y);
-                path->addEndTile(lastTile);
-                path->addTargetTile(lastTile);
-
-                //work backwards from current tile to find path
-                while(currentNode->parent != nullptr)
+                if (currentNode->x == targetX && currentNode->y == targetY)
                 {
-                    auto prevNode = currentNode->parent;
-                    auto prevTile = new PathTile(prevNode->x, prevNode->y);
-                    prevTile->nextTile = lastTile;
+                    ///solution is found! now just create the path structure
+                    path->foundEnd = true;
 
-                    if (prevNode->parent == nullptr)
-                    {
-                        //prevNode is now a starting tile
-                        path->addStartTile(prevTile);
-                    }
-                    else
-                    {
-                        path->addPathTile(prevTile);
+                    //create end tile
+                    auto lastTile = new PathTile(currentNode->x, currentNode->y);
+                    path->addTile(lastTile);
+
+                    //work backwards from current tile to find path
+                    while (currentNode->parent != nullptr) {
+                        auto prevNode = currentNode->parent;
+                        auto prevTile = new PathTile(prevNode->x, prevNode->y);
+                        prevTile->nextTile = lastTile;
+                        path->addTile(prevTile);
+                        currentNode = prevNode;
+                        lastTile = prevTile;
                     }
 
-                    currentNode = prevNode;
-                    lastTile = prevTile;
+                    cleanUp(nodes, closedMap, openHeap, openMap);
+                    return;
                 }
+            }
+            else
+            {
+                auto tileInPath = path->getTile(currentNode->x, currentNode->y);
+                if (tileInPath != nullptr)
+                {
+                    ///we found the path! now just add to the existing path
+                    auto lastTile = tileInPath;
 
-                cleanUp(nodes, closedMap, openHeap, openMap);
+                    //work backwards from current tile to find path
+                    while (currentNode->parent != nullptr) {
+                        auto prevNode = currentNode->parent;
+                        auto prevTile = new PathTile(prevNode->x, prevNode->y);
+                        prevTile->nextTile = lastTile;
+                        path->addTile(prevTile);
+                        currentNode = prevNode;
+                        lastTile = prevTile;
+                    }
 
-                return path;
+                    cleanUp(nodes, closedMap, openHeap, openMap);
+                    return;
+                }
             }
 
             std::list<PathNode*>* neighbors = getNeighbors(currentNode, targetX, targetY);
@@ -97,6 +119,7 @@ namespace DsprGameServer
                         existingNode->g = newNode->g;
                         existingNode->h = newNode->h;
                         existingNode->parent = newNode->parent;
+                        //since g and h are re-evaluted, shouldn't we re-insert the new node back into the heap? so that it may bubble up to the top
                     }
 
                     delete newNode;
@@ -111,8 +134,7 @@ namespace DsprGameServer
         }
 
         cleanUp(nodes, closedMap, openHeap, openMap);
-
-        return std::make_shared<Path>(false);
+        return;
     }
 
     std::list<PathNode*>* AStarPathfinder::getNeighbors(PathNode* parent, int targetX, int targetY)
@@ -138,7 +160,7 @@ namespace DsprGameServer
 
         int x = parent->x + xAdj;
         int y = parent->y + yAdj;
-        auto tile = tileManager->getTileAt(x, y);
+        auto tile = this->game->tileManager->getTileAt(x, y);
         if (tile == nullptr) return;
         if (!tile->walkable) return;
 
@@ -169,5 +191,13 @@ namespace DsprGameServer
         delete map;
         delete map2;
         delete heap;
+    }
+
+    void AStarPathfinder::completeOtherStartTiles(std::shared_ptr<Path> path,
+                                                  std::unordered_map<int, PathNode*>* closedMap,
+                                                  std::unordered_map<int, PathNode*>* openMap,
+                                                  std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* openHeap,
+                                                  std::list<PathNode*>* nodes) {
+
     }
 }

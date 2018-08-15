@@ -7,11 +7,13 @@
 #include "MathUtils.h"
 #include "GameServer.h"
 #include "Pathfinding/PathTile.h"
+#include "UnitManager.h"
 
 namespace DsprGameServer
 {
-    Unit::Unit(int id, int x, int y)
+    Unit::Unit(Game *game, int id, int x, int y)
     {
+        this->game = game;
         this->id = id;
         this->position = new Point(x, y);
         this->nextPosition = new Synced<Point>("nextPosition", new Point(x, y));
@@ -39,26 +41,39 @@ namespace DsprGameServer
 
         if (this->walkAmount == 0 && this->followingPath)
         {
-            if (this->currentPathTile != nullptr) {
-                PathTile *nextTile = this->currentPathTile->nextTile;
-                if (nextTile == nullptr) {
+            if (this->currentPathTile != nullptr)
+            {
+                PathTile* nextTile = this->currentPathTile->nextTile;
+                if (nextTile == nullptr)
+                {
                     //maybe this tile is end!
-                    if (this->position->Equals(this->moveTarget->obj())) {
+                    if (this->position->Equals(this->moveTarget->obj()))
+                    {
                         this->followingPath = false;
                     }
-                } else {
-                    currentPathTile = nextTile;
-                    int difx = currentPathTile->x - this->position->x;
-                    int dify = currentPathTile->y - this->position->y;
-                    if (difx == 2 || dify == 2 || difx == -2 || dify == -2) {
-                        walkSpeed = walkSpeedDiagonal;
-                    } else {
-                        walkSpeed = walkSpeedStraight;
-                    }
-
-                    this->nextPosition->dirtyObj()->Set(this->position->x + difx, this->position->y + dify);
                 }
-            } else this->followingPath = false;
+                else
+                {
+                    auto unitAtNextPosition = this->game->unitManager->getUnitWithNextPosition(nextTile->x, nextTile->y);
+                    if (unitAtNextPosition == nullptr)
+                    {
+                        currentPathTile = nextTile;
+                        int difx = currentPathTile->x - this->position->x;
+                        int dify = currentPathTile->y - this->position->y;
+                        if (difx == 2 || dify == 2 || difx == -2 || dify == -2) {
+                            walkSpeed = walkSpeedDiagonal;
+                        } else {
+                            walkSpeed = walkSpeedStraight;
+                        }
+
+                        this->nextPosition->dirtyObj()->Set(currentPathTile->x, currentPathTile->y);
+                    }
+                }
+            }
+            else
+            {
+                this->followingPath = false;
+            }
         }
     }
 
@@ -109,7 +124,7 @@ namespace DsprGameServer
     {
         this->path = path;
         this->followingPath = true;
-        this->currentPathTile = this->path->getStartTile(this->position->x, this->position->y);
-        this->moveTarget->dirtyObj()->Set(this->path->getTargetTile()->x, this->path->getTargetTile()->y);
+        this->currentPathTile = this->path->getTile(this->position->x, this->position->y);
+        this->moveTarget->dirtyObj()->Set(this->path->targetX, this->path->targetY);
     }
 }

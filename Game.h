@@ -6,11 +6,14 @@
 
 #include <uWS/WebSocket.h>
 #include <map>
+#include <list>
 #include "Player.h"
-#include "TileManager.h"
-#include "UnitManager.h"
 
 namespace DsprGameServer {
+
+    class TileManager;
+    class UnitManager;
+
     class Game {
 
     public:
@@ -22,9 +25,9 @@ namespace DsprGameServer {
         void receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY);
         void update();
 
-    private:
-        std::map<std::string, Player *> playerMap;
         TileManager* tileManager = nullptr;
         UnitManager* unitManager = nullptr;
+    private:
+        std::map<std::string, Player *> playerMap;
     };
 }

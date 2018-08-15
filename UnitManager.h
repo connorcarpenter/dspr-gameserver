@@ -15,7 +15,7 @@
 namespace DsprGameServer {
     class UnitManager {
     public:
-        UnitManager(TileManager* tileManager);
+        UnitManager(Game *game);
         ~UnitManager();
         void sendUnits(DsprGameServer::Player *pPlayer);
         Unit* createUnit();
@@ -27,10 +27,12 @@ namespace DsprGameServer {
 
         void cleanAllUnits();
 
+        Unit* getUnitWithNextPosition(int x, int y);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
         AStarPathfinder* pathfinder = nullptr;
-        TileManager* tileManager = nullptr;
+        Game* game = nullptr;
     };
 }

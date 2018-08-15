@@ -3,14 +3,16 @@
 //
 
 #include "Game.h"
+#include "TileManager.h";
+#include "UnitManager.h";
 
 namespace DsprGameServer
 {
     Game::Game()
     {
-        tileManager = new TileManager(32, 32);
+        tileManager = new TileManager(this, 32, 32);
         AStarPathfinder::setMapWidth(32);
-        unitManager = new UnitManager(tileManager);
+        unitManager = new UnitManager(this);
     }
 
     Game::~Game()

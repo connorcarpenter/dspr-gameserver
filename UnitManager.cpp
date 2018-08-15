@@ -10,11 +10,11 @@
 
 namespace DsprGameServer
 {
-    UnitManager::UnitManager(TileManager* tileManager)
+    UnitManager::UnitManager(Game *game)
     {
-        this->tileManager = tileManager;
+        this->game = game;
 
-        this->pathfinder = new AStarPathfinder(tileManager);
+        this->pathfinder = new AStarPathfinder(game);
 
         for (int i = 0; i<6; i++)
             createUnit();
@@ -46,7 +46,9 @@ namespace DsprGameServer
 
     Unit* UnitManager::createUnit()
     {
-        Unit* newUnit = new Unit((int) unitMap.size(), (MathUtils::getRandom(tileManager->width))*2, (MathUtils::getRandom(tileManager->height))*2);
+        Unit* newUnit = new Unit(this->game, (int) unitMap.size(),
+                                 (MathUtils::getRandom(this->game->tileManager->width)) * 2,
+                                 (MathUtils::getRandom(this->game->tileManager->height)) * 2);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
     }
 
@@ -60,7 +62,7 @@ namespace DsprGameServer
             unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
         }
 
-        auto path = this->pathfinder->findPath(unitPositionsList, (int) unitPositionsList.size(), tileX, tileY);
+        auto path = this->pathfinder->findPath(unitPositionsList, tileX, tileY);
 
         for (const auto& i : idList)
         {
@@ -93,5 +95,15 @@ namespace DsprGameServer
         {
             unitPair.second->cleanAllVars();
         }
+    }
+
+    Unit *UnitManager::getUnitWithNextPosition(int x, int y) {
+        for(const auto& unitPair : unitMap)
+        {
+            if (unitPair.second->nextPosition->obj()->x == x && unitPair.second->nextPosition->obj()->y == y)
+                return unitPair.second;
+        }
+
+        return nullptr;
     }
 }

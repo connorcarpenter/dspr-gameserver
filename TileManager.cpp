@@ -10,8 +10,9 @@
 
 namespace DsprGameServer
 {
-    TileManager::TileManager(int width, int height)
+    TileManager::TileManager(Game *game, int width, int height)
     {
+        this->game = game;
         this->width = width;
         this->height = height;
         this->tileArrayA = initializeTileArray(this->width, this->height);

@@ -22,8 +22,6 @@ namespace DsprGameServer
         float g = 0;
         float h = 0;
         PathNode* parent = nullptr;
-
-    private:
     };
 
     class PathNodeComparator
