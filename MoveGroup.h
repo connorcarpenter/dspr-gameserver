@@ -16,8 +16,11 @@ namespace DsprGameServer {
         int getNumberUnits();
         int getAcceptableHeat();
 
+        void unitArrived();
+
     private:
         std::list<Unit*> units;
 
+        int unitsArrived = 0;
     };
 }

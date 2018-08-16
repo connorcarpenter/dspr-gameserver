@@ -61,6 +61,7 @@ namespace DsprGameServer
                     {
                         this->moveVector->Set(0, 0);
                         this->followingPath = false;
+                        this->moveGroup->unitArrived();
                     }
                     else
                     {
@@ -133,58 +134,18 @@ namespace DsprGameServer
         }
     }
 
-    void Unit::sendUpdate(DsprGameServer::Player* player)
-    {
-        if (!this->anyVarIsDirty()) return;
-        std::stringstream msg;
-        msg << "unit/1.0/update|" << id << "|";
-        bool firstVar = true;
-
-        if (this->nextPosition->isDirty())
-        {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->nextPosition->serialize();
-        }
-
-        if (this->moveTarget->isDirty())
-        {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->moveTarget->serialize();
-        }
-
-        //next synced variable should follow this format
-//        if (this->nextPosition->isDirty())
-//        {
-//            msg << "&" << this->nextPosition->serialize();
-//        }
-
-        msg << "\r\n";
-        GameServer::get().queueMessage(player->getWs(), msg.str());
-    }
-
-    bool Unit::anyVarIsDirty()
-    {
-        if (this->nextPosition->isDirty()) return true;
-        if (this->moveTarget->isDirty()) return true;
-        //more synced vars here
-        return false;
-    }
-
-    void Unit::cleanAllVars() {
-        this->nextPosition->clean();
-        this->moveTarget->clean();
-        //more synced vars here
-    }
-
     void Unit::startPath(std::shared_ptr<DsprGameServer::Path> path)
     {
-        this->path = path;
-        this->followingPath = true;
-        this->currentPathTile = this->path->getTile(this->position->x, this->position->y);
-        this->nextPathTile = this->currentPathTile->nextTile;
-        this->direction = getDir(this->nextPathTile->x - this->currentPathTile->x, this->nextPathTile->y - this->currentPathTile->y);
-        this->nextPathTile = getNextPathTile(this->currentPathTile, path);
-        this->moveTarget->dirtyObj()->Set(this->path->targetX, this->path->targetY);
+        this->currentPathTile = path->getTile(this->position->x, this->position->y);
+        if (this->currentPathTile != nullptr)
+        {
+            this->path = path;
+            this->followingPath = true;
+            this->nextPathTile = this->currentPathTile->nextTile;
+            this->direction = getDir(this->nextPathTile->x - this->currentPathTile->x, this->nextPathTile->y - this->currentPathTile->y);
+            this->nextPathTile = getNextPathTile(this->currentPathTile, path);
+            this->moveTarget->dirtyObj()->Set(this->path->targetX, this->path->targetY);
+        }
     }
 
     void Unit::Push(int x, int y, float mag)
@@ -234,7 +195,7 @@ namespace DsprGameServer
             direction = 0;
         }
 
-        for(int i = 0; i<2;i++)
+        for(int i = 0; i<3;i++)
         {
             auto newDir = direction + i;
             if (newDir>7)newDir-=8;
@@ -373,4 +334,46 @@ namespace DsprGameServer
 //
 //        return true;
 //    }
+    void Unit::sendUpdate(DsprGameServer::Player* player)
+    {
+        if (!this->anyVarIsDirty()) return;
+        std::stringstream msg;
+        msg << "unit/1.0/update|" << id << "|";
+        bool firstVar = true;
+
+        if (this->nextPosition->isDirty())
+        {
+            if (firstVar) { firstVar = false; } else { msg << "&"; }
+            msg << this->nextPosition->serialize();
+        }
+
+        if (this->moveTarget->isDirty())
+        {
+            if (firstVar) { firstVar = false; } else { msg << "&"; }
+            msg << this->moveTarget->serialize();
+        }
+
+        //next synced variable should follow this format
+//        if (this->nextPosition->isDirty())
+//        {
+//            msg << "&" << this->nextPosition->serialize();
+//        }
+
+        msg << "\r\n";
+        GameServer::get().queueMessage(player->getWs(), msg.str());
+    }
+
+    bool Unit::anyVarIsDirty()
+    {
+        if (this->nextPosition->isDirty()) return true;
+        if (this->moveTarget->isDirty()) return true;
+        //more synced vars here
+        return false;
+    }
+
+    void Unit::cleanAllVars() {
+        this->nextPosition->clean();
+        this->moveTarget->clean();
+        //more synced vars here
+    }
 }

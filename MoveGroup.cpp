@@ -33,9 +33,13 @@ namespace DsprGameServer {
         return units.size();
     }
 
+    void MoveGroup::unitArrived(){
+        this->unitsArrived += 1;
+    }
+
     int MoveGroup::getAcceptableHeat() {
-        if (getNumberUnits() == 1) return 0;
-        if (getNumberUnits() <= 9) return 13;
+        if (this->unitsArrived == 0) return 0;
+        if (getNumberUnits() < 9) return 13;
         return 23;
     }
 }
