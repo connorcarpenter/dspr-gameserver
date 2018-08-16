@@ -8,10 +8,13 @@
 #include "Synced.h"
 #include "Player.h"
 #include "Game.h"
+#include "FloatPoint.h"
+
 //#include "Pathfinding/Path.h"
 
 namespace DsprGameServer
 {
+    class MoveGroup;
     class Game;
     class Path;
     class PathTile;
@@ -42,11 +45,32 @@ namespace DsprGameServer
         void cleanAllVars();
 
         void startPath(std::shared_ptr<Path> path);
+        void setMoveGroup(std::shared_ptr<MoveGroup> group);
 
         std::shared_ptr<Path> path = nullptr;
         bool followingPath = false;
         PathTile* currentPathTile = nullptr;
+        PathTile* nextPathTile = nullptr;
     private:
         Game* game = nullptr;
+        FloatPoint* moveVector = nullptr;
+        std::shared_ptr<MoveGroup> moveGroup = nullptr;
+        int direction = -1;
+
+        void Push(int x, int y, float mag);
+
+        PathTile *getNextPathTile(PathTile *curTile, std::shared_ptr<DsprGameServer::Path> path);
+
+        bool losToNextTile(PathTile *nextTile);
+
+        void addCohesion();
+
+        PathTile *nextTileIfFree(PathTile *nextTile);
+
+        PathTile *nextTileCheck(std::shared_ptr<DsprGameServer::Path> path, PathTile *curTile, int xAdj, int yAdj);
+
+        int getDir(int x, int y);
+
+        Point *getPointFromDir(int dir);
     };
 }

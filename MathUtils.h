@@ -4,6 +4,7 @@
 // Created by connor on 7/23/18.
 //
 #include <cstdlib>
+#include <cmath>
 
 namespace DsprGameServer {
     class MathUtils { ;
@@ -27,6 +28,9 @@ namespace DsprGameServer {
         }
         static int Max(int value1, int value2) {
             return (value1 > value2) ? value1 : value2;
+        }
+        static float Sqrt(int value) {
+            return (float) std::sqrt(value);
         }
     };
 }

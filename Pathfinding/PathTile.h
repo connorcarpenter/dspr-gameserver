@@ -12,9 +12,7 @@ namespace DsprGameServer
     class PathTile
     {
     public:
-        PathTile(int x, int y);
-
-        PathTile(DsprGameServer::PathNode* pathNode);
+        PathTile(int x, int y, int heat);
 
         int getTileId() const;
         static int getTileId(int x, int y);
@@ -23,7 +21,7 @@ namespace DsprGameServer
         int y;
         PathTile* nextTile = nullptr;
 
-    private:
+        int heat;
 
     };
 }

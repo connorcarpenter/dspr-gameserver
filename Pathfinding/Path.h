@@ -21,8 +21,8 @@ namespace DsprGameServer
         int targetX;
         int targetY;
         bool foundEnd = false;
-
-    private:
         std::unordered_map<int, PathTile*> tiles;
+    private:
+
     };
 }

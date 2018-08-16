@@ -40,11 +40,16 @@ namespace DsprGameServer
 
         Game* game = nullptr;
 
-        void completeOtherStartTiles(std::shared_ptr<Path> shared_ptr, std::unordered_map<int, PathNode *> *pMap,
-                                 std::unordered_map<int, PathNode *> *pUnordered_map,
-                                 std::priority_queue<PathNode *, std::vector<PathNode *>, PathNodeComparator> *pQueue,
-                                 std::list<PathNode *> *pList);
-
         void addToPath(std::shared_ptr<Path> path, int startX, int startY, int targetX, int targetY);
+
+        void growPath(std::shared_ptr<Path> path, bool growTwice);
+
+        const int heatStep = 10;
+
+        void
+    growTile(std::shared_ptr<Path> path, std::unordered_map<int, PathTile *> *newTiles, PathTile *oldTile, int x, int y,
+                 bool growAgain);
+
+        const int heatStepSmall = 3;
     };
 }

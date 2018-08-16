@@ -25,6 +25,11 @@ namespace DsprGameServer
             addToPath(path, startPosition.first, startPosition.second, targetX, targetY);
         }
 
+        int toGrow = 0;
+        if (unitPositions.size() > 1 && unitPositions.size() <= 9) toGrow = 1;
+        if (unitPositions.size() > 9) toGrow = 2;
+        if (toGrow != 0) growPath(path, toGrow == 2);
+
         return path;
     }
 
@@ -55,13 +60,13 @@ namespace DsprGameServer
                     path->foundEnd = true;
 
                     //create end tile
-                    auto lastTile = new PathTile(currentNode->x, currentNode->y);
+                    auto lastTile = new PathTile(currentNode->x, currentNode->y, 0);
                     path->addTile(lastTile);
 
                     //work backwards from current tile to find path
                     while (currentNode->parent != nullptr) {
                         auto prevNode = currentNode->parent;
-                        auto prevTile = new PathTile(prevNode->x, prevNode->y);
+                        auto prevTile = new PathTile(prevNode->x, prevNode->y, lastTile->heat+heatStep);
                         prevTile->nextTile = lastTile;
                         path->addTile(prevTile);
                         currentNode = prevNode;
@@ -83,7 +88,7 @@ namespace DsprGameServer
                     //work backwards from current tile to find path
                     while (currentNode->parent != nullptr) {
                         auto prevNode = currentNode->parent;
-                        auto prevTile = new PathTile(prevNode->x, prevNode->y);
+                        auto prevTile = new PathTile(prevNode->x, prevNode->y, lastTile->heat+heatStep);
                         prevTile->nextTile = lastTile;
                         path->addTile(prevTile);
                         currentNode = prevNode;
@@ -193,11 +198,74 @@ namespace DsprGameServer
         delete heap;
     }
 
-    void AStarPathfinder::completeOtherStartTiles(std::shared_ptr<Path> path,
-                                                  std::unordered_map<int, PathNode*>* closedMap,
-                                                  std::unordered_map<int, PathNode*>* openMap,
-                                                  std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* openHeap,
-                                                  std::list<PathNode*>* nodes) {
+    void AStarPathfinder::growPath(std::shared_ptr<Path> path, bool growTwice)
+    {
+        std::unordered_map<int, PathTile*>* newTiles = new std::unordered_map<int, PathTile*>();
 
+        for (auto oldTilePair : path->tiles)
+        {
+            auto oldTile = oldTilePair.second;
+
+            growTile(path, newTiles, oldTile, 2, 0, growTwice);
+            growTile(path, newTiles, oldTile, -2, 0, growTwice);
+            growTile(path, newTiles, oldTile, 0, 2, growTwice);
+            growTile(path, newTiles, oldTile, 0, -2, growTwice);
+
+            growTile(path, newTiles, oldTile, 1, 1, growTwice);
+            growTile(path, newTiles, oldTile, -1, -1, growTwice);
+            growTile(path, newTiles, oldTile, 1, -1, growTwice);
+            growTile(path, newTiles, oldTile, -1, 1, growTwice);
+        }
+
+        // add newTiles to path
+        for(auto newTilePair : *newTiles)
+        {
+            path->addTile(newTilePair.second);
+        }
+
+        //clean up
+        delete newTiles;
+    }
+
+    void AStarPathfinder::growTile(std::shared_ptr<Path> path, std::unordered_map<int, PathTile *> *newTiles, PathTile *oldTile, int x, int y,
+                                       bool growAgain)
+    {
+        int newX = oldTile->x+x;
+        int newY = oldTile->y+y;
+        int newHeat = oldTile->heat+heatStepSmall;
+
+        if (path->getTile(newX, newY) != nullptr) return;
+        auto tile = this->game->tileManager->getTileAt(newX, newY);
+        if (tile == nullptr) return;
+        if (!tile->walkable) return;
+        auto newTileId = PathTile::getTileId(newX, newY);
+        if(newTiles->count(newTileId) > 0)
+        {
+            auto otherTile = newTiles->at(newTileId);
+            if (otherTile->heat > newHeat)
+            {
+                otherTile->heat = newHeat;
+                otherTile->nextTile = oldTile;
+            }
+        }
+        else
+        {
+            auto newTile = new PathTile(newX, newY, newHeat);
+            newTile->nextTile = oldTile;
+            newTiles->emplace(newTile->getTileId(), newTile);
+
+            if (growAgain)
+            {
+                growTile(path, newTiles, newTile, 2, 0, false);
+                growTile(path, newTiles, newTile, -2, 0, false);
+                growTile(path, newTiles, newTile, 0, 2, false);
+                growTile(path, newTiles, newTile, 0, -2, false);
+
+                growTile(path, newTiles, newTile, 1, 1, false);
+                growTile(path, newTiles, newTile, -1, -1, false);
+                growTile(path, newTiles, newTile, 1, -1, false);
+                growTile(path, newTiles, newTile, -1, 1, false);
+            }
+        }
     }
 }

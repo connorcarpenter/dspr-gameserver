@@ -3,7 +3,7 @@
 //
 
 #include "Point.h"
-
+#include "MathUtils.h"
 
 
 namespace DsprGameServer
@@ -35,5 +35,10 @@ namespace DsprGameServer
         str.append(",");
         str.append(std::to_string(this->y));
         return str;
+    }
+
+    void Point::Add(int x, int y) {
+        this->x += x;
+        this->y += y;
     }
 }

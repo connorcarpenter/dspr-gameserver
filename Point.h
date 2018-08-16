@@ -22,5 +22,7 @@ namespace DsprGameServer
         void Set(int x, int y);
 
         std::string serialize();
+
+        void Add(int x, int y);
     };
 }

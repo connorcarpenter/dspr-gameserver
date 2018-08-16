@@ -7,6 +7,7 @@
 #include "MathUtils.h"
 #include "GameServer.h"
 #include "Pathfinding/AStarPathfinder.h"
+#include "MoveGroup.h"
 
 namespace DsprGameServer
 {
@@ -16,7 +17,7 @@ namespace DsprGameServer
 
         this->pathfinder = new AStarPathfinder(game);
 
-        for (int i = 0; i<6; i++)
+        for (int i = 0; i<12; i++)
             createUnit();
     }
 
@@ -56,10 +57,13 @@ namespace DsprGameServer
     {
         std::list<std::pair<int, int>> unitPositionsList;
 
+        auto newMoveGroup = std::make_shared<MoveGroup>();
+
         for (const auto& i : idList)
         {
             Unit* unit = unitMap.at(i);
             unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
+            unit->setMoveGroup(newMoveGroup);
         }
 
         auto path = this->pathfinder->findPath(unitPositionsList, tileX, tileY);

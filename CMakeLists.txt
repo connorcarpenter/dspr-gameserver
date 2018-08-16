@@ -27,6 +27,8 @@ add_executable(dspr-gameserver
         Tile.h Tile.cpp
         Unit.h Unit.cpp
         Point.h Point.cpp
+        FloatPoint.h FloatPoint.cpp
+        MoveGroup.h MoveGroup.cpp
         Synced.h
         StringUtils.h MapUtils.h MathUtils.h
 
