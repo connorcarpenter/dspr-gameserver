@@ -10,8 +10,8 @@ namespace DsprGameServer
 {
     Game::Game()
     {
-        tileManager = new TileManager(this, 32, 32);
-        AStarPathfinder::setMapWidth(32);
+        tileManager = new TileManager(this, 64, 64);
+        AStarPathfinder::setMapWidth(64);
         unitManager = new UnitManager(this);
     }
 

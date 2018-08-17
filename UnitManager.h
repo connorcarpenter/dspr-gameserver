@@ -18,7 +18,7 @@ namespace DsprGameServer {
         UnitManager(Game *game);
         ~UnitManager();
         void sendUnits(DsprGameServer::Player *pPlayer);
-        Unit* createUnit();
+        Unit *createUnit(int x, int y);
         void receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY);
 
         void updateUnits();

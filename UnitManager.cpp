@@ -17,8 +17,9 @@ namespace DsprGameServer
 
         this->pathfinder = new AStarPathfinder(game);
 
-        for (int i = 0; i<12; i++)
-            createUnit();
+        for (int i = 0; i<3; i++)
+            for (int j = 0; j<4;j++)
+            createUnit((6+i)*2, (6+j)*2);
     }
 
     UnitManager::~UnitManager()
@@ -45,11 +46,11 @@ namespace DsprGameServer
         }
     }
 
-    Unit* UnitManager::createUnit()
+    Unit * UnitManager::createUnit(int x, int y)
     {
         Unit* newUnit = new Unit(this->game, (int) unitMap.size(),
-                                 (MathUtils::getRandom(this->game->tileManager->width)) * 2,
-                                 (MathUtils::getRandom(this->game->tileManager->height)) * 2);
+                                 x,
+                                 y);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
     }
 
