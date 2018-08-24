@@ -190,6 +190,7 @@ namespace DsprGameServer
 
         if (direction == -1)
         {
+            if (curTile == nullptr) return nullptr;
             if (curTile->nextTile == nullptr) return nullptr;
             nextTile = nextTileIfFree(curTile->nextTile); if (nextTile != nullptr) return nextTile;
             direction = 0;
