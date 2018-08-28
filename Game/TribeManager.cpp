@@ -10,8 +10,8 @@ namespace DsprGameServer
     TribeManager::TribeManager(Game *game) {
         this->game = game;
 
-        this->tribeA = new Tribe();
-        this->tribeB = new Tribe();
+        this->tribeA = new Tribe(0);
+        this->tribeB = new Tribe(1);
         this->tribeA->setEnemy(this->tribeB);
         this->tribeB->setEnemy(this->tribeA);
         tribeSet.insert(this->tribeA);

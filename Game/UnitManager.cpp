@@ -18,15 +18,17 @@ namespace DsprGameServer
 
         this->pathfinder = new AStarPathfinder(game);
 
-        for (int i = 0; i<3; i++)
-            for (int j = 0; j<4;j++)
+        int i = 0;
+        int j = 0;
+        //for (int i = 0; i<3; i++)
+        //    for (int j = 0; j<4;j++)
                 createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA);
 
-        for(int i=0;i<10;i++){
+        //for(int i=0;i<10;i++){
             createUnit((MathUtils::getRandom(this->game->tileManager->width-30)+10) * 2,
                        (MathUtils::getRandom(this->game->tileManager->height-30)+10) * 2,
                        this->game->tribeManager->tribeB);
-        }
+        //}
     }
 
     UnitManager::~UnitManager()
@@ -48,7 +50,7 @@ namespace DsprGameServer
             Unit* unit = unitPair.second;
 
             std::stringstream msg;
-            msg << "unit/1.0/create|" << id << "," << unit->position->x << "," << unit->position->y << "\r\n";
+            msg << "unit/1.0/create|" << id << "," << unit->position->x << "," << unit->position->y << "," << unit->tribe->index << "\r\n";
             GameServer::get().queueMessage(player->getWs(), msg.str());
         }
     }

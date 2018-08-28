@@ -6,6 +6,9 @@
 
 namespace DsprGameServer
 {
+    Tribe::Tribe(int index) {
+        this->index = index;
+    }
 
     void Tribe::setEnemy(Tribe* otherTribe) {
         this->enemies.insert(otherTribe);

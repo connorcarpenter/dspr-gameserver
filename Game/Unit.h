@@ -52,6 +52,7 @@ namespace DsprGameServer
         bool followingPath = false;
         PathTile* currentPathTile = nullptr;
         PathTile* nextPathTile = nullptr;
+        Tribe *tribe = nullptr;
     private:
         Game* game = nullptr;
         FloatPoint* moveVector = nullptr;
@@ -74,6 +75,5 @@ namespace DsprGameServer
 
         Point *getPointFromDir(int dir);
 
-        Tribe *tribe = nullptr;
     };
 }

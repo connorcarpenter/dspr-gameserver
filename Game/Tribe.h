@@ -9,7 +9,9 @@ namespace DsprGameServer
     class Tribe
     {
     public:
+        Tribe(int color);
         void setEnemy(Tribe* otherTribe);
+        int index = -1;
     private:
         std::set<Tribe*> enemies;
     };
