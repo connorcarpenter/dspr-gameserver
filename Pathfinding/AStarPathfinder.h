@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <list>
 #include <bits/unordered_map.h>
-#include "../TileManager.h"
+#include "../Game/TileManager.h"
 #include "Path.h"
 
 namespace DsprGameServer

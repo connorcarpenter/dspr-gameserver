@@ -3,7 +3,7 @@
 //
 
 #include "PathTile.h"
-#include "../MathUtils.h"
+#include "../Math/MathUtils.h"
 #include "AStarPathfinder.h"
 
 namespace DsprGameServer

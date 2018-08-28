@@ -5,8 +5,8 @@
 #include <sstream>
 #include <iostream>
 #include "TileManager.h"
-#include "GameServer.h"
-#include "MathUtils.h"
+#include "../GameServer.h"
+#include "../Math/MathUtils.h"
 
 namespace DsprGameServer
 {

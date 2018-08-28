@@ -4,10 +4,11 @@
 
 #include <sstream>
 #include "UnitManager.h"
-#include "MathUtils.h"
-#include "GameServer.h"
-#include "Pathfinding/AStarPathfinder.h"
+#include "../Math/MathUtils.h"
+#include "../GameServer.h"
+#include "../Pathfinding/AStarPathfinder.h"
 #include "MoveGroup.h"
+#include "TribeManager.h"
 
 namespace DsprGameServer
 {
@@ -19,7 +20,13 @@ namespace DsprGameServer
 
         for (int i = 0; i<3; i++)
             for (int j = 0; j<4;j++)
-            createUnit((6+i)*2, (6+j)*2);
+                createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA);
+
+        for(int i=0;i<10;i++){
+            createUnit((MathUtils::getRandom(this->game->tileManager->width-30)+10) * 2,
+                       (MathUtils::getRandom(this->game->tileManager->height-30)+10) * 2,
+                       this->game->tribeManager->tribeB);
+        }
     }
 
     UnitManager::~UnitManager()
@@ -46,11 +53,9 @@ namespace DsprGameServer
         }
     }
 
-    Unit * UnitManager::createUnit(int x, int y)
+    Unit* UnitManager::createUnit(int x, int y, Tribe* tribe)
     {
-        Unit* newUnit = new Unit(this->game, (int) unitMap.size(),
-                                 x,
-                                 y);
+        Unit* newUnit = new Unit(this->game, (int) unitMap.size(), tribe, x, y);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
     }
 

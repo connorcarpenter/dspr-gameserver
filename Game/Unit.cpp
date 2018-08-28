@@ -4,15 +4,15 @@
 
 #include <sstream>
 #include "Unit.h"
-#include "MathUtils.h"
-#include "GameServer.h"
-#include "Pathfinding/PathTile.h"
+#include "../Math/MathUtils.h"
+#include "../GameServer.h"
+#include "../Pathfinding/PathTile.h"
 #include "UnitManager.h"
 #include "MoveGroup.h"
 
 namespace DsprGameServer
 {
-    Unit::Unit(Game *game, int id, int x, int y)
+    Unit::Unit(Game *game, int id, Tribe* tribe, int x, int y)
     {
         this->game = game;
         this->id = id;
@@ -20,6 +20,7 @@ namespace DsprGameServer
         this->nextPosition = new Synced<Point>("nextPosition", new Point(x, y));
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->moveVector = new FloatPoint(0,0);
+        this->tribe = tribe;
     }
 
     Unit::~Unit()

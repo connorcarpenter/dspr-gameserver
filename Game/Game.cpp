@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "TileManager.h";
 #include "UnitManager.h";
+#include "TribeManager.h";
 
 namespace DsprGameServer
 {
@@ -12,6 +13,7 @@ namespace DsprGameServer
     {
         tileManager = new TileManager(this, 64, 64);
         AStarPathfinder::setMapWidth(64);
+        tribeManager = new TribeManager(this);
         unitManager = new UnitManager(this);
     }
 

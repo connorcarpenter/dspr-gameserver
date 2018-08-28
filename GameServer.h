@@ -6,7 +6,7 @@
 
 #include <queue>
 #include "Message.h"
-#include "Game.h"
+#include "Game/Game.h"
 
 namespace DsprGameServer
 {

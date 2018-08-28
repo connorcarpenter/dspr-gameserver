@@ -20,17 +20,23 @@ add_executable(dspr-gameserver
         main.cpp
         GameServer.h GameServer.cpp
         Message.h Message.cpp
-        Game.h Game.cpp
         Player.h Player.cpp
-        TileManager.h TileManager.cpp
-        UnitManager.h UnitManager.cpp
-        Tile.h Tile.cpp
-        Unit.h Unit.cpp
-        Point.h Point.cpp
-        FloatPoint.h FloatPoint.cpp
-        MoveGroup.h MoveGroup.cpp
-        Synced.h
-        StringUtils.h MapUtils.h MathUtils.h
+        StringUtils.h
+        MapUtils.h
+
+        Game/Game.h Game/Game.cpp
+        Game/TileManager.h Game/TileManager.cpp
+        Game/UnitManager.h Game/UnitManager.cpp
+        Game/Tile.h Game/Tile.cpp
+        Game/Unit.h Game/Unit.cpp
+        Game/MoveGroup.h Game/MoveGroup.cpp
+        Game/Synced.h
+        Game/Tribe.h Game/Tribe.cpp
+        Game/TribeManager.h Game/TribeManager.cpp
+
+        Math/Point.h Math/Point.cpp
+        Math/FloatPoint.h Math/FloatPoint.cpp
+        Math/MathUtils.h
 
         Pathfinding/AStarPathfinder.h Pathfinding/AStarPathfinder.cpp
         Pathfinding/Path.h Pathfinding/Path.cpp

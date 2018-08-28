@@ -4,11 +4,11 @@
 // Created by connor on 8/1/18.
 //
 
-#include "Point.h"
+#include "../Math/Point.h"
 #include "Synced.h"
-#include "Player.h"
+#include "../Player.h"
 #include "Game.h"
-#include "FloatPoint.h"
+#include "../Math/FloatPoint.h"
 
 //#include "Pathfinding/Path.h"
 
@@ -18,11 +18,12 @@ namespace DsprGameServer
     class Game;
     class Path;
     class PathTile;
+    class Tribe;
 
     class Unit
     {
     public:
-        Unit(Game *game, int id, int x, int y);
+        Unit(Game *game, int id, Tribe *tribe, int x, int y);
         ~Unit();
         int id = -1;
         Point* position = nullptr;
@@ -72,5 +73,7 @@ namespace DsprGameServer
         int getDir(int x, int y);
 
         Point *getPointFromDir(int dir);
+
+        Tribe *tribe = nullptr;
     };
 }

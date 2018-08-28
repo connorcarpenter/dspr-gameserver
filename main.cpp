@@ -1,6 +1,6 @@
 #include <uWS/uWS.h>
 #include <iostream>
-#include "Game.h"
+#include "Game/Game.h"
 #include "StringUtils.h"
 #include "MapUtils.h"
 #include "GameServer.h"

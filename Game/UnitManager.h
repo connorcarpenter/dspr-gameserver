@@ -8,9 +8,9 @@
 #include <queue>
 #include <list>
 #include "Unit.h"
-#include "Player.h"
+#include "../Player.h"
 #include "TileManager.h"
-#include "Pathfinding/AStarPathfinder.h"
+#include "../Pathfinding/AStarPathfinder.h"
 
 namespace DsprGameServer {
     class UnitManager {
@@ -18,7 +18,7 @@ namespace DsprGameServer {
         UnitManager(Game *game);
         ~UnitManager();
         void sendUnits(DsprGameServer::Player *pPlayer);
-        Unit *createUnit(int x, int y);
+        Unit *createUnit(int x, int y, Tribe *tribe);
         void receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY);
 
         void updateUnits();
