@@ -13,6 +13,7 @@
 
 namespace DsprGameServer
 {
+    class Game;
     class PathNode;
     class PathNodeComparator;
 

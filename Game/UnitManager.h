@@ -18,8 +18,10 @@ namespace DsprGameServer {
         UnitManager(Game *game);
         ~UnitManager();
         void sendUnits(DsprGameServer::Player *pPlayer);
-        Unit *createUnit(int x, int y, Tribe *tribe);
-        void receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY);
+        Unit* createUnit(int x, int y, Tribe *tribe);
+        void receiveMoveOrder(const std::list<int> &idList, int tileX, int tileY);
+        void receiveFollowOrder(const std::list<int> &idList, int targetUnitId);
+        void receiveAttackTargetOrder(const std::list<int> &idList, int targetUnitId);
 
         void updateUnits();
 
@@ -32,7 +34,8 @@ namespace DsprGameServer {
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
-        AStarPathfinder* pathfinder = nullptr;
         Game* game = nullptr;
+
+
     };
 }

@@ -14,6 +14,7 @@ namespace DsprGameServer {
     class TileManager;
     class UnitManager;
     class TribeManager;
+    class AStarPathfinder;
 
     class Game {
 
@@ -23,12 +24,12 @@ namespace DsprGameServer {
         ~Game();
 
         void addPlayer(std::string token, uWS::WebSocket<1> *ws);
-        void receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY);
         void update();
 
         TileManager* tileManager = nullptr;
         UnitManager* unitManager = nullptr;
         TribeManager* tribeManager = nullptr;
+        AStarPathfinder* pathfinder = nullptr;
     private:
         std::map<std::string, Player *> playerMap;
     };

@@ -29,7 +29,7 @@ add_executable(dspr-gameserver
         Game/UnitManager.h Game/UnitManager.cpp
         Game/Tile.h Game/Tile.cpp
         Game/Unit.h Game/Unit.cpp
-        Game/MoveGroup.h Game/MoveGroup.cpp
+        Game/OrderGroup.h Game/OrderGroup.cpp
         Game/Synced.h
         Game/Tribe.h Game/Tribe.cpp
         Game/TribeManager.h Game/TribeManager.cpp

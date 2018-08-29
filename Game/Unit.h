@@ -14,58 +14,64 @@
 
 namespace DsprGameServer
 {
-    class MoveGroup;
+    class OrderGroup;
     class Game;
     class Path;
     class PathTile;
     class Tribe;
+
+    enum UnitOrder { Move, AttackMove, Follow, AttackTarget };
 
     class Unit
     {
     public:
         Unit(Game *game, int id, Tribe *tribe, int x, int y);
         ~Unit();
+        void update();
+        void updateStandingWalking();
+        void updateFollowing();
+        void updateAttacking();
+        void startPath();
+        void setOrderGroup(std::shared_ptr<OrderGroup> group);
+        void sendUpdate(DsprGameServer::Player* player);
+        bool anyVarIsDirty();
+        void cleanAllVars();
+
+        const int walkMax = 6;
+        const int walkSpeedStraight = walkMax / 2; //2 updates to walk straight
+        const int walkSpeedDiagonal = walkMax / 3; //3 updates to walk diagonal
+
         int id = -1;
         Point* position = nullptr;
         Synced<Point>* nextPosition = nullptr;
         Synced<Point>* moveTarget = nullptr;
-
-        const int walkMax = 6;
-        const int walkSpeedStraight = walkMax / 2;
-        const int walkSpeedDiagonal = walkMax / 3;
-        int walkSpeed = 0;
-        int walkAmount = 0;
-
-
-        void update();
-
-        void sendUpdate(DsprGameServer::Player* player);
-
-        bool anyVarIsDirty();
-
-        void cleanAllVars();
-
-        void startPath(std::shared_ptr<Path> path);
-        void setMoveGroup(std::shared_ptr<MoveGroup> group);
-
-        std::shared_ptr<Path> path = nullptr;
         bool followingPath = false;
         PathTile* currentPathTile = nullptr;
         PathTile* nextPathTile = nullptr;
+        int walkSpeed = 0;
+        int walkAmount = 0;
+
+        int health = 100;
+        int stamina = 100;
+        int damage = 1;
+        int range = 1;
+        int cooldown = 0;
+        int attackFrameIndex =
+        int attackFramesNumber = 5;
+        int attackFrameToApplyDamage = 3;
+
         Tribe *tribe = nullptr;
+
     private:
+
         Game* game = nullptr;
         FloatPoint* moveVector = nullptr;
-        std::shared_ptr<MoveGroup> moveGroup = nullptr;
+        std::shared_ptr<OrderGroup> orderGroup = nullptr;
         int direction = -1;
 
-        void Push(int x, int y, float mag);
+        void pushOtherUnit(int x, int y, float mag);
 
         PathTile *getNextPathTile(PathTile *curTile, std::shared_ptr<DsprGameServer::Path> path);
-
-        bool losToNextTile(PathTile *nextTile);
-
-        void addCohesion();
 
         PathTile *nextTileIfFree(PathTile *nextTile);
 
@@ -74,6 +80,5 @@ namespace DsprGameServer
         int getDir(int x, int y);
 
         Point *getPointFromDir(int dir);
-
     };
 }

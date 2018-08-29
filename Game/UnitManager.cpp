@@ -7,7 +7,7 @@
 #include "../Math/MathUtils.h"
 #include "../GameServer.h"
 #include "../Pathfinding/AStarPathfinder.h"
-#include "MoveGroup.h"
+#include "OrderGroup.h"
 #include "TribeManager.h"
 
 namespace DsprGameServer
@@ -16,19 +16,15 @@ namespace DsprGameServer
     {
         this->game = game;
 
-        this->pathfinder = new AStarPathfinder(game);
-
-        int i = 0;
-        int j = 0;
-        //for (int i = 0; i<3; i++)
-        //    for (int j = 0; j<4;j++)
+        for (int i = 0; i<3; i++)
+            for (int j = 0; j<4;j++)
                 createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA);
 
-        //for(int i=0;i<10;i++){
+        for(int i=0;i<10;i++){
             createUnit((MathUtils::getRandom(this->game->tileManager->width-30)+10) * 2,
                        (MathUtils::getRandom(this->game->tileManager->height-30)+10) * 2,
                        this->game->tribeManager->tribeB);
-        //}
+        }
     }
 
     UnitManager::~UnitManager()
@@ -38,8 +34,6 @@ namespace DsprGameServer
             Unit* unit = unitPair.second;
             delete unit;
         }
-
-        delete this->pathfinder;
     }
 
     void UnitManager::sendUnits(DsprGameServer::Player* player)
@@ -61,25 +55,77 @@ namespace DsprGameServer
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
     }
 
-    void UnitManager::receiveUnitOrder(const std::list<int>& idList, int tileX, int tileY)
+    void UnitManager::receiveMoveOrder(const std::list<int> &idList, int tileX, int tileY)
     {
         std::list<std::pair<int, int>> unitPositionsList;
 
-        auto newMoveGroup = std::make_shared<MoveGroup>();
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
 
         for (const auto& i : idList)
         {
             Unit* unit = unitMap.at(i);
             unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
-            unit->setMoveGroup(newMoveGroup);
+            unit->setOrderGroup(newOrderGroup);
         }
 
-        auto path = this->pathfinder->findPath(unitPositionsList, tileX, tileY);
+        auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY);
+        newOrderGroup->setPath(path);
 
         for (const auto& i : idList)
         {
             Unit* unit = unitMap.at(i);
-            unit->startPath(path);
+            unit->startPath();
+        }
+    }
+
+    void UnitManager::receiveFollowOrder(const std::list<int> &idList, int targetUnitId)
+    {
+        std::list<std::pair<int, int>> unitPositionsList;
+
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Follow);
+        auto targetUnit = unitMap.at(targetUnitId);
+        newOrderGroup->setTargetUnit(targetUnit);
+
+
+        for (const auto& i : idList)
+        {
+            Unit* unit = unitMap.at(i);
+            unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
+            unit->setOrderGroup(newOrderGroup);
+        }
+
+        auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
+        newOrderGroup->setPath(path);
+
+        for (const auto& i : idList)
+        {
+            Unit* unit = unitMap.at(i);
+            unit->startPath();
+        }
+    }
+
+    void UnitManager::receiveAttackTargetOrder(const std::list<int> &idList, int targetUnitId)
+    {
+        std::list<std::pair<int, int>> unitPositionsList;
+
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackTarget);
+        auto targetUnit = unitMap.at(targetUnitId);
+        newOrderGroup->setTargetUnit(targetUnit);
+
+        for (const auto& i : idList)
+        {
+            Unit* unit = unitMap.at(i);
+            unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
+            unit->setOrderGroup(newOrderGroup);
+        }
+
+        auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
+        newOrderGroup->setPath(path);
+
+        for (const auto& i : idList)
+        {
+            Unit* unit = unitMap.at(i);
+            unit->startPath();
         }
     }
 
@@ -118,4 +164,6 @@ namespace DsprGameServer
 
         return nullptr;
     }
+
+
 }

@@ -4,6 +4,7 @@
 #include "StringUtils.h"
 #include "MapUtils.h"
 #include "GameServer.h"
+#include "Game/UnitManager.h"
 
 using namespace DsprGameServer;
 
@@ -78,10 +79,27 @@ int main()
                 unitIdList.push_front(stoi(str));
             }
 
-            int x = stoi(orderStrings[0]);
-            int y = stoi(orderStrings[1]);
+            UnitOrder orderIndex = static_cast<UnitOrder>(stoi(orderStrings[0]));
 
-            game->receiveUnitOrder(unitIdList, x, y);
+            switch (orderIndex)
+            {
+                case Move: {
+                    int x = stoi(orderStrings[1]);
+                    int y = stoi(orderStrings[2]);
+                    game->unitManager->receiveMoveOrder(unitIdList, x, y);
+                }
+                    break;
+                case Follow: {
+                    int targetUnitId = stoi(orderStrings[1]);
+                    game->unitManager->receiveFollowOrder(unitIdList, targetUnitId);
+                }
+                    break;
+                case AttackTarget: {
+                    int targetUnitId = stoi(orderStrings[1]);
+                    game->unitManager->receiveAttackTargetOrder(unitIdList, targetUnitId);
+                }
+                    break;
+            }
 
             std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;
         }
