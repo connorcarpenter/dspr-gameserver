@@ -32,5 +32,18 @@ namespace DsprGameServer {
         static float Sqrt(int value) {
             return (float) std::sqrt(value);
         }
+
+        static float Distance(int x1, int y1, int x2, int y2) {
+            return Sqrt(Pow(x2-x1,2)+Pow(y2-y1, 2));
+        }
+
+        static int Ceiling(float value){
+            if (value == (int) value) return (int) value;
+            return (int) value + 1;
+        }
+
+        static int Pow(int value, int exponent){
+            return (int) std::pow(value, exponent);
+        }
     };
 }

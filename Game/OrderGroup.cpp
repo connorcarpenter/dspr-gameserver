@@ -58,6 +58,7 @@ namespace DsprGameServer {
                 }
 
                 this->unitsArrived = 0;
+                this->lastTargetPosition.Set(targetUnit->position);
             }
         }
     }

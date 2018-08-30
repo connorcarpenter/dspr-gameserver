@@ -19,6 +19,7 @@ namespace DsprGameServer
         this->position = new Point(x, y);
         this->nextPosition = new Synced<Point>("nextPosition", new Point(x, y));
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
+        this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
         this->moveVector = new FloatPoint(0,0);
         this->tribe = tribe;
     }
@@ -29,6 +30,7 @@ namespace DsprGameServer
         delete this->nextPosition;
         delete this->moveTarget;
         delete this->moveVector;
+        delete this->animationState;
     }
 
     void Unit::update() {
@@ -164,27 +166,57 @@ namespace DsprGameServer
     }
 
     void Unit::updateAttacking() {
-        if (this->followingPath) {
-            if (this->currentPathTile != nullptr) {
-                if (this->position->x == nextPathTile->x && this->position->y == nextPathTile->y) {
-                    currentPathTile = nextPathTile;
-                    nextPathTile = getNextPathTile(this->currentPathTile, this->orderGroup->path);
-                    if (nextPathTile != nullptr)
-                        this->direction = getDir(this->nextPathTile->x - this->currentPathTile->x,
-                                                 this->nextPathTile->y - this->currentPathTile->y);
+
+        auto targetUnit = this->orderGroup->targetUnit;
+        int distanceToTarget = (int) MathUtils::Ceiling(MathUtils::Distance(this->position->x, this->position->y,
+                                                                            targetUnit->position->x, targetUnit->position->y));
+
+        if (distanceToTarget <= this->range){
+            //start to attack!
+            if (this->animationState->obj()->GetState() != Attacking) {
+                this->animationState->dirtyObj()->SetState(Attacking);
+                int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
+                this->animationState->dirtyObj()->SetHeading(newHeading);
+                this->attackFrameIndex = 0;
+            }
+
+            this->attackFrameIndex += 1;
+            if (this->attackFrameIndex == this->attackFrameToApplyDamage){
+                targetUnit->health -= this->damage;
+            }
+            if (this->attackFrameIndex >= this->attackFramesNumber){
+                this->attackFrameIndex = 0;
+            }
+        }
+        else {
+            //try to get in range of target unit
+            if (this->animationState->obj()->GetState() != Walking)
+                this->animationState->dirtyObj()->SetState(Walking);
+
+            if (this->followingPath) {
+                if (this->currentPathTile != nullptr) {
+                    if (this->position->x == nextPathTile->x && this->position->y == nextPathTile->y) {
+                        currentPathTile = nextPathTile;
+                        nextPathTile = getNextPathTile(this->currentPathTile, this->orderGroup->path);
+                        if (nextPathTile != nullptr)
+                            this->direction = getDir(this->nextPathTile->x - this->currentPathTile->x,
+                                                     this->nextPathTile->y - this->currentPathTile->y);
 
                         this->orderGroup->recalculatePathIfTargetMoved();
-                }
+                    }
 
-                if (nextPathTile == nullptr || (currentPathTile->heat <= this->orderGroup->getAcceptableHeat())) {
-                    this->moveVector->Set(0, 0);
-                    this->followingPath = false;
-                    this->orderGroup->unitArrived();
+                    if (nextPathTile == nullptr) {
+                        this->moveVector->Set(0, 0);
+                        this->followingPath = false;
+                        this->orderGroup->unitArrived();
+                    } else {
+                        this->moveVector->Add(nextPathTile->x - this->position->x, nextPathTile->y - this->position->y);
+                    }
                 } else {
-                    this->moveVector->Add(nextPathTile->x - this->position->x, nextPathTile->y - this->position->y);
+                    this->followingPath = false;
                 }
             } else {
-                this->followingPath = false;
+                this->orderGroup->recalculatePathIfTargetMoved();
             }
         }
     }
@@ -293,6 +325,9 @@ namespace DsprGameServer
 
     void Unit::setOrderGroup(std::shared_ptr<OrderGroup> group)
     {
+        if (this->animationState->obj()->GetState() != Walking)
+            this->animationState->dirtyObj()->SetState(Walking);
+
         if (this->orderGroup != nullptr)
         {
             this->orderGroup->removeUnit(this);
@@ -354,6 +389,12 @@ namespace DsprGameServer
             msg << this->moveTarget->serialize();
         }
 
+        if (this->animationState->isDirty())
+        {
+            if (firstVar) { firstVar = false; } else { msg << "&"; }
+            msg << this->animationState->serialize();
+        }
+
         //next synced variable should follow this format
 //        if (this->nextPosition->isDirty())
 //        {
@@ -368,6 +409,7 @@ namespace DsprGameServer
     {
         if (this->nextPosition->isDirty()) return true;
         if (this->moveTarget->isDirty()) return true;
+        if (this->animationState->isDirty()) return true;
         //more synced vars here
         return false;
     }
@@ -375,6 +417,7 @@ namespace DsprGameServer
     void Unit::cleanAllVars() {
         this->nextPosition->clean();
         this->moveTarget->clean();
+        this->animationState->clean();
         //more synced vars here
     }
 }

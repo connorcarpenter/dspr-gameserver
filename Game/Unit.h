@@ -9,8 +9,7 @@
 #include "../Player.h"
 #include "Game.h"
 #include "../Math/FloatPoint.h"
-
-//#include "Pathfinding/Path.h"
+#include "AnimationState.h"
 
 namespace DsprGameServer
 {
@@ -45,6 +44,8 @@ namespace DsprGameServer
         Point* position = nullptr;
         Synced<Point>* nextPosition = nullptr;
         Synced<Point>* moveTarget = nullptr;
+        Synced<AnimationState>* animationState = nullptr;
+
         bool followingPath = false;
         PathTile* currentPathTile = nullptr;
         PathTile* nextPathTile = nullptr;
@@ -54,9 +55,8 @@ namespace DsprGameServer
         int health = 100;
         int stamina = 100;
         int damage = 1;
-        int range = 1;
-        int cooldown = 0;
-        int attackFrameIndex =
+        int range = 2;//make sure this is multiples of 2... to accomodate for diagonal tiles
+        int attackFrameIndex = 0;
         int attackFramesNumber = 5;
         int attackFrameToApplyDamage = 3;
 

@@ -33,6 +33,8 @@ add_executable(dspr-gameserver
         Game/Synced.h
         Game/Tribe.h Game/Tribe.cpp
         Game/TribeManager.h Game/TribeManager.cpp
+        Game/AnimationState.h Game/AnimationState.cpp
+        Game/Int.h Game/Int.cpp
 
         Math/Point.h Math/Point.cpp
         Math/FloatPoint.h Math/FloatPoint.cpp
