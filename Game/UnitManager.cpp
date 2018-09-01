@@ -16,15 +16,17 @@ namespace DsprGameServer
     {
         this->game = game;
 
+        //createUnit(6, 6, this->game->tribeManager->tribeA);
+
         for (int i = 0; i<3; i++)
             for (int j = 0; j<4;j++)
                 createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA);
-
-        for(int i=0;i<10;i++){
-            createUnit((MathUtils::getRandom(this->game->tileManager->width-30)+10) * 2,
-                       (MathUtils::getRandom(this->game->tileManager->height-30)+10) * 2,
-                       this->game->tribeManager->tribeB);
-        }
+//
+//        for(int i=0;i<10;i++){
+//            createUnit((MathUtils::getRandom(this->game->tileManager->width-30)+10) * 2,
+//                       (MathUtils::getRandom(this->game->tileManager->height-30)+10) * 2,
+//                       this->game->tribeManager->tribeB);
+//        }
     }
 
     UnitManager::~UnitManager()
@@ -64,17 +66,18 @@ namespace DsprGameServer
         for (const auto& i : idList)
         {
             Unit* unit = unitMap.at(i);
-            unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
+            unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
             unit->setOrderGroup(newOrderGroup);
         }
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY);
-        newOrderGroup->setPath(path);
+        if (path!= nullptr) {
+            newOrderGroup->setPath(path);
 
-        for (const auto& i : idList)
-        {
-            Unit* unit = unitMap.at(i);
-            unit->startPath();
+            for (const auto &i : idList) {
+                Unit *unit = unitMap.at(i);
+                unit->startPath();
+            }
         }
     }
 
@@ -95,12 +98,13 @@ namespace DsprGameServer
         }
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
-        newOrderGroup->setPath(path);
+        if (path != nullptr) {
+            newOrderGroup->setPath(path);
 
-        for (const auto& i : idList)
-        {
-            Unit* unit = unitMap.at(i);
-            unit->startPath();
+            for (const auto &i : idList) {
+                Unit *unit = unitMap.at(i);
+                unit->startPath();
+            }
         }
     }
 
@@ -120,12 +124,14 @@ namespace DsprGameServer
         }
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
-        newOrderGroup->setPath(path);
-
-        for (const auto& i : idList)
+        if (path != nullptr)
         {
-            Unit* unit = unitMap.at(i);
-            unit->startPath();
+            newOrderGroup->setPath(path);
+
+            for (const auto &i : idList) {
+                Unit *unit = unitMap.at(i);
+                unit->startPath();
+            }
         }
     }
 

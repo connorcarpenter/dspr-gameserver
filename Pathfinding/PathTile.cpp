@@ -8,11 +8,11 @@
 
 namespace DsprGameServer
 {
-    PathTile::PathTile(int x, int y, int heat)
+    PathTile::PathTile(int x, int y, int disToEnd)
     {
         this->x = x;
         this->y = y;
-        this->heat = heat;
+        this->disToEnd = disToEnd;
     }
 
     int PathTile::getTileId() const

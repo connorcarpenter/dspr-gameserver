@@ -16,7 +16,7 @@ namespace DsprGameServer {
         void addUnit(Unit* unit);
         void removeUnit(Unit *unit);
         int getNumberUnits();
-        int getAcceptableHeat();
+        int getAcceptableDisToEnd();
         void unitArrived();
         void recalculatePathIfTargetMoved();
         void setTargetUnit(Unit* targetUnit);
@@ -26,11 +26,14 @@ namespace DsprGameServer {
         UnitOrder orderIndex;
         std::shared_ptr<DsprGameServer::Path> path = nullptr;
 
+        int getAcceptableTilesToEnd();
+
     private:
 
         std::list<Unit*> units;
         int unitsArrived = 0;
         Point lastTargetPosition = DsprGameServer::Point(0, 0);
         Game* game = nullptr;
+
     };
 }

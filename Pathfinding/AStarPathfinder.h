@@ -36,21 +36,12 @@ namespace DsprGameServer
         void cleanUp(std::list<PathNode *> *nodes, std::unordered_map<int, PathNode *> *map,
                      std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* heap, std::unordered_map<int, PathNode *> *map2);
 
-        const float straightCost = 2;
-        const float diagonalCost = 3;
-
-        Game* game = nullptr;
-
         void addToPath(std::shared_ptr<Path> path, int startX, int startY, int targetX, int targetY);
 
-        void growPath(std::shared_ptr<Path> path, bool growTwice);
+        const float straightCost = 2;
+        const float diagonalCost = 3;
+        const int disToEndUnits = 10;
 
-        const int heatStep = 10;
-
-        void
-    growTile(std::shared_ptr<Path> path, std::unordered_map<int, PathTile *> *newTiles, PathTile *oldTile, int x, int y,
-                 bool growAgain);
-
-        const int heatStepSmall = 3;
+        Game* game = nullptr;
     };
 }

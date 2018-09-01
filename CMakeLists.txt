@@ -41,6 +41,7 @@ add_executable(dspr-gameserver
         Math/MathUtils.h
 
         Pathfinding/AStarPathfinder.h Pathfinding/AStarPathfinder.cpp
+        Pathfinding/SimplePathfinder.h Pathfinding/SimplePathfinder.cpp
         Pathfinding/Path.h Pathfinding/Path.cpp
         Pathfinding/PathNode.h Pathfinding/PathNode.cpp
         Pathfinding/PathTile.h Pathfinding/PathTile.cpp)

@@ -30,10 +30,16 @@ namespace DsprGameServer {
         this->unitsArrived += 1;
     }
 
-    int OrderGroup::getAcceptableHeat() {
+    int OrderGroup::getAcceptableDisToEnd() {
         if (this->unitsArrived == 0) return 0;
-        if (getNumberUnits() < 9) return 13;
-        return 23;
+        if (this->unitsArrived < 9) return 10;
+        return 20;
+    }
+
+    int OrderGroup::getAcceptableTilesToEnd() {
+        if (this->unitsArrived == 0) return 0;
+        if (this->unitsArrived < 9) return 2;
+        return 4;
     }
 
     void OrderGroup::recalculatePathIfTargetMoved()
@@ -50,15 +56,17 @@ namespace DsprGameServer {
                 }
 
                 auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
-                this->setPath(path);
-
-                for (const auto& unit : units)
+                if (path != nullptr)
                 {
-                    unit->startPath();
-                }
+                    this->setPath(path);
 
-                this->unitsArrived = 0;
-                this->lastTargetPosition.Set(targetUnit->position);
+                    for (const auto &unit : units) {
+                        unit->startPath();
+                    }
+
+                    this->unitsArrived = 0;
+                    this->lastTargetPosition.Set(targetUnit->position);
+                }
             }
         }
     }

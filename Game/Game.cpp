@@ -7,6 +7,7 @@
 #include "UnitManager.h";
 #include "TribeManager.h";
 #include "../Pathfinding/AStarPathfinder.h"
+#include "../Pathfinding/SimplePathfinder.h"
 
 namespace DsprGameServer
 {
@@ -17,6 +18,7 @@ namespace DsprGameServer
         this->tribeManager = new TribeManager(this);
         this->unitManager = new UnitManager(this);
         this->pathfinder = new AStarPathfinder(this);
+        this->simplePathfinder = new SimplePathfinder(this);
     }
 
     Game::~Game()

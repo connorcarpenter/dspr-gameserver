@@ -45,10 +45,11 @@ namespace DsprGameServer
         Synced<Point>* nextPosition = nullptr;
         Synced<Point>* moveTarget = nullptr;
         Synced<AnimationState>* animationState = nullptr;
+        Point* nextTilePosition = nullptr;
+        std::shared_ptr<DsprGameServer::Path> shortPath = nullptr;
+        PathTile* shortPathCurrentTile = nullptr;
 
         bool followingPath = false;
-        PathTile* currentPathTile = nullptr;
-        PathTile* nextPathTile = nullptr;
         int walkSpeed = 0;
         int walkAmount = 0;
 
@@ -62,16 +63,16 @@ namespace DsprGameServer
 
         Tribe *tribe = nullptr;
 
+        int disToEnd = 0;
+
+        std::shared_ptr<OrderGroup> orderGroup = nullptr;
     private:
 
         Game* game = nullptr;
-        FloatPoint* moveVector = nullptr;
-        std::shared_ptr<OrderGroup> orderGroup = nullptr;
-        int direction = -1;
 
-        void pushOtherUnit(int x, int y, float mag);
+        void pushOtherUnit(Unit *otherUnit);
 
-        PathTile *getNextPathTile(PathTile *curTile, std::shared_ptr<DsprGameServer::Path> path);
+        void getNextTile();
 
         PathTile *nextTileIfFree(PathTile *nextTile);
 
@@ -80,5 +81,12 @@ namespace DsprGameServer
         int getDir(int x, int y);
 
         Point *getPointFromDir(int dir);
+
+        void setPathArrived();
+
+        Unit *getUnitAtPosition(int x, int y);
+
+        void getNextTileSimplePathfind();
+
     };
 }

@@ -2,12 +2,31 @@
 // Created by connor on 8/6/18.
 //
 
+#include <assert.h>
 #include "PathNode.h"
 #include "../Math/MathUtils.h"
 #include "AStarPathfinder.h"
 
 namespace DsprGameServer
 {
+    PathNode::PathNode(int x, int y, PathNode* parent, float parDis, bool calcH)
+    {
+        assert(calcH == false);
+
+        this->x = x;
+        this->y = y;
+
+        if (parent == nullptr)
+        {
+            this->g = 0;
+        }
+        else
+        {
+            this->g = parent->g + parDis;
+            this->parent = parent;
+        }
+    }
+
     PathNode::PathNode(int x, int y, PathNode* parent, float parDis, int tarX, int tarY)
     {
         this->x = x;

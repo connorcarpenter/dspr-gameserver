@@ -15,6 +15,7 @@ namespace DsprGameServer {
     class UnitManager;
     class TribeManager;
     class AStarPathfinder;
+    class SimplePathfinder;
 
     class Game {
 
@@ -30,6 +31,7 @@ namespace DsprGameServer {
         UnitManager* unitManager = nullptr;
         TribeManager* tribeManager = nullptr;
         AStarPathfinder* pathfinder = nullptr;
+        SimplePathfinder *simplePathfinder;
     private:
         std::map<std::string, Player *> playerMap;
     };

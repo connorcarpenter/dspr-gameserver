@@ -5,14 +5,13 @@
 //
 
 #include <cstddef>
-#include "PathNode.h"
 
 namespace DsprGameServer
 {
     class PathTile
     {
     public:
-        PathTile(int x, int y, int heat);
+        PathTile(int x, int y, int disToEnd);
 
         int getTileId() const;
         static int getTileId(int x, int y);
@@ -21,7 +20,6 @@ namespace DsprGameServer
         int y;
         PathTile* nextTile = nullptr;
 
-        int heat;
-
+        int disToEnd;
     };
 }
