@@ -27,7 +27,8 @@ namespace DsprGameServer
         Unit(Game *game, int id, Tribe *tribe, int x, int y);
         ~Unit();
         void update();
-        void updateStandingWalking();
+        void updateStanding();
+        void updateWalking();
         void updateFollowing();
         void updateAttacking();
         void startPath();
@@ -104,5 +105,6 @@ namespace DsprGameServer
         int pushCount = 0;
 
         void updateNextPosition(Point *newNextPosition);
+        Unit* getEnemyUnitInAcquisitionRange();
     };
 }

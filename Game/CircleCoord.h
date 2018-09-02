@@ -6,6 +6,8 @@ namespace DsprGameServer {
     class CircleCoord {
     public:
         CircleCoord(int x, int y);
-        int distanceFromCenter;
+        float distanceFromCenter;
+        int x;
+        int y;
     };
 }

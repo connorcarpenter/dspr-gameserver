@@ -201,7 +201,7 @@ namespace DsprGameServer
 
     Unit* UnitManager::getUnitFromGrid(int x, int y){
         int gridIndex = getGridIndex(x, y);
-        if (gridIndex == -1) return 0;
+        if (gridIndex == -1) return nullptr;
         int tileIndex = getTileIndex(gridIndex, x, y);
         if (gridIndex == 0)
         {

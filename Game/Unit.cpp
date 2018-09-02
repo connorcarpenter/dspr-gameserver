@@ -10,6 +10,7 @@
 #include "UnitManager.h"
 #include "OrderGroup.h"
 #include "../Pathfinding/SimplePathfinder.h"
+#include "CircleCache.h"
 
 namespace DsprGameServer
 {
@@ -51,7 +52,7 @@ namespace DsprGameServer
             if(this->orderGroup != nullptr) {
                 switch (this->orderGroup->orderIndex) {
                     case Move:
-                        this->updateStandingWalking();
+                        this->updateWalking();
                         break;
                     case Follow:
                         this->updateFollowing();
@@ -61,7 +62,7 @@ namespace DsprGameServer
                         break;
                 }
             } else {
-                this->updateStandingWalking();
+                this->updateWalking();
             }
         }
 
@@ -81,9 +82,37 @@ namespace DsprGameServer
 
             this->updateNextPosition(this->nextTilePosition);
         }
+        else
+        {
+            if(!this->followingPath && (this->orderGroup==nullptr || (this->orderGroup != nullptr && this->orderGroup->orderIndex == Move)))
+            {
+                this->updateStanding();
+            }
+        }
     }
 
-    void Unit::updateStandingWalking() {
+    void Unit::updateStanding() {
+        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
+        if (enemyUnitInAcquisitionRange != nullptr){
+            //ideally, we would store the current order in a stack, and just push it down.. for now, no such thing
+            std::list<std::pair<int, int>> unitPositionsList;
+
+            auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackTarget);
+            newOrderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
+
+            unitPositionsList.emplace_back(std::pair<int,int>(this->position->x, this->position->y));
+            this->setOrderGroup(newOrderGroup);
+
+            auto path = this->game->pathfinder->findPath(unitPositionsList, enemyUnitInAcquisitionRange->position->x, enemyUnitInAcquisitionRange->position->y);
+            if (path != nullptr)
+            {
+                newOrderGroup->setPath(path);
+                this->startPath();
+            }
+        }
+    }
+
+    void Unit::updateWalking() {
         if (this->followingPath && this->pushCount<5) {
             if (this->position->Equals(this->nextTilePosition) && this->nextPosition->obj()->Equals(this->nextTilePosition)) {
                 if (this->orderGroup != nullptr) {
@@ -307,7 +336,7 @@ namespace DsprGameServer
 
     void Unit::updateFollowing()
     {
-        this->updateStandingWalking();
+        this->updateWalking();
         this->orderGroup->recalculatePathIfTargetMoved();
     }
 
@@ -360,6 +389,19 @@ namespace DsprGameServer
         this->game->unitManager->removeUnitFromGrid(this);
         this->nextPosition->dirtyObj()->Set(newNextPosition);
         this->game->unitManager->addUnitToGrid(this);
+    }
+
+    Unit* Unit::getEnemyUnitInAcquisitionRange(){
+        auto acquiCircle = CircleCache::get().getCircle(this->acquisition);
+
+        for(auto circleCoord : acquiCircle->coordList){
+            auto unitAtPosition = this->getUnitAtPosition(this->position->x + circleCoord->x, this->position->y + circleCoord->y);
+            if (unitAtPosition == nullptr)continue;
+            if (unitAtPosition->tribe == this->tribe)continue;
+            return unitAtPosition;
+        }
+
+        return nullptr;
     }
 
     int Unit::getDir(int x, int y)
