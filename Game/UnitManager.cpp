@@ -16,8 +16,8 @@ namespace DsprGameServer
     {
         this->game = game;
 
-        this->unitGridArrayA = initializeUnitGridArray(this->game->tileManager->width, this->game->tileManager->height);
-        this->unitGridArrayB = initializeUnitGridArray(this->game->tileManager->width, this->game->tileManager->height);
+        this->unitGrid = new IsoGrid<Unit*>();
+        this->unitGrid->initialize(this->game->tileManager->width * 2, this->game->tileManager->height * 2);
     }
 
     void UnitManager::initializeFirstUnits(){
@@ -39,6 +39,8 @@ namespace DsprGameServer
             Unit* unit = unitPair.second;
             delete unit;
         }
+
+        delete unitGrid;
     }
 
     void UnitManager::sendUnits(DsprGameServer::Player* player)
@@ -164,67 +166,12 @@ namespace DsprGameServer
         }
     }
 
-    Unit** UnitManager::initializeUnitGridArray(int width, int height) {
-        Unit** output = new Unit*[width * height];
-        for (int j = 0; j < height; j += 1)
-        {
-            for (int i = 0;i< width; i+=1)
-            {
-                output[(j*width)+i] = nullptr;
-            }
-        }
-        return output;
-    }
-
-    int UnitManager::getGridIndex(int x, int y) {
-        if (x < 0 || y < 0 || x >= this->game->tileManager->width*2 || y >= this->game->tileManager->height*2) return -1;
-
-        if (x % 2 == 0 && y % 2 == 0) return 0;
-        if ((x+1) % 2 == 0 && (y+1) % 2 == 0) return 1;
-        return -1;
-    }
-
-    int UnitManager::getTileIndex(int gridIndex, int x, int y) {
-        if (gridIndex == 0)
-        {
-            int xsmall = x / 2;
-            int ysmall = y / 2;
-            return (ysmall * this->game->tileManager->width) + xsmall;
-        }
-        else
-        {
-            int xsmall = (x-1) / 2;
-            int ysmall = (y-1) / 2;
-            return (ysmall * this->game->tileManager->width) + xsmall;
-        }
+    void UnitManager::setUnitInGrid(int x, int y, Unit* unit){
+        return this->unitGrid->set(x,y, unit);
     }
 
     Unit* UnitManager::getUnitFromGrid(int x, int y){
-        int gridIndex = getGridIndex(x, y);
-        if (gridIndex == -1) return nullptr;
-        int tileIndex = getTileIndex(gridIndex, x, y);
-        if (gridIndex == 0)
-        {
-            return this->unitGridArrayA[tileIndex];
-        }
-        else
-        {
-            return this->unitGridArrayB[tileIndex];
-        }
-    }
-
-    void UnitManager::setUnitInGrid(int x, int y, Unit* unit){
-        int gridIndex = getGridIndex(x, y);
-        if (gridIndex == -1) return;
-        int tileIndex = getTileIndex(gridIndex, x, y);
-        if (gridIndex == 0)
-        {
-            this->unitGridArrayA[tileIndex] = unit;
-        }
-        else
-        {
-            this->unitGridArrayB[tileIndex] = unit;
-        }
+        return this->unitGrid->get(x,y);
     }
 
     void UnitManager::removeUnitFromGrid(Unit *unit) {

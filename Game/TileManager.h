@@ -7,8 +7,10 @@
 #include "Tile.h"
 #include "../Player.h"
 #include "Game.h"
+#include "../IsoGrid.h"
 
 namespace DsprGameServer {
+
     class Game;
 
     class TileManager {
@@ -25,18 +27,12 @@ namespace DsprGameServer {
         int height;
     private:
 
-
-        Tile **tileArrayA = nullptr;
-        Tile **tileArrayB = nullptr;
-
-        Tile **initializeTileArray(int width, int height);
-
-        int getGridIndex(int x, int y);
-
-        int getTileIndex(int gridIndex, int x, int y);
-
         void makeRandomWall();
 
         Game *game = nullptr;
+
+        IsoGrid<Tile*>* tileGrid = nullptr;
+
+        void initializeTiles();
     };
 }

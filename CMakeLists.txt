@@ -23,6 +23,7 @@ add_executable(dspr-gameserver
         Player.h Player.cpp
         StringUtils.h
         MapUtils.h
+        IsoGrid.h
 
         Game/Game.h Game/Game.cpp
         Game/TileManager.h Game/TileManager.cpp

@@ -13,6 +13,7 @@
 #include "../Pathfinding/AStarPathfinder.h"
 
 namespace DsprGameServer {
+
     class UnitManager {
     public:
         UnitManager(Game *game);
@@ -42,15 +43,8 @@ namespace DsprGameServer {
         std::queue<int> unusedIds;
         Game* game = nullptr;
 
-        Unit** unitGridArrayA = nullptr;
-        Unit** unitGridArrayB = nullptr;
-        Unit** initializeUnitGridArray(int width, int height);
-
-        int getGridIndex(int x, int y);
-
-        int getTileIndex(int gridIndex, int x, int y);
+        IsoGrid<Unit*>* unitGrid = nullptr;
 
         void setUnitInGrid(int x, int y, Unit *unit);
-
     };
 }
