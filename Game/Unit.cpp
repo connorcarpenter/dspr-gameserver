@@ -79,7 +79,7 @@ namespace DsprGameServer
     }
 
     void Unit::updateStandingWalking() {
-        if (this->followingPath) {
+        if (this->followingPath && this->pushCount<5) {
             if (this->position->Equals(this->nextTilePosition) && this->nextPosition->obj()->Equals(this->nextTilePosition)) {
                 if (MathUtils::Distance(this->position->x, this->position->y, this->moveTarget->obj()->x, this->moveTarget->obj()->y)
                     <= (this->orderGroup->getAcceptableTilesToEnd()))
@@ -92,13 +92,51 @@ namespace DsprGameServer
                 }
             }
         }
+        else
+        {
+            if (this->pushCount > 0) {
+            if (this->position->Equals(this->nextTilePosition) && this->nextPosition->obj()->Equals(this->nextTilePosition)) {
+                    auto nextPoint = getPointFromDir(this->pushDirection);
+                    int nextX = this->position->x + nextPoint->x;
+                    int nextY = this->position->y + nextPoint->y;
+
+                    auto tile = this->game->tileManager->getTileAt(nextX, nextY);
+                    if (tile != nullptr && tile->walkable) {
+
+                        auto unitOnTile = getUnitAtPosition(nextX, nextY);
+                        bool tileIsOccupied = unitOnTile != nullptr;
+                        if (tileIsOccupied) {
+                            pushOtherUnit(unitOnTile);
+                            this->pushDirection+=1;
+                            if (this->pushDirection>7)this->pushDirection-=8;
+                        } else {
+                            nextTilePosition->x = nextX;
+                            nextTilePosition->y = nextY;
+                            this->pushCount = 0;
+                            setPathUnarrived();
+                        }
+                    } else {
+                        this->pushDirection+=1;
+                        if (this->pushDirection>7)this->pushDirection-=8;
+                    }
+                    delete nextPoint;
+                }
+            }
+        }
     }
 
     void Unit::startPath()
     {
         this->followingPath = true;
         this->moveTarget->dirtyObj()->Set(this->orderGroup->path->targetX, this->orderGroup->path->targetY);
-        this->disToEnd = INT_MAX;
+        auto currentTile = this->orderGroup->path->getTile(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
+        if (currentTile == nullptr){
+            int i = 12;//waht's goin on here?
+        }
+        else {
+            this->lastKnownLongPathTile = currentTile;
+            this->disToEnd = currentTile->disToEnd;
+        }
     }
 
     void Unit::setPathArrived()
@@ -107,8 +145,31 @@ namespace DsprGameServer
         this->orderGroup->unitArrived();
     }
 
+    void Unit::setPathUnarrived()
+    {
+        this->followingPath = true;
+        this->orderGroup->unitUnarrived();
+    }
+
     void Unit::getNextTile()
     {
+        //if at the front of the pack, maybe just skip this step
+        if (this->orderGroup->getUnitsArrived() == 0) {
+            int minDisInGroup = 0;
+            int maxDisInGroup = 0;
+            this->orderGroup->getMinAndMaxDisInGroup(minDisInGroup, maxDisInGroup);
+            int range = maxDisInGroup-minDisInGroup;
+            if (this->disToEnd <= minDisInGroup + (range/5)) {
+                int preferredSpacing = this->orderGroup->getNumberUnits()*10;
+
+                if (MathUtils::getRandom(MathUtils::Max(preferredSpacing, range+100))<range)
+                {
+                    return;
+                }
+            }
+        }
+
+        //if we are already on a shortPath, just follow it
         bool shortPathSuccess = false;
         if (this->shortPath != nullptr)
         {
@@ -122,10 +183,17 @@ namespace DsprGameServer
                         {
                             this->shortPath = nullptr;
                             this->shortPathCurrentTile = nullptr;
+
+                            if (shouldPushOtherUnit(unitOnTile, false))
+                            {
+                                pushOtherUnit(unitOnTile);
+                                shortPathSuccess = true;
+                            }
                         }
                         else
                         {
                             this->nextTilePosition->Set(nextTile->x, nextTile->y);
+                            this->disToEnd = nextTile->disToEnd;
                             shortPathSuccess = true;
                         }
                     }
@@ -133,10 +201,14 @@ namespace DsprGameServer
         }
 
         if (shortPathSuccess)return;
+
+        //follow the longPath
+        if (this->orderGroup->path == nullptr) return;
         auto currentTileIfOnPath = this->orderGroup->path->getTile(this->position->x, this->position->y);
         bool onLongPath = currentTileIfOnPath != nullptr;
         if (onLongPath)
         {
+            this->lastKnownLongPathTile = currentTileIfOnPath;
             this->disToEnd = currentTileIfOnPath->disToEnd;
             auto nextTile = currentTileIfOnPath->nextTile;
             if(nextTile == nullptr)
@@ -150,14 +222,14 @@ namespace DsprGameServer
                 bool tileIsOccupied = unitOnTile != nullptr;
                 if (tileIsOccupied)
                 {
-                    if (unitOnTile->followingPath)
+                    if (shouldPushOtherUnit(unitOnTile, false))
                     {
-                        getNextTileSimplePathfind();
+                        pushOtherUnit(unitOnTile);
+                        //getNextTileSimplePathfind();
                         return;
                     }
                     else
                     {
-                        //pushOtherUnit(unitOnTile);
                         getNextTileSimplePathfind();
                         return;
                     }
@@ -175,26 +247,6 @@ namespace DsprGameServer
         }
     }
 
-    PathTile *Unit::nextTileCheck(std::shared_ptr<DsprGameServer::Path> path, PathTile *curTile, int xAdj, int yAdj)
-    {
-        auto otherTile = path->getTile(curTile->x+xAdj, curTile->y+yAdj);
-        if (otherTile == nullptr) return nullptr;
-        if (otherTile->disToEnd >= curTile->disToEnd) return nullptr;
-        return nextTileIfFree(otherTile);
-    }
-
-    PathTile *Unit::nextTileIfFree(PathTile *nextTile)
-    {
-        if (nextTile == nullptr) return nullptr;
-
-        auto unitAtNextPosition = this->game->unitManager->getUnitWithNextPosition(nextTile->x, nextTile->y);
-        if (unitAtNextPosition != nullptr) return nullptr;
-
-        return nextTile;
-    }
-
-
-
     void Unit::setOrderGroup(std::shared_ptr<OrderGroup> group)
     {
         if (this->animationState->obj()->GetState() != Walking)
@@ -211,9 +263,17 @@ namespace DsprGameServer
 
     void Unit::pushOtherUnit(Unit *otherUnit)
     {
-        ///TODO: make this work!
-        //otherUnit->followingPath = true;
-        //otherUnit->nextTilePosition
+        this->timesHaventPushed = 0;
+
+        if (otherUnit->pushCount == 0) {
+            otherUnit->pushDirection = getDir(otherUnit->position->x - this->position->x,
+                                              otherUnit->position->y - this->position->y);
+            otherUnit->pushDirection += MathUtils::getRandom(3) - 1;
+            if (otherUnit->pushDirection > 7) otherUnit->pushDirection -= 8;
+            if (otherUnit->pushDirection < 0) otherUnit->pushDirection += 8;
+        }
+
+        otherUnit->pushCount += 1;
     }
 
     Unit *Unit::getUnitAtPosition(int x, int y) {
@@ -222,8 +282,18 @@ namespace DsprGameServer
 
     void Unit::getNextTileSimplePathfind() {
         Point* nextPoint = this->game->simplePathfinder->findNextPosition(this, this->orderGroup->path);
-        if (nextPoint == nullptr) return;
-        this->nextTilePosition->Set(nextPoint);
+        if (nextPoint == nullptr){
+            this->lostWithoutShortPath += 1;
+            this->disToEnd += 10;
+            return;
+        }
+        this->lostWithoutShortPath = 0;
+        auto unitOnTile = getUnitAtPosition(nextPoint->x, nextPoint->y);
+        if (unitOnTile == nullptr) {
+            this->nextTilePosition->Set(nextPoint);
+        } else {
+            pushOtherUnit(unitOnTile);
+        }
         delete nextPoint;
     }
 
@@ -387,5 +457,13 @@ namespace DsprGameServer
         this->moveTarget->clean();
         this->animationState->clean();
         //more synced vars here
+    }
+
+    bool Unit::shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding) {
+        if (inPathfinding)
+            return (!otherUnit->followingPath || otherUnit->timesHaventPushed>20) && (otherUnit->orderGroup.get() != this->orderGroup.get() || (this->timesHaventPushed>20));
+        bool shouldPush = (!otherUnit->followingPath || otherUnit->timesHaventPushed>20) && (otherUnit->orderGroup.get() != this->orderGroup.get() || (this->timesHaventPushed>20));
+        if (!shouldPush) this->timesHaventPushed += 1;
+        return shouldPush;
     }
 }

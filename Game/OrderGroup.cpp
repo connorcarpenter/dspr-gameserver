@@ -20,6 +20,7 @@ namespace DsprGameServer {
 
     void OrderGroup::removeUnit(Unit* unit){
         units.remove(unit);
+        if (!unit->followingPath) this->unitsArrived -= 1;
     }
 
     int OrderGroup::getNumberUnits() {
@@ -28,6 +29,10 @@ namespace DsprGameServer {
 
     void OrderGroup::unitArrived(){
         this->unitsArrived += 1;
+    }
+
+    void OrderGroup::unitUnarrived(){
+        this->unitsArrived -= 1;
     }
 
     int OrderGroup::getAcceptableDisToEnd() {
@@ -78,5 +83,20 @@ namespace DsprGameServer {
 
     void OrderGroup::setPath(std::shared_ptr<DsprGameServer::Path> path) {
         this->path = path;
+    }
+
+    void OrderGroup::getMinAndMaxDisInGroup(int& minDis, int& maxDis) {
+        if (this->units.size() <= 0) return;
+
+        minDis = INT_MAX;
+        maxDis = INT_MIN;
+        for (const auto &unit : units) {
+            if(unit->disToEnd < minDis)minDis = unit->disToEnd;
+            if(unit->disToEnd > maxDis)maxDis = unit->disToEnd;
+        }
+    }
+
+    int OrderGroup::getUnitsArrived() {
+        return this->unitsArrived;
     }
 }

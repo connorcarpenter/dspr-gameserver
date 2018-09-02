@@ -25,10 +25,10 @@ namespace DsprGameServer {
                  std::priority_queue<DsprGameServer::PathNode *, std::vector<DsprGameServer::PathNode *>, DsprGameServer::PathNodeComparator> *heap,
                  std::unordered_map<int, DsprGameServer::PathNode *> *map2);
 
-        std::list<PathNode *> *getNeighbors(PathNode *parent, Unit *unit);
+        std::list<PathNode *> *getNeighbors(PathNode *parent, int targetX, int targetY, Unit *unit);
 
         void tryAddNeighbor(std::list<PathNode *> *neighborList, PathNode *parent, int xAdj, int yAdj, float cost,
-                                    Unit *unit);
+                                    int targetX, int targetY, Unit *unit);
 
     private:
         const float straightCost = 2;

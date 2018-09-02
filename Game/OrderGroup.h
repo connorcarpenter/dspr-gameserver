@@ -21,12 +21,16 @@ namespace DsprGameServer {
         void recalculatePathIfTargetMoved();
         void setTargetUnit(Unit* targetUnit);
         void setPath(std::shared_ptr<DsprGameServer::Path> path);
+        void getMinAndMaxDisInGroup(int& minDis, int& maxDis);
+        int getUnitsArrived();
 
         Unit* targetUnit = nullptr;
         UnitOrder orderIndex;
         std::shared_ptr<DsprGameServer::Path> path = nullptr;
 
         int getAcceptableTilesToEnd();
+
+        void unitUnarrived();
 
     private:
 

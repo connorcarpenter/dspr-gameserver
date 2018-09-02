@@ -66,6 +66,12 @@ namespace DsprGameServer
         int disToEnd = 0;
 
         std::shared_ptr<OrderGroup> orderGroup = nullptr;
+        PathTile *lastKnownLongPathTile = nullptr;
+        int lostWithoutShortPath = 0;
+        int pushDirection = 0;
+
+        bool shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding);
+
     private:
 
         Game* game = nullptr;
@@ -88,5 +94,11 @@ namespace DsprGameServer
 
         void getNextTileSimplePathfind();
 
+        int waitToPathfind = 0;
+
+        void setPathUnarrived();
+
+        int timesHaventPushed = 0;
+        int pushCount = 0;
     };
 }

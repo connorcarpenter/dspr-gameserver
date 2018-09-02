@@ -12,8 +12,6 @@ namespace DsprGameServer
 
         PathNode(PathNode *other);
 
-        PathNode(int x, int y, PathNode *parent, float parDis, bool calcH);
-
         int getId() const;
         static int getId(int x, int y);
         float getF()const;

@@ -26,8 +26,26 @@ namespace DsprGameServer {
         auto openMap = new std::unordered_map<int, PathNode*>();
         auto nodes = new std::list<PathNode*>();
 
+        //find targetX, targetY, from path, unit's lastKnownTile
+        int targetX = 0;
+        int targetY = 0;
+
+        if (unit->lastKnownLongPathTile == nullptr){
+            targetX = path->targetX; targetY = path->targetY;
+        } else {
+            auto targetTile = unit->lastKnownLongPathTile;
+            int scanLength = this->maxNodeCost/this->straightCost;
+            while (scanLength > 0 && targetTile->nextTile != nullptr) {
+                targetTile = targetTile->nextTile;
+                scanLength -= 1;
+            }
+            targetX = targetTile->x;
+            targetY = targetTile->y;
+        }
+
         //put first node into openHeap/Map
-        auto startNode = new PathNode(unit->position->x, unit->position->y, nullptr, 0, false);
+        auto startNode = new PathNode(unit->position->x, unit->position->y, nullptr, 0, targetX, targetY);
+        int maxDisToConsider = startNode->h;
         openHeap->push(startNode);
         openMap->emplace(startNode->getId(), startNode);
         nodes->push_back(startNode);
@@ -39,27 +57,28 @@ namespace DsprGameServer {
 
             //check if we've hit the path yet
             auto tileInPath = path->getTile(currentNode->x, currentNode->y);
-            bool withinEndDis = MathUtils::Distance(currentNode->x, currentNode->y, path->targetX, path->targetY) <= unit->orderGroup->getAcceptableTilesToEnd();
-            bool pathFindSuccess = withinEndDis || (tileInPath != nullptr && tileInPath->disToEnd < unit->disToEnd);
+            bool pathFindSuccess = (tileInPath != nullptr && tileInPath->disToEnd < unit->disToEnd);
+            bool withinEndDis = false;
+            if (!pathFindSuccess) {
+                withinEndDis = MathUtils::Distance(currentNode->x, currentNode->y, path->targetX, path->targetY) <=
+                               unit->orderGroup->getAcceptableTilesToEnd();
+                if (withinEndDis) pathFindSuccess = true;
+            }
 
             if (pathFindSuccess)
             {
+                int newDisToEnd = (tileInPath != nullptr) ? tileInPath->disToEnd : (int) withinEndDis * 5;
+                if (tileInPath != nullptr){
+                    unit->lastKnownLongPathTile = tileInPath;
+                }
                 //path tile is closer to end, this is our guy!
-                if (tileInPath != nullptr)
-                {
-                    unit->disToEnd = tileInPath->disToEnd;
-                }
-                else
-                {
-                    unit->disToEnd = (int) withinEndDis * 5;
-                }
 
                 unit->shortPath = std::make_shared<Path>(currentNode->x, currentNode->y);
 
-                PathTile* prevTile = new PathTile(currentNode->x, currentNode->y, unit->disToEnd);
+                PathTile* prevTile = new PathTile(currentNode->x, currentNode->y, newDisToEnd);
                 unit->shortPath->addTile(prevTile);
 
-                int disToEndCount = unit->disToEnd;
+                int disToEndCount = newDisToEnd;
 
                 //work backwards from current tile till we're 1 step away from start
                 while (currentNode->parent != startNode && currentNode->parent != nullptr) {
@@ -73,6 +92,7 @@ namespace DsprGameServer {
                 }
 
                 unit->shortPathCurrentTile = prevTile;
+                unit->disToEnd = prevTile->disToEnd;
 
                 int newX = currentNode->x;
                 int newY = currentNode->y;
@@ -84,8 +104,13 @@ namespace DsprGameServer {
             //expand nodes
             if (currentNode->g < this->maxNodeCost)
             {
-                std::list<PathNode *> *neighbors = getNeighbors(currentNode, unit);
+                std::list<PathNode *> *neighbors = getNeighbors(currentNode, targetX, targetY, unit);
                 for (auto newNode : *neighbors) {
+                    if (newNode->h > maxDisToConsider + unit->lostWithoutShortPath){
+                        delete newNode;
+                        continue;
+                    }
+
                     if (closedMap->count(newNode->getId()) != 0) {
                         delete newNode;
                         continue;
@@ -119,24 +144,24 @@ namespace DsprGameServer {
         return nullptr;
     }
 
-    std::list<PathNode *> * SimplePathfinder::getNeighbors(PathNode *parent, Unit *unit)
+    std::list<PathNode *> * SimplePathfinder::getNeighbors(PathNode *parent, int targetX, int targetY, Unit *unit)
     {
         auto neighbors = new std::list<PathNode*>();
 
         if (parent->g + this->diagonalCost <= this->maxNodeCost)
         {
-            tryAddNeighbor(neighbors, parent, 2, 0, this->diagonalCost, unit);
-            tryAddNeighbor(neighbors, parent, -2, 0, this->diagonalCost, unit);
-            tryAddNeighbor(neighbors, parent, 0, 2, this->diagonalCost, unit);
-            tryAddNeighbor(neighbors, parent, 0, -2, this->diagonalCost, unit);
+            tryAddNeighbor(neighbors, parent, 2, 0, this->diagonalCost, targetX, targetY, unit);
+            tryAddNeighbor(neighbors, parent, -2, 0, this->diagonalCost, targetX, targetY, unit);
+            tryAddNeighbor(neighbors, parent, 0, 2, this->diagonalCost, targetX, targetY, unit);
+            tryAddNeighbor(neighbors, parent, 0, -2, this->diagonalCost, targetX, targetY, unit);
         }
 
         if (parent->g + this->straightCost <= this->maxNodeCost)
         {
-            tryAddNeighbor(neighbors, parent, 1, 1, this->straightCost, unit);
-            tryAddNeighbor(neighbors, parent, -1, -1, this->straightCost, unit);
-            tryAddNeighbor(neighbors, parent, 1, -1, this->straightCost, unit);
-            tryAddNeighbor(neighbors, parent, -1, 1, this->straightCost, unit);
+            tryAddNeighbor(neighbors, parent, 1, 1, this->straightCost, targetX, targetY, unit);
+            tryAddNeighbor(neighbors, parent, -1, -1, this->straightCost, targetX, targetY, unit);
+            tryAddNeighbor(neighbors, parent, 1, -1, this->straightCost, targetX, targetY, unit);
+            tryAddNeighbor(neighbors, parent, -1, 1, this->straightCost, targetX, targetY, unit);
         }
 
         return neighbors;
@@ -144,7 +169,7 @@ namespace DsprGameServer {
 
     void
     SimplePathfinder::tryAddNeighbor(std::list<PathNode *> *neighborList, PathNode *parent, int xAdj, int yAdj, float cost,
-                                         Unit *unit)
+                                         int targetX, int targetY, Unit *unit)
     {
 
         int x = parent->x + xAdj;
@@ -153,9 +178,9 @@ namespace DsprGameServer {
         if (tile == nullptr) return;
         if (!tile->walkable) return;
         auto otherUnit = this->game->unitManager->getUnitWithNextPosition(x, y);
-        if (otherUnit != nullptr) return;
+        if (otherUnit != nullptr && (!unit->shouldPushOtherUnit(otherUnit, true))) return;
 
-        auto newPathNode = new PathNode(x, y, parent, cost, false);
+        auto newPathNode = new PathNode(x, y, parent, cost, targetX, targetY);
         neighborList->push_front(newPathNode);
     };
 
