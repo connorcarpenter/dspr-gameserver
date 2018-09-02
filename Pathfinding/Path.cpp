@@ -17,6 +17,9 @@ namespace DsprGameServer
     {
         for(auto tile : tiles)
             delete tile.second;
+
+        for(auto tile : endTiles)
+            delete tile.second;
     }
 
     PathTile* Path::getTile(int x, int y)
@@ -29,5 +32,17 @@ namespace DsprGameServer
     void Path::addTile(PathTile *tile)
     {
         tiles.emplace(tile->getTileId(), tile);
+    }
+
+    PathTile* Path::getEndTile(int x, int y)
+    {
+        int tileId = PathTile::getTileId(x,y);
+        if (endTiles.count(tileId) == 0) return nullptr;
+        return endTiles.at(tileId);
+    }
+
+    void Path::addEndTile(PathTile *tile)
+    {
+        endTiles.emplace(tile->getTileId(), tile);
     }
 }

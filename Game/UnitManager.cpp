@@ -16,8 +16,14 @@ namespace DsprGameServer
     {
         this->game = game;
 
-        this->unitGrid = new IsoGrid<Unit*>();
+        this->unitGrid = new PtrIsoGrid<Unit*>();
         this->unitGrid->initialize(this->game->tileManager->width * 2, this->game->tileManager->height * 2);
+
+        this->endPosGrid = new PrimIsoGrid<bool>();
+        this->endPosGrid->initialize(this->game->tileManager->width * 2, this->game->tileManager->height * 2);
+        this->endPosGrid->forEachCoord([&](int x, int y){
+           this->endPosGrid->set(x,y,false);
+        });
     }
 
     void UnitManager::initializeFirstUnits(){
@@ -41,6 +47,7 @@ namespace DsprGameServer
         }
 
         delete unitGrid;
+        delete endPosGrid;
     }
 
     void UnitManager::sendUnits(DsprGameServer::Player* player)

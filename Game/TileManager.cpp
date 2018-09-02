@@ -16,7 +16,7 @@ namespace DsprGameServer
         this->width = width;
         this->height = height;
 
-        this->tileGrid = new IsoGrid<Tile*>();
+        this->tileGrid = new PtrIsoGrid<Tile*>();
         this->tileGrid->initialize(this->width * 2, this->height * 2);
         this->initializeTiles();
 

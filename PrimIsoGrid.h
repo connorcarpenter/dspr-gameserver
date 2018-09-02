@@ -7,21 +7,14 @@
 
 namespace DsprGameServer {
     template<class T>
-    class IsoGrid
+    class PrimIsoGrid
     {
     public:
 
-        IsoGrid() {};
+        PrimIsoGrid() {};
 
-        ~IsoGrid()
+        ~PrimIsoGrid()
         {
-            for (int j = 0; j < this->halfHeight; j += 1) {
-                for (int i = 0; i < this->halfWidth; i += 1) {
-                    delete this->gridArrayA[(j * this->halfWidth) + i];
-                    delete this->gridArrayB[(j * this->halfWidth) + i];
-                }
-            }
-
             delete[] this->gridArrayA;
             delete[] this->gridArrayB;
         }
@@ -60,7 +53,7 @@ namespace DsprGameServer {
         T get(int x, int y)
         {
             int gridIndex = getGridIndex(x, y);
-            if (gridIndex == -1) return nullptr;
+            if (gridIndex == -1) return T();
             int tileIndex = getTileIndex(gridIndex, x, y);
             if (gridIndex == 0)
             {
@@ -139,7 +132,7 @@ namespace DsprGameServer {
             {
                 for (int i = 0;i< width; i+=1)
                 {
-                    output[(j*width)+i] = nullptr;
+                    output[(j*width)+i] = T();
                 }
             }
             return output;

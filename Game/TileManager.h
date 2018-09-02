@@ -7,7 +7,7 @@
 #include "Tile.h"
 #include "../Player.h"
 #include "Game.h"
-#include "../IsoGrid.h"
+#include "../PtrIsoGrid.h"
 
 namespace DsprGameServer {
 
@@ -31,7 +31,7 @@ namespace DsprGameServer {
 
         Game *game = nullptr;
 
-        IsoGrid<Tile*>* tileGrid = nullptr;
+        PtrIsoGrid<Tile*>* tileGrid = nullptr;
 
         void initializeTiles();
     };

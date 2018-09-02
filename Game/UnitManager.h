@@ -11,6 +11,7 @@
 #include "../Player.h"
 #include "TileManager.h"
 #include "../Pathfinding/AStarPathfinder.h"
+#include "../PrimIsoGrid.h"
 
 namespace DsprGameServer {
 
@@ -43,7 +44,8 @@ namespace DsprGameServer {
         std::queue<int> unusedIds;
         Game* game = nullptr;
 
-        IsoGrid<Unit*>* unitGrid = nullptr;
+        PtrIsoGrid<Unit*>* unitGrid = nullptr;
+        PrimIsoGrid<bool>* endPosGrid = nullptr;
 
         void setUnitInGrid(int x, int y, Unit *unit);
     };
