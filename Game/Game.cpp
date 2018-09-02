@@ -17,6 +17,7 @@ namespace DsprGameServer
         AStarPathfinder::setMapWidth(64);
         this->tribeManager = new TribeManager(this);
         this->unitManager = new UnitManager(this);
+        this->unitManager->initializeFirstUnits();
         this->pathfinder = new AStarPathfinder(this);
         this->simplePathfinder = new SimplePathfinder(this);
     }

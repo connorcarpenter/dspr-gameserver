@@ -29,13 +29,28 @@ namespace DsprGameServer {
 
         void cleanAllUnits();
 
-        Unit* getUnitWithNextPosition(int x, int y);
+        void removeUnitFromGrid(Unit *unit);
+
+        void addUnitToGrid(Unit *unit);
+
+        Unit *getUnitFromGrid(int x, int y);
+
+        void initializeFirstUnits();
 
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
         Game* game = nullptr;
 
+        Unit** unitGridArrayA = nullptr;
+        Unit** unitGridArrayB = nullptr;
+        Unit** initializeUnitGridArray(int width, int height);
+
+        int getGridIndex(int x, int y);
+
+        int getTileIndex(int gridIndex, int x, int y);
+
+        void setUnitInGrid(int x, int y, Unit *unit);
 
     };
 }

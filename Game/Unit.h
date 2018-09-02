@@ -60,6 +60,8 @@ namespace DsprGameServer
         int attackFrameIndex = 0;
         int attackFramesNumber = 5;
         int attackFrameToApplyDamage = 3;
+        const int sight = 8;
+        const int acquisition = 8;
 
         Tribe *tribe = nullptr;
 
@@ -100,5 +102,7 @@ namespace DsprGameServer
 
         int timesHaventPushed = 0;
         int pushCount = 0;
+
+        void updateNextPosition(Point *newNextPosition);
     };
 }

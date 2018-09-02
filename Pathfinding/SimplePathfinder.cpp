@@ -177,7 +177,7 @@ namespace DsprGameServer {
         auto tile = this->game->tileManager->getTileAt(x, y);
         if (tile == nullptr) return;
         if (!tile->walkable) return;
-        auto otherUnit = this->game->unitManager->getUnitWithNextPosition(x, y);
+        auto otherUnit = this->game->unitManager->getUnitFromGrid(x, y);
         if (otherUnit != nullptr && (!unit->shouldPushOtherUnit(otherUnit, true))) return;
 
         auto newPathNode = new PathNode(x, y, parent, cost, targetX, targetY);

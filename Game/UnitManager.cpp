@@ -16,17 +16,20 @@ namespace DsprGameServer
     {
         this->game = game;
 
-        //createUnit(6, 6, this->game->tribeManager->tribeA);
+        this->unitGridArrayA = initializeUnitGridArray(this->game->tileManager->width, this->game->tileManager->height);
+        this->unitGridArrayB = initializeUnitGridArray(this->game->tileManager->width, this->game->tileManager->height);
+    }
 
+    void UnitManager::initializeFirstUnits(){
         for (int i = 0; i<3; i++)
             for (int j = 0; j<4;j++)
                 createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA);
-//
-//        for(int i=0;i<10;i++){
-//            createUnit((MathUtils::getRandom(this->game->tileManager->width-30)+10) * 2,
-//                       (MathUtils::getRandom(this->game->tileManager->height-30)+10) * 2,
-//                       this->game->tribeManager->tribeB);
-//        }
+
+        for(int i=0;i<10;i++){
+            createUnit((MathUtils::getRandom(this->game->tileManager->width-30)+10) * 2,
+                       (MathUtils::getRandom(this->game->tileManager->height-30)+10) * 2,
+                       this->game->tribeManager->tribeB);
+        }
     }
 
     UnitManager::~UnitManager()
@@ -161,15 +164,74 @@ namespace DsprGameServer
         }
     }
 
-    Unit *UnitManager::getUnitWithNextPosition(int x, int y) {
-        for(const auto& unitPair : unitMap)
+    Unit** UnitManager::initializeUnitGridArray(int width, int height) {
+        Unit** output = new Unit*[width * height];
+        for (int j = 0; j < height; j += 1)
         {
-            if (unitPair.second->nextPosition->obj()->x == x && unitPair.second->nextPosition->obj()->y == y)
-                return unitPair.second;
+            for (int i = 0;i< width; i+=1)
+            {
+                output[(j*width)+i] = nullptr;
+            }
         }
-
-        return nullptr;
+        return output;
     }
 
+    int UnitManager::getGridIndex(int x, int y) {
+        if (x < 0 || y < 0 || x >= this->game->tileManager->width*2 || y >= this->game->tileManager->height*2) return -1;
 
+        if (x % 2 == 0 && y % 2 == 0) return 0;
+        if ((x+1) % 2 == 0 && (y+1) % 2 == 0) return 1;
+        return -1;
+    }
+
+    int UnitManager::getTileIndex(int gridIndex, int x, int y) {
+        if (gridIndex == 0)
+        {
+            int xsmall = x / 2;
+            int ysmall = y / 2;
+            return (ysmall * this->game->tileManager->width) + xsmall;
+        }
+        else
+        {
+            int xsmall = (x-1) / 2;
+            int ysmall = (y-1) / 2;
+            return (ysmall * this->game->tileManager->width) + xsmall;
+        }
+    }
+
+    Unit* UnitManager::getUnitFromGrid(int x, int y){
+        int gridIndex = getGridIndex(x, y);
+        if (gridIndex == -1) return 0;
+        int tileIndex = getTileIndex(gridIndex, x, y);
+        if (gridIndex == 0)
+        {
+            return this->unitGridArrayA[tileIndex];
+        }
+        else
+        {
+            return this->unitGridArrayB[tileIndex];
+        }
+    }
+
+    void UnitManager::setUnitInGrid(int x, int y, Unit* unit){
+        int gridIndex = getGridIndex(x, y);
+        if (gridIndex == -1) return;
+        int tileIndex = getTileIndex(gridIndex, x, y);
+        if (gridIndex == 0)
+        {
+            this->unitGridArrayA[tileIndex] = unit;
+        }
+        else
+        {
+            this->unitGridArrayB[tileIndex] = unit;
+        }
+    }
+
+    void UnitManager::removeUnitFromGrid(Unit *unit) {
+        setUnitInGrid(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y, nullptr);
+    }
+
+    void UnitManager::addUnitToGrid(Unit *unit) {
+        setUnitInGrid(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y, unit);
+    }
 }

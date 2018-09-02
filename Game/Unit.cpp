@@ -19,6 +19,7 @@ namespace DsprGameServer
         this->id = id;
         this->position = new Point(x, y);
         this->nextPosition = new Synced<Point>("nextPosition", new Point(x, y));
+        this->game->unitManager->addUnitToGrid(this);
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
         this->nextTilePosition = new Point(x,y);
@@ -46,17 +47,21 @@ namespace DsprGameServer
             }
         }
 
-        if (this->walkAmount == 0 && this->orderGroup != nullptr) {
-            switch (this->orderGroup->orderIndex) {
-                case Move:
-                    this->updateStandingWalking();
-                    break;
-                case Follow:
-                    this->updateFollowing();
-                    break;
-                case AttackTarget:
-                    this->updateAttacking();
-                    break;
+        if (this->walkAmount == 0) {
+            if(this->orderGroup != nullptr) {
+                switch (this->orderGroup->orderIndex) {
+                    case Move:
+                        this->updateStandingWalking();
+                        break;
+                    case Follow:
+                        this->updateFollowing();
+                        break;
+                    case AttackTarget:
+                        this->updateAttacking();
+                        break;
+                }
+            } else {
+                this->updateStandingWalking();
             }
         }
 
@@ -74,21 +79,21 @@ namespace DsprGameServer
                 this->walkSpeed = this->walkSpeedStraight;
             }
 
-            this->nextPosition->dirtyObj()->Set(this->nextTilePosition);
+            this->updateNextPosition(this->nextTilePosition);
         }
     }
 
     void Unit::updateStandingWalking() {
         if (this->followingPath && this->pushCount<5) {
             if (this->position->Equals(this->nextTilePosition) && this->nextPosition->obj()->Equals(this->nextTilePosition)) {
-                if (MathUtils::Distance(this->position->x, this->position->y, this->moveTarget->obj()->x, this->moveTarget->obj()->y)
-                    <= (this->orderGroup->getAcceptableTilesToEnd()))
-                {
-                    setPathArrived();
-                }
-                else
-                {
-                    getNextTile();
+                if (this->orderGroup != nullptr) {
+                    if (MathUtils::Distance(this->position->x, this->position->y, this->moveTarget->obj()->x,
+                                            this->moveTarget->obj()->y)
+                        <= (this->orderGroup->getAcceptableTilesToEnd())) {
+                        setPathArrived();
+                    } else {
+                        getNextTile();
+                    }
                 }
             }
         }
@@ -131,12 +136,12 @@ namespace DsprGameServer
         this->moveTarget->dirtyObj()->Set(this->orderGroup->path->targetX, this->orderGroup->path->targetY);
         auto currentTile = this->orderGroup->path->getTile(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
         if (currentTile == nullptr){
-            int i = 12;//waht's goin on here?
+            this->disToEnd = INT_MAX;
         }
         else {
-            this->lastKnownLongPathTile = currentTile;
             this->disToEnd = currentTile->disToEnd;
         }
+        this->lastKnownLongPathTile = currentTile;
     }
 
     void Unit::setPathArrived()
@@ -148,21 +153,22 @@ namespace DsprGameServer
     void Unit::setPathUnarrived()
     {
         this->followingPath = true;
-        this->orderGroup->unitUnarrived();
+        if (this->orderGroup != nullptr)
+            this->orderGroup->unitUnarrived();
     }
 
     void Unit::getNextTile()
     {
         //if at the front of the pack, maybe just skip this step
-        if (this->orderGroup->getUnitsArrived() == 0) {
+        if (this->orderGroup->getUnitsArrived() == 0 && this->orderGroup->getNumberUnits() > 1) {
             int minDisInGroup = 0;
             int maxDisInGroup = 0;
             this->orderGroup->getMinAndMaxDisInGroup(minDisInGroup, maxDisInGroup);
             int range = maxDisInGroup-minDisInGroup;
-            if (this->disToEnd <= minDisInGroup + (range/5)) {
-                int preferredSpacing = this->orderGroup->getNumberUnits()*10;
+            if (this->disToEnd <= minDisInGroup + (range/4)) {
+                int preferredSpacing = this->orderGroup->getNumberUnits()*5;
 
-                if (MathUtils::getRandom(MathUtils::Max(preferredSpacing, range+100))<range)
+                if (MathUtils::getRandom(MathUtils::Max(preferredSpacing+100, range))<range)
                 {
                     return;
                 }
@@ -192,6 +198,7 @@ namespace DsprGameServer
                         }
                         else
                         {
+                            this->shortPathCurrentTile = nextTile;
                             this->nextTilePosition->Set(nextTile->x, nextTile->y);
                             this->disToEnd = nextTile->disToEnd;
                             shortPathSuccess = true;
@@ -277,14 +284,15 @@ namespace DsprGameServer
     }
 
     Unit *Unit::getUnitAtPosition(int x, int y) {
-        return this->game->unitManager->getUnitWithNextPosition(x,y);
+        return this->game->unitManager->getUnitFromGrid(x,y);
     }
 
     void Unit::getNextTileSimplePathfind() {
         Point* nextPoint = this->game->simplePathfinder->findNextPosition(this, this->orderGroup->path);
         if (nextPoint == nullptr){
             this->lostWithoutShortPath += 1;
-            this->disToEnd += 10;
+            if (lostWithoutShortPath > 5)
+                this->disToEnd += 10;
             return;
         }
         this->lostWithoutShortPath = 0;
@@ -299,80 +307,59 @@ namespace DsprGameServer
 
     void Unit::updateFollowing()
     {
-//        if (this->followingPath) {
-//            if (this->currentPathTile != nullptr) {
-//                if (this->position->x == nextPathTile->x && this->position->y == nextPathTile->y) {
-//                    currentPathTile = nextPathTile;
-//                    nextPathTile = getNextPathTile();
-//                    this->orderGroup->recalculatePathIfTargetMoved();
-//                }
-//
-//                if (nextPathTile == nullptr || (currentPathTile->heat <= this->orderGroup->getAcceptableHeat())) {
-//                    this->moveVector->Set(0, 0);
-//                    this->followingPath = false;
-//                    this->orderGroup->unitArrived();
-//                } else {
-//                    this->moveVector->Add(nextPathTile->x - this->position->x, nextPathTile->y - this->position->y);
-//                }
-//            } else {
-//                this->followingPath = false;
-//            }
-//        } else{
-//            this->orderGroup->recalculatePathIfTargetMoved();
-//        }
+        this->updateStandingWalking();
+        this->orderGroup->recalculatePathIfTargetMoved();
     }
 
-    void Unit::updateAttacking() {
+    void Unit::updateAttacking()
+    {
+        auto targetUnit = this->orderGroup->targetUnit;
+        int distanceToTarget = (int) MathUtils::Ceiling(MathUtils::Distance(this->position->x, this->position->y,
+                                                                            targetUnit->position->x, targetUnit->position->y));
 
-//        auto targetUnit = this->orderGroup->targetUnit;
-//        int distanceToTarget = (int) MathUtils::Ceiling(MathUtils::Distance(this->position->x, this->position->y,
-//                                                                            targetUnit->position->x, targetUnit->position->y));
-//
-//        if (distanceToTarget <= this->range){
-//            //start to attack!
-//            if (this->animationState->obj()->GetState() != Attacking) {
-//                this->animationState->dirtyObj()->SetState(Attacking);
-//                int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
-//                this->animationState->dirtyObj()->SetHeading(newHeading);
-//                this->attackFrameIndex = 0;
-//            }
-//
-//            this->attackFrameIndex += 1;
-//            if (this->attackFrameIndex == this->attackFrameToApplyDamage){
-//                targetUnit->health -= this->damage;
-//            }
-//            if (this->attackFrameIndex >= this->attackFramesNumber){
-//                this->attackFrameIndex = 0;
-//            }
-//        }
-//        else {
-//            //try to get in range of target unit
-//            if (this->animationState->obj()->GetState() != Walking)
-//                this->animationState->dirtyObj()->SetState(Walking);
-//
-//            if (this->followingPath) {
-//                if (this->currentPathTile != nullptr) {
-//                    if (this->position->x == nextPathTile->x && this->position->y == nextPathTile->y) {
-//                        currentPathTile = nextPathTile;
-//                        nextPathTile = getNextPathTile();
-//
-//                        this->orderGroup->recalculatePathIfTargetMoved();
-//                    }
-//
-//                    if (nextPathTile == nullptr) {
-//                        this->moveVector->Set(0, 0);
-//                        this->followingPath = false;
-//                        this->orderGroup->unitArrived();
-//                    } else {
-//                        this->moveVector->Add(nextPathTile->x - this->position->x, nextPathTile->y - this->position->y);
-//                    }
-//                } else {
-//                    this->followingPath = false;
-//                }
-//            } else {
-//                this->orderGroup->recalculatePathIfTargetMoved();
-//            }
-//        }
+        if (distanceToTarget <= this->range){
+            //start to attack!
+            if (this->animationState->obj()->GetState() != Attacking) {
+                this->animationState->dirtyObj()->SetState(Attacking);
+                int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
+                this->animationState->dirtyObj()->SetHeading(newHeading);
+                this->attackFrameIndex = 0;
+                this->orderGroup->unitArrived();
+            }
+
+            this->attackFrameIndex += 1;
+            if (this->attackFrameIndex == this->attackFrameToApplyDamage){
+                targetUnit->health -= this->damage;
+            }
+            if (this->attackFrameIndex >= this->attackFramesNumber){
+                this->attackFrameIndex = 0;
+            }
+        }
+        else {
+            //try to get in range of target unit
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+                this->orderGroup->unitUnarrived();
+            }
+
+            this->updateFollowing();
+        }
+    }
+
+    bool Unit::shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding) {
+        if (otherUnit->tribe != this->tribe && !inPathfinding) return false;
+        if (otherUnit->animationState->obj()->GetState() == Attacking) return false;
+        if (inPathfinding)
+            return (!otherUnit->followingPath || otherUnit->timesHaventPushed>20) && (otherUnit->orderGroup.get() != this->orderGroup.get() || (this->timesHaventPushed>20));
+        bool shouldPush = (!otherUnit->followingPath || otherUnit->timesHaventPushed>20) && (otherUnit->orderGroup.get() != this->orderGroup.get() || (this->timesHaventPushed>20));
+        if (!shouldPush) this->timesHaventPushed += 1;
+        return shouldPush;
+    }
+
+    void Unit::updateNextPosition(Point *newNextPosition) {
+        this->game->unitManager->removeUnitFromGrid(this);
+        this->nextPosition->dirtyObj()->Set(newNextPosition);
+        this->game->unitManager->addUnitToGrid(this);
     }
 
     int Unit::getDir(int x, int y)
@@ -457,13 +444,5 @@ namespace DsprGameServer
         this->moveTarget->clean();
         this->animationState->clean();
         //more synced vars here
-    }
-
-    bool Unit::shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding) {
-        if (inPathfinding)
-            return (!otherUnit->followingPath || otherUnit->timesHaventPushed>20) && (otherUnit->orderGroup.get() != this->orderGroup.get() || (this->timesHaventPushed>20));
-        bool shouldPush = (!otherUnit->followingPath || otherUnit->timesHaventPushed>20) && (otherUnit->orderGroup.get() != this->orderGroup.get() || (this->timesHaventPushed>20));
-        if (!shouldPush) this->timesHaventPushed += 1;
-        return shouldPush;
     }
 }

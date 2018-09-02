@@ -57,7 +57,7 @@ namespace DsprGameServer {
 
                 for (const auto& unit : units)
                 {
-                    unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
+                    unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
                 }
 
                 auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
