@@ -16,11 +16,14 @@ namespace DsprGameServer
     class Game;
     class PathNode;
     class PathNodeComparator;
+    class MoveEndPosFiller;
+    class AttackEndPosFiller;
 
     class AStarPathfinder
     {
     public:
         AStarPathfinder(Game *game);
+        ~AStarPathfinder();
 
         std::shared_ptr<Path> findPath(const std::list<std::pair<int, int>> &unitPositions, int targetX, int targetY,
                                                bool attacking);
@@ -44,9 +47,7 @@ namespace DsprGameServer
         const int disToEndUnits = 10;
 
         Game* game = nullptr;
-
-        void fillEndTilesMove(std::shared_ptr<Path> path, int unitNumber);
-
-        void fillEndTilesAttack(std::shared_ptr<Path> path, int unitNumber);
+        MoveEndPosFiller *moveEndPosFiller = nullptr;
+        AttackEndPosFiller *attackEndPosFiller = nullptr;
     };
 }

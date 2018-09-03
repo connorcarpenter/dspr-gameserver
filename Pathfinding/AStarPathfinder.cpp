@@ -3,18 +3,27 @@
 //
 
 #include <unordered_map>
-#include <bits/unordered_map.h>
 #include <set>
 #include <queue>
 #include "AStarPathfinder.h"
 #include "PathTile.h"
 #include "PathNode.h"
 #include "../Game/UnitManager.h"
+#include "MoveEndPosFiller.h"
+#include "AttackEndPosFiller.h"
 
 namespace DsprGameServer
 {
     AStarPathfinder::AStarPathfinder(Game *game) {
         this->game = game;
+        this->moveEndPosFiller = new MoveEndPosFiller(game);
+        this->attackEndPosFiller = new AttackEndPosFiller(game);
+    }
+
+    AStarPathfinder::~AStarPathfinder()
+    {
+        delete this->moveEndPosFiller;
+        delete this->attackEndPosFiller;
     }
 
     std::shared_ptr<Path>
@@ -32,9 +41,9 @@ namespace DsprGameServer
         }
 
         if (attacking){
-            this->fillEndTilesMove(path, unitPositions.size() + 1);
+            this->attackEndPosFiller->fillEndTiles(path, unitPositions.size());
         } else {
-            this->fillEndTilesMove(path, unitPositions.size());
+            this->moveEndPosFiller->fillEndTiles(path, unitPositions.size());
         }
 
         return path;
@@ -204,70 +213,5 @@ namespace DsprGameServer
         delete map;
         delete map2;
         delete heap;
-    }
-
-    void AStarPathfinder::fillEndTilesMove(std::shared_ptr<Path> path, int unitNumber)
-    {
-        int endTileNumber = (unitNumber == 1) ? 1 : unitNumber+2;
-        auto closedMap = new std::unordered_map<int, PathNode*>();
-        auto openHeap = new std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>();
-        auto openMap = new std::unordered_map<int, PathNode*>();
-        auto nodes = new std::list<PathNode*>();
-
-        //put first node into openHeap/Map
-        auto startNode = new PathNode(path->targetX, path->targetY, nullptr, 0, path->targetX, path->targetY);
-        openHeap->push(startNode);
-        openMap->emplace(startNode->getId(), startNode);
-        nodes->push_back(startNode);
-
-        while(openMap->size() > 0)
-        {
-            PathNode* currentNode = openHeap->top(); /*and then delete it*/ openHeap->pop();
-            openMap->erase(currentNode->getId());
-
-            if (closedMap->size() + 1 < endTileNumber)
-            {
-                std::list<PathNode*>* neighbors = getNeighbors(currentNode, path->targetX, path->targetY, true);
-                for(auto newNode : *neighbors)
-                {
-                    if (closedMap->count(newNode->getId()) != 0)
-                    {
-                        delete newNode;
-                        continue;
-                    }
-
-                    if (openMap->count(newNode->getId()) == 0)
-                    {
-                        openHeap->push(newNode);
-                        openMap->emplace(newNode->getId(), newNode);
-                        nodes->push_back(newNode);
-                    }
-                    else
-                    {
-                        delete newNode;
-                        continue;
-                    }
-                }
-
-                //clean up neighbor list
-                delete neighbors;
-            }
-            else
-            {
-                closedMap->emplace(currentNode->getId(), currentNode);
-                break;
-            }
-
-            closedMap->emplace(currentNode->getId(), currentNode);
-        }
-
-        //all our end tiles are in the closedMap, so iterate through that
-        for(auto nodePair : *closedMap) {
-            auto node = nodePair.second;
-            path->addEndTile(new PathTile(node->x, node->y, 0));
-        }
-
-        cleanUp(nodes, closedMap, openHeap, openMap);
-        return;
     }
 }
