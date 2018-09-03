@@ -23,6 +23,7 @@ namespace DsprGameServer {
         int getUnitsArrived();
         void unitArrived();
         void unitUnarrived();
+        bool isAttacking();
 
         Unit* targetUnit = nullptr;
         UnitOrder orderIndex;

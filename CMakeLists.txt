@@ -50,6 +50,6 @@ add_executable(dspr-gameserver
         Pathfinding/PathNode.h Pathfinding/PathNode.cpp
         Pathfinding/PathTile.h Pathfinding/PathTile.cpp
         Pathfinding/MoveEndPosFiller.h Pathfinding/MoveEndPosFiller.cpp
-        Pathfinding/AttackEndPosFiller.h Pathfinding/AttackEndPosFiller.cpp)
+        )
 
 target_link_libraries (dspr-gameserver LINK_PUBLIC libuWS libssl libz)

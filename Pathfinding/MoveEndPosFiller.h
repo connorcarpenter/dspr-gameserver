@@ -23,10 +23,10 @@ namespace DsprGameServer {
 
 
     private:
-        std::list<PathNode *> *getNeighbors(PathNode *parent, int targetX, int targetY, bool endFilling);
+        std::list<PathNode *> *getNeighbors(PathNode *parent, int targetX, int targetY);
 
         void tryAddNeighbor(std::list<PathNode *> *neighborList, PathNode *parentTile, int tileX, int y,
-                            int targetX, int targetY, float cost, bool endFilling);
+                                    int targetX, int targetY, float cost);
 
         void cleanUp(std::list<PathNode *> *nodes, std::unordered_map<int, PathNode *> *map,
                      std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* heap, std::unordered_map<int, PathNode *> *map2);

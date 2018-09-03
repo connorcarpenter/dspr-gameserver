@@ -36,7 +36,7 @@ namespace DsprGameServer {
 
             if (closedMap->size() + 1 < endTileNumber)
             {
-                std::list<PathNode*>* neighbors = getNeighbors(currentNode, path->targetX, path->targetY, true);
+                std::list<PathNode*>* neighbors = getNeighbors(currentNode, path->targetX, path->targetY);
                 for(auto newNode : *neighbors)
                 {
                     if (closedMap->count(newNode->getId()) != 0)
@@ -80,25 +80,25 @@ namespace DsprGameServer {
         return;
     }
 
-    std::list<PathNode *> * MoveEndPosFiller::getNeighbors(PathNode *parent, int targetX, int targetY, bool endFilling)
+    std::list<PathNode *> * MoveEndPosFiller::getNeighbors(PathNode *parent, int targetX, int targetY)
     {
         auto neighbors = new std::list<PathNode*>();
 
-        tryAddNeighbor(neighbors, parent, 2, 0, targetX, targetY, this->diagonalCost, endFilling);
-        tryAddNeighbor(neighbors, parent, -2, 0, targetX, targetY, this->diagonalCost, endFilling);
-        tryAddNeighbor(neighbors, parent, 0, 2, targetX, targetY, this->diagonalCost, endFilling);
-        tryAddNeighbor(neighbors, parent, 0, -2, targetX, targetY, this->diagonalCost, endFilling);
+        tryAddNeighbor(neighbors, parent, 2, 0, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent, -2, 0, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent, 0, 2, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent, 0, -2, targetX, targetY, this->diagonalCost);
 
-        tryAddNeighbor(neighbors, parent, 1, 1, targetX, targetY, this->straightCost, endFilling);
-        tryAddNeighbor(neighbors, parent, -1, -1, targetX, targetY, this->straightCost, endFilling);
-        tryAddNeighbor(neighbors, parent, 1, -1, targetX, targetY, this->straightCost, endFilling);
-        tryAddNeighbor(neighbors, parent, -1, 1, targetX, targetY, this->straightCost, endFilling);
+        tryAddNeighbor(neighbors, parent, 1, 1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent, -1, -1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent, 1, -1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent, -1, 1, targetX, targetY, this->straightCost);
 
         return neighbors;
     }
 
     void MoveEndPosFiller::tryAddNeighbor(std::list<PathNode *> *neighborList, PathNode *parent, int xAdj, int yAdj, int targetX,
-                                         int targetY, float cost, bool endFilling)
+                                              int targetY, float cost)
     {
 
         int x = parent->x + xAdj;
@@ -106,7 +106,7 @@ namespace DsprGameServer {
         auto tile = this->game->tileManager->getTileAt(x, y);
         if (tile == nullptr) return;
         if (!tile->walkable) return;
-        if (endFilling) if (this->game->unitManager->getEndPosAtCoord(x, y)) return;
+        if (this->game->unitManager->getEndPosAtCoord(x, y)) return;
 
         auto newPathNode = new PathNode(x, y, parent, cost, targetX, targetY);
         neighborList->push_front(newPathNode);

@@ -10,25 +10,22 @@
 #include "PathNode.h"
 #include "../Game/UnitManager.h"
 #include "MoveEndPosFiller.h"
-#include "AttackEndPosFiller.h"
 
 namespace DsprGameServer
 {
     AStarPathfinder::AStarPathfinder(Game *game) {
         this->game = game;
         this->moveEndPosFiller = new MoveEndPosFiller(game);
-        this->attackEndPosFiller = new AttackEndPosFiller(game);
     }
 
     AStarPathfinder::~AStarPathfinder()
     {
         delete this->moveEndPosFiller;
-        delete this->attackEndPosFiller;
     }
 
     std::shared_ptr<Path>
     AStarPathfinder::findPath(const std::list<std::pair<int, int>> &unitPositions, int targetX, int targetY,
-                                  bool attacking)
+                                  bool attackTarget)
     {
         auto targetTile = this->game->tileManager->getTileAt(targetX, targetY);
         if (targetTile == nullptr || !targetTile->walkable) return nullptr;
@@ -40,11 +37,8 @@ namespace DsprGameServer
             addToPath(path, startPosition.first, startPosition.second, targetX, targetY);
         }
 
-        if (attacking){
-            this->attackEndPosFiller->fillEndTiles(path, unitPositions.size());
-        } else {
+        if (!attackTarget)
             this->moveEndPosFiller->fillEndTiles(path, unitPositions.size());
-        }
 
         return path;
     }
@@ -116,7 +110,7 @@ namespace DsprGameServer
                 }
             }
 
-            std::list<PathNode*>* neighbors = getNeighbors(currentNode, targetX, targetY, false);
+            std::list<PathNode*>* neighbors = getNeighbors(currentNode, targetX, targetY);
             for(auto newNode : *neighbors)
             {
                 if (closedMap->count(newNode->getId()) != 0)
@@ -158,25 +152,25 @@ namespace DsprGameServer
         return;
     }
 
-    std::list<PathNode *> * AStarPathfinder::getNeighbors(PathNode *parent, int targetX, int targetY, bool endFilling)
+    std::list<PathNode *> * AStarPathfinder::getNeighbors(PathNode *parent, int targetX, int targetY)
     {
         auto neighbors = new std::list<PathNode*>();
 
-        tryAddNeighbor(neighbors, parent, 2, 0, targetX, targetY, this->diagonalCost, endFilling);
-        tryAddNeighbor(neighbors, parent, -2, 0, targetX, targetY, this->diagonalCost, endFilling);
-        tryAddNeighbor(neighbors, parent, 0, 2, targetX, targetY, this->diagonalCost, endFilling);
-        tryAddNeighbor(neighbors, parent, 0, -2, targetX, targetY, this->diagonalCost, endFilling);
+        tryAddNeighbor(neighbors, parent, 2, 0, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent, -2, 0, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent, 0, 2, targetX, targetY, this->diagonalCost);
+        tryAddNeighbor(neighbors, parent, 0, -2, targetX, targetY, this->diagonalCost);
 
-        tryAddNeighbor(neighbors, parent, 1, 1, targetX, targetY, this->straightCost, endFilling);
-        tryAddNeighbor(neighbors, parent, -1, -1, targetX, targetY, this->straightCost, endFilling);
-        tryAddNeighbor(neighbors, parent, 1, -1, targetX, targetY, this->straightCost, endFilling);
-        tryAddNeighbor(neighbors, parent, -1, 1, targetX, targetY, this->straightCost, endFilling);
+        tryAddNeighbor(neighbors, parent, 1, 1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent, -1, -1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent, 1, -1, targetX, targetY, this->straightCost);
+        tryAddNeighbor(neighbors, parent, -1, 1, targetX, targetY, this->straightCost);
 
         return neighbors;
     }
 
     void AStarPathfinder::tryAddNeighbor(std::list<PathNode *> *neighborList, PathNode *parent, int xAdj, int yAdj, int targetX,
-                                             int targetY, float cost, bool endFilling)
+                                             int targetY, float cost)
     {
 
         int x = parent->x + xAdj;
@@ -184,7 +178,6 @@ namespace DsprGameServer
         auto tile = this->game->tileManager->getTileAt(x, y);
         if (tile == nullptr) return;
         if (!tile->walkable) return;
-        if (endFilling) if (this->game->unitManager->getEndPosAtCoord(x, y)) return;
 
         auto newPathNode = new PathNode(x, y, parent, cost, targetX, targetY);
         neighborList->push_front(newPathNode);

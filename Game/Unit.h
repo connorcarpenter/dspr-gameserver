@@ -75,6 +75,8 @@ namespace DsprGameServer
 
         bool shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding);
 
+        bool withinAttackRange(int x, int y, Unit *targetUnit);
+
     private:
 
         Game* game = nullptr;
@@ -106,5 +108,6 @@ namespace DsprGameServer
 
         void updateNextPosition(Point *newNextPosition);
         Unit* getEnemyUnitInAcquisitionRange();
+
     };
 }

@@ -97,14 +97,14 @@ namespace DsprGameServer
             //ideally, we would store the current order in a stack, and just push it down.. for now, no such thing
             std::list<std::pair<int, int>> unitPositionsList;
 
-            auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackTarget);
+            auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackMove);
             newOrderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
 
             unitPositionsList.emplace_back(std::pair<int,int>(this->position->x, this->position->y));
             this->setOrderGroup(newOrderGroup);
 
             auto path = this->game->pathfinder->findPath(unitPositionsList, enemyUnitInAcquisitionRange->position->x,
-                                                         enemyUnitInAcquisitionRange->position->y, true);
+                                                         enemyUnitInAcquisitionRange->position->y, false);
             if (path != nullptr)
             {
                 newOrderGroup->setPath(path);
@@ -117,11 +117,20 @@ namespace DsprGameServer
         if (this->followingPath && this->pushCount<5) {
             if (this->position->Equals(this->nextTilePosition) && this->nextPosition->obj()->Equals(this->nextTilePosition)) {
                 if (this->orderGroup != nullptr) {
-                    if (this->orderGroup->path->getEndTile(this->position->x, this->position->y) != nullptr) {
-                        setPathArrived();
-                    } else {
-                        getNextTile();
+                    if (this->orderGroup->orderIndex == AttackTarget)
+                    {
+                        if (this->withinAttackRange(this->position->x, this->position->y, orderGroup->targetUnit)) {
+                            setPathArrived();
+                        }
                     }
+                    else
+                    {
+                        if (this->orderGroup->path->getEndTile(this->position->x, this->position->y) != nullptr) {
+                            setPathArrived();
+                        }
+                    }
+                    if (this->followingPath)
+                        getNextTile();
                 }
             }
         }
@@ -231,6 +240,9 @@ namespace DsprGameServer
                             this->disToEnd = nextTile->disToEnd;
                             shortPathSuccess = true;
                         }
+                    } else {
+                        this->shortPath = nullptr;
+                        this->shortPathCurrentTile = nullptr;
                     }
                 }
         }
@@ -342,10 +354,8 @@ namespace DsprGameServer
     void Unit::updateAttacking()
     {
         auto targetUnit = this->orderGroup->targetUnit;
-        int distanceToTarget = (int) MathUtils::Ceiling(MathUtils::Distance(this->position->x, this->position->y,
-                                                                            targetUnit->position->x, targetUnit->position->y));
 
-        if (distanceToTarget <= this->range){
+        if (this->withinAttackRange(this->position->x, this->position->y, targetUnit)){
             //start to attack!
             if (this->animationState->obj()->GetState() != Attacking) {
                 this->animationState->dirtyObj()->SetState(Attacking);
@@ -370,6 +380,7 @@ namespace DsprGameServer
                 this->orderGroup->unitUnarrived();
             }
 
+            if(!this->followingPath) setPathUnarrived();
             this->updateFollowing();
         }
     }
@@ -485,5 +496,10 @@ namespace DsprGameServer
         this->moveTarget->clean();
         this->animationState->clean();
         //more synced vars here
+    }
+
+    bool Unit::withinAttackRange(int x, int y, Unit *targetUnit) {
+        int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y, targetUnit->position->x, targetUnit->position->y));
+        return (distanceToTarget <= this->range);
     }
 }
