@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <list>
+#include "../Game/Game.h"
 
 namespace DsprGameServer
 {
@@ -14,7 +15,7 @@ namespace DsprGameServer
     class Path
     {
     public:
-        Path(int targetX, int targetY);
+        Path(Game *game, int targetX, int targetY);
         ~Path();
         PathTile* getTile(int x, int y);
         void addTile(PathTile* tile);
@@ -29,5 +30,6 @@ namespace DsprGameServer
     private:
         std::unordered_map<int, PathTile*> tiles;
         std::unordered_map<int, PathTile*> endTiles;
+        Game *game = nullptr;
     };
 }

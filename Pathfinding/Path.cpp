@@ -4,11 +4,13 @@
 
 #include "Path.h"
 #include "PathTile.h"
+#include "../Game/UnitManager.h"
 
 namespace DsprGameServer
 {
-    Path::Path(int targetX, int targetY)
+    Path::Path(Game *game, int targetX, int targetY)
     {
+        this->game = game;
         this->targetX = targetX;
         this->targetY = targetY;
     }
@@ -18,8 +20,11 @@ namespace DsprGameServer
         for(auto tile : tiles)
             delete tile.second;
 
-        for(auto tile : endTiles)
-            delete tile.second;
+        for(auto endTilePair : endTiles) {
+            auto endTile = endTilePair.second;
+            this->game->unitManager->removeEndPosAtCoord(endTile->x, endTile->y);
+            delete endTilePair.second;
+        }
     }
 
     PathTile* Path::getTile(int x, int y)
@@ -43,6 +48,7 @@ namespace DsprGameServer
 
     void Path::addEndTile(PathTile *tile)
     {
+        this->game->unitManager->addEndPosAtCoord(tile->x, tile->y);
         endTiles.emplace(tile->getTileId(), tile);
     }
 }

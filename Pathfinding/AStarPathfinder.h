@@ -22,16 +22,17 @@ namespace DsprGameServer
     public:
         AStarPathfinder(Game *game);
 
-        std::shared_ptr<Path> findPath(const std::list<std::pair<int, int>> &unitPositions, int targetX, int targetY);
+        std::shared_ptr<Path> findPath(const std::list<std::pair<int, int>> &unitPositions, int targetX, int targetY,
+                                               bool attacking);
 
         static void setMapWidth(int width);
         static int getMapWidth();
         static int mapWidth;
     private:
-        std::list<PathNode*>* getNeighbors(PathNode* parent, int targetX, int targetY);
+        std::list<PathNode *> *getNeighbors(PathNode *parent, int targetX, int targetY, bool endFilling);
 
-        void tryAddNeighbor(std::list<PathNode*>* neighborList, PathNode* parentTile,
-                       int tileX, int y, int targetX, int targetY, float cost);
+        void tryAddNeighbor(std::list<PathNode *> *neighborList, PathNode *parentTile, int tileX, int y,
+                                    int targetX, int targetY, float cost, bool endFilling);
 
         void cleanUp(std::list<PathNode *> *nodes, std::unordered_map<int, PathNode *> *map,
                      std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* heap, std::unordered_map<int, PathNode *> *map2);
@@ -43,5 +44,9 @@ namespace DsprGameServer
         const int disToEndUnits = 10;
 
         Game* game = nullptr;
+
+        void fillEndTilesMove(std::shared_ptr<Path> path, int unitNumber);
+
+        void fillEndTilesAttack(std::shared_ptr<Path> path, int unitNumber);
     };
 }

@@ -58,22 +58,21 @@ namespace DsprGameServer {
             //check if we've hit the path yet
             auto tileInPath = path->getTile(currentNode->x, currentNode->y);
             bool pathFindSuccess = (tileInPath != nullptr && tileInPath->disToEnd < unit->disToEnd);
-            bool withinEndDis = false;
+            PathTile* endTileInPath = nullptr;
             if (!pathFindSuccess) {
-                withinEndDis = MathUtils::Distance(currentNode->x, currentNode->y, path->targetX, path->targetY) <=
-                               unit->orderGroup->getAcceptableTilesToEnd();
-                if (withinEndDis) pathFindSuccess = true;
+                endTileInPath = path->getEndTile(currentNode->x, currentNode->y);
+                if (endTileInPath != nullptr) pathFindSuccess = true;
             }
 
             if (pathFindSuccess)
             {
-                int newDisToEnd = (tileInPath != nullptr) ? tileInPath->disToEnd : (int) withinEndDis * 5;
+                int newDisToEnd = (tileInPath != nullptr) ? tileInPath->disToEnd : 0;
                 if (tileInPath != nullptr){
                     unit->lastKnownLongPathTile = tileInPath;
                 }
                 //path tile is closer to end, this is our guy!
 
-                unit->shortPath = std::make_shared<Path>(currentNode->x, currentNode->y);
+                unit->shortPath = std::make_shared<Path>(this->game, currentNode->x, currentNode->y);
 
                 PathTile* prevTile = new PathTile(currentNode->x, currentNode->y, newDisToEnd);
                 unit->shortPath->addTile(prevTile);

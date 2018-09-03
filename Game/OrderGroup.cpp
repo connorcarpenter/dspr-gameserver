@@ -35,18 +35,6 @@ namespace DsprGameServer {
         this->unitsArrived -= 1;
     }
 
-    int OrderGroup::getAcceptableDisToEnd() {
-        if (this->unitsArrived == 0) return 0;
-        if (this->unitsArrived < 9) return 10;
-        return 20;
-    }
-
-    int OrderGroup::getAcceptableTilesToEnd() {
-        if (this->unitsArrived == 0) return 0;
-        if (this->unitsArrived < 9) return 2;
-        return 4;
-    }
-
     void OrderGroup::recalculatePathIfTargetMoved()
     {
         if (!this->lastTargetPosition.Equals(this->targetUnit->position))
@@ -60,7 +48,8 @@ namespace DsprGameServer {
                     unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
                 }
 
-                auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
+                auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
+                                                             targetUnit->position->y, false);
                 if (path != nullptr)
                 {
                     this->setPath(path);

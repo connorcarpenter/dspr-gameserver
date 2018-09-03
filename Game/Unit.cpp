@@ -103,7 +103,8 @@ namespace DsprGameServer
             unitPositionsList.emplace_back(std::pair<int,int>(this->position->x, this->position->y));
             this->setOrderGroup(newOrderGroup);
 
-            auto path = this->game->pathfinder->findPath(unitPositionsList, enemyUnitInAcquisitionRange->position->x, enemyUnitInAcquisitionRange->position->y);
+            auto path = this->game->pathfinder->findPath(unitPositionsList, enemyUnitInAcquisitionRange->position->x,
+                                                         enemyUnitInAcquisitionRange->position->y, true);
             if (path != nullptr)
             {
                 newOrderGroup->setPath(path);
@@ -116,9 +117,7 @@ namespace DsprGameServer
         if (this->followingPath && this->pushCount<5) {
             if (this->position->Equals(this->nextTilePosition) && this->nextPosition->obj()->Equals(this->nextTilePosition)) {
                 if (this->orderGroup != nullptr) {
-                    if (MathUtils::Distance(this->position->x, this->position->y, this->moveTarget->obj()->x,
-                                            this->moveTarget->obj()->y)
-                        <= (this->orderGroup->getAcceptableTilesToEnd())) {
+                    if (this->orderGroup->path->getEndTile(this->position->x, this->position->y) != nullptr) {
                         setPathArrived();
                     } else {
                         getNextTile();

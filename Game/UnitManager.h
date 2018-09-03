@@ -39,6 +39,12 @@ namespace DsprGameServer {
 
         void initializeFirstUnits();
 
+        bool getEndPosAtCoord(int x, int y);
+
+        void addEndPosAtCoord(int x, int y);
+
+        void removeEndPosAtCoord(int x, int y);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
@@ -48,5 +54,6 @@ namespace DsprGameServer {
         PrimIsoGrid<bool>* endPosGrid = nullptr;
 
         void setUnitInGrid(int x, int y, Unit *unit);
+
     };
 }

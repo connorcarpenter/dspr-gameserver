@@ -82,7 +82,7 @@ namespace DsprGameServer
             unit->setOrderGroup(newOrderGroup);
         }
 
-        auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY);
+        auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY, false);
         if (path!= nullptr) {
             newOrderGroup->setPath(path);
 
@@ -109,7 +109,8 @@ namespace DsprGameServer
             unit->setOrderGroup(newOrderGroup);
         }
 
-        auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
+        auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
+                                                     targetUnit->position->y, false);
         if (path != nullptr) {
             newOrderGroup->setPath(path);
 
@@ -135,7 +136,8 @@ namespace DsprGameServer
             unit->setOrderGroup(newOrderGroup);
         }
 
-        auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x, targetUnit->position->y);
+        auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
+                                                     targetUnit->position->y, true);
         if (path != nullptr)
         {
             newOrderGroup->setPath(path);
@@ -187,5 +189,17 @@ namespace DsprGameServer
 
     void UnitManager::addUnitToGrid(Unit *unit) {
         setUnitInGrid(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y, unit);
+    }
+
+    bool UnitManager::getEndPosAtCoord(int x, int y) {
+        return this->endPosGrid->get(x, y);
+    }
+
+    void UnitManager::addEndPosAtCoord(int x, int y) {
+        this->endPosGrid->set(x, y, true);
+    }
+
+    void UnitManager::removeEndPosAtCoord(int x, int y) {
+        this->endPosGrid->set(x, y, false);
     }
 }
