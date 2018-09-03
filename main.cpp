@@ -99,6 +99,12 @@ int main()
                     game->unitManager->receiveAttackTargetOrder(unitIdList, targetUnitId);
                 }
                     break;
+                case AttackMove: {
+                    int x = stoi(orderStrings[1]);
+                    int y = stoi(orderStrings[2]);
+                    game->unitManager->receiveAttackMoveOrder(unitIdList, x, y);
+                }
+                    break;
             }
 
             std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;

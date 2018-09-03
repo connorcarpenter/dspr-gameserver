@@ -4,6 +4,7 @@
 // Created by connor on 8/1/18.
 //
 
+#include <set>
 #include "../Math/Point.h"
 #include "Synced.h"
 #include "../Player.h"
@@ -109,5 +110,12 @@ namespace DsprGameServer
         void updateNextPosition(Point *newNextPosition);
         Unit* getEnemyUnitInAcquisitionRange();
 
+        void updateAttackMoving();
+
+        void lookForEnemyUnitsAndEngage();
+
+        void addToBlockedEnemyList(Unit *blockedEnemy);
+
+        std::set<Unit *> *blockedEnemyList = nullptr;
     };
 }

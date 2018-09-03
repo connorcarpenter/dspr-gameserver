@@ -29,6 +29,8 @@ namespace DsprGameServer {
         UnitOrder orderIndex;
         std::shared_ptr<DsprGameServer::Path> path = nullptr;
 
+        bool targetHasMoved();
+
     private:
 
         std::list<Unit*> units;
@@ -36,5 +38,8 @@ namespace DsprGameServer {
         Point lastTargetPosition = DsprGameServer::Point(0, 0);
         Game* game = nullptr;
 
+        bool targetOffPath();
+
+        void targetUpdatePosition();
     };
 }

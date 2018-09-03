@@ -24,6 +24,7 @@ namespace DsprGameServer {
         void receiveMoveOrder(const std::list<int> &idList, int tileX, int tileY);
         void receiveFollowOrder(const std::list<int> &idList, int targetUnitId);
         void receiveAttackTargetOrder(const std::list<int> &idList, int targetUnitId);
+        void receiveAttackMoveOrder(const std::list<int> &idList, int tileX, int tileY);
 
         void updateUnits();
 

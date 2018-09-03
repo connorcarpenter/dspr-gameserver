@@ -60,7 +60,7 @@ namespace DsprGameServer {
             bool pathFindSuccess = (tileInPath != nullptr && tileInPath->disToEnd < unit->disToEnd);
             PathTile* endTileInPath = nullptr;
             if (!pathFindSuccess) {
-                if (unit->orderGroup->isAttacking()) {
+                if (unit->orderGroup->orderIndex == AttackTarget) {
                     if (unit->withinAttackRange(currentNode->x, currentNode->y, unit->orderGroup->targetUnit))
                         pathFindSuccess = true;
                 } else {

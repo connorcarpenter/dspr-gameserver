@@ -35,11 +35,23 @@ namespace DsprGameServer {
         this->unitsArrived -= 1;
     }
 
+    bool OrderGroup::targetHasMoved(){
+        return !this->lastTargetPosition.Equals(this->targetUnit->position);
+    }
+
+    bool OrderGroup::targetOffPath() {
+        return this->path->getTile(this->targetUnit->position->x, this->targetUnit->position->y) == nullptr;
+    }
+
+    void OrderGroup::targetUpdatePosition(){
+        this->lastTargetPosition.Set(targetUnit->position);
+    }
+
     void OrderGroup::recalculatePathIfTargetMoved()
     {
-        if (!this->lastTargetPosition.Equals(this->targetUnit->position))
+        if (targetHasMoved())
         {
-            if (this->path->getTile(this->targetUnit->position->x, this->targetUnit->position->y) == nullptr)
+            if (targetOffPath())
             {
                 std::list<std::pair<int, int>> unitPositionsList;
 
@@ -59,7 +71,7 @@ namespace DsprGameServer {
                     }
 
                     this->unitsArrived = 0;
-                    this->lastTargetPosition.Set(targetUnit->position);
+                    targetUpdatePosition();
                 }
             }
         }

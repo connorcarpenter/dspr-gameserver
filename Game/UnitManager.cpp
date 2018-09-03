@@ -93,6 +93,30 @@ namespace DsprGameServer
         }
     }
 
+    void UnitManager::receiveAttackMoveOrder(const std::list<int> &idList, int tileX, int tileY)
+    {
+        std::list<std::pair<int, int>> unitPositionsList;
+
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackMove);
+
+        for (const auto& i : idList)
+        {
+            Unit* unit = unitMap.at(i);
+            unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
+            unit->setOrderGroup(newOrderGroup);
+        }
+
+        auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY, false);
+        if (path!= nullptr) {
+            newOrderGroup->setPath(path);
+
+            for (const auto &i : idList) {
+                Unit *unit = unitMap.at(i);
+                unit->startPath();
+            }
+        }
+    }
+
     void UnitManager::receiveFollowOrder(const std::list<int> &idList, int targetUnitId)
     {
         std::list<std::pair<int, int>> unitPositionsList;
