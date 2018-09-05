@@ -40,6 +40,15 @@ namespace DsprGameServer
         // update units
         this->unitManager->updateUnits();
 
+        // delete queued units
+        this->unitManager->deleteUnits();
+
+        // send deletes to each player
+        for (const auto &playerPair : playerMap) {
+            if (playerPair.second != nullptr)
+                this->unitManager->sendUnitDeletes(playerPair.second);
+        }
+
         // send updates to each player
         for (const auto &playerPair : playerMap) {
             if (playerPair.second != nullptr)

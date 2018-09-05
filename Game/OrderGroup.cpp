@@ -6,6 +6,7 @@
 #include "Unit.h"
 #include "../Pathfinding/Path.h"
 #include "../Pathfinding/AStarPathfinder.h"
+#include "UnitManager.h"
 
 namespace DsprGameServer {
 
@@ -15,16 +16,16 @@ namespace DsprGameServer {
     }
 
     void OrderGroup::addUnit(Unit* unit) {
-        units.push_back(unit);
+        unitIds.push_back(unit->id);
     }
 
     void OrderGroup::removeUnit(Unit* unit){
-        units.remove(unit);
+        unitIds.remove(unit->id);
         if (!unit->followingPath) this->unitsArrived -= 1;
     }
 
     int OrderGroup::getNumberUnits() {
-        return units.size();
+        return unitIds.size();
     }
 
     void OrderGroup::unitArrived(){
@@ -35,17 +36,19 @@ namespace DsprGameServer {
         this->unitsArrived -= 1;
     }
 
-    bool OrderGroup::targetHasMoved(){
-        return !this->lastTargetPosition.Equals(this->targetUnit->position);
+    bool OrderGroup::targetHasMoved() {
+        auto targetUnit = this->getTargetUnit();
+        if (targetUnit == nullptr) return false;
+        return !this->lastTargetPosition.Equals(targetUnit->position);
     }
 
     bool OrderGroup::targetOffPath() {
         if (this->path == nullptr) return true;
-        return this->path->getTile(this->targetUnit->position->x, this->targetUnit->position->y) == nullptr;
+        return this->path->getTile(this->getTargetUnit()->position->x, this->getTargetUnit()->position->y) == nullptr;
     }
 
     void OrderGroup::targetUpdatePosition(){
-        this->lastTargetPosition.Set(targetUnit->position);
+        this->lastTargetPosition.Set(this->getTargetUnit()->position);
     }
 
     void OrderGroup::recalculatePathIfTargetMoved()
@@ -56,18 +59,21 @@ namespace DsprGameServer {
             {
                 std::list<std::pair<int, int>> unitPositionsList;
 
-                for (const auto& unit : units)
+                for (const auto& unitId : unitIds)
                 {
+                    auto unit = this->game->unitManager->getUnitWithId(unitId);
                     unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
                 }
 
+                auto targetUnit = this->getTargetUnit();
                 auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
                                                              targetUnit->position->y, orderIndex == AttackTarget);
                 if (path != nullptr)
                 {
                     this->setPath(path);
 
-                    for (const auto &unit : units) {
+                    for (const auto &unitId : unitIds) {
+                        auto unit = this->game->unitManager->getUnitWithId(unitId);
                         unit->startPath();
                     }
 
@@ -79,7 +85,7 @@ namespace DsprGameServer {
     }
 
     void OrderGroup::setTargetUnit(Unit *targetUnit) {
-        this->targetUnit = targetUnit;
+        this->targetUnitId = targetUnit->id;
         this->lastTargetPosition.Set(targetUnit->position);
     }
 
@@ -88,11 +94,12 @@ namespace DsprGameServer {
     }
 
     void OrderGroup::getMinAndMaxDisInGroup(int& minDis, int& maxDis) {
-        if (this->units.size() <= 0) return;
+        if (this->unitIds.size() <= 0) return;
 
         minDis = INT_MAX;
         maxDis = INT_MIN;
-        for (const auto &unit : units) {
+        for (const auto &unitId : unitIds) {
+            auto unit = this->game->unitManager->getUnitWithId(unitId);
             if(unit->disToEnd < minDis)minDis = unit->disToEnd;
             if(unit->disToEnd > maxDis)maxDis = unit->disToEnd;
         }
@@ -104,5 +111,9 @@ namespace DsprGameServer {
 
     bool OrderGroup::isAttacking() {
         return orderIndex == AttackTarget || orderIndex == AttackMove;
+    }
+
+    Unit *OrderGroup::getTargetUnit() {
+        return this->game->unitManager->getUnitWithId(this->targetUnitId);
     }
 }

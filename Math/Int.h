@@ -13,7 +13,7 @@ namespace DsprGameServer{
         int Get();
         void Subtract(int subInt);
         std::string serialize();
-    private:
+
         int value;
     };
 }

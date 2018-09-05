@@ -20,7 +20,7 @@ namespace DsprGameServer
 
         ~Synced()
         {
-            delete this->internal;
+            delete internal;
         }
 
         T* obj() {

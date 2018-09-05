@@ -107,7 +107,7 @@ namespace DsprGameServer
                 if (this->orderGroup != nullptr) {
                     if (this->orderGroup->orderIndex == AttackTarget)
                     {
-                        if (this->withinAttackRange(this->position->x, this->position->y, orderGroup->targetUnit)) {
+                        if (this->withinAttackRange(this->position->x, this->position->y, orderGroup->getTargetUnit())) {
                             setPathArrived();
                         }
                     }
@@ -337,7 +337,7 @@ namespace DsprGameServer
                     }
                     else
                     {
-                        this->addToBlockedEnemyList(this->orderGroup->targetUnit);
+                        this->addToBlockedEnemyList(this->orderGroup->getTargetUnit());
                         this->lookForEnemyUnitsAndEngage();
                     }
                 }
@@ -372,7 +372,7 @@ namespace DsprGameServer
 
     void Unit::updateAttacking()
     {
-        auto targetUnit = this->orderGroup->targetUnit;
+        auto targetUnit = this->orderGroup->getTargetUnit();
 
         if (this->withinAttackRange(this->position->x, this->position->y, targetUnit)){
             //start to attack!
@@ -392,7 +392,7 @@ namespace DsprGameServer
 
             this->attackFrameIndex += 1;
             if (this->attackFrameIndex == this->attackFrameToApplyDamage){
-                targetUnit->health->dirtyObj()->Subtract(this->damage);
+                this->damageOtherUnit(targetUnit, this->damage);
             }
             if (this->attackFrameIndex >= this->attackFramesNumber){
                 this->attackFrameIndex = 0;
@@ -441,6 +441,8 @@ namespace DsprGameServer
     }
 
     bool Unit::withinAttackRange(int x, int y, Unit *targetUnit) {
+        if (targetUnit == nullptr)
+            return false;
         int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y, targetUnit->position->x, targetUnit->position->y));
         return (distanceToTarget <= this->range);
     }
@@ -564,5 +566,12 @@ namespace DsprGameServer
         this->animationState->clean();
         this->health->clean();
         //more synced vars here
+    }
+
+    void Unit::damageOtherUnit(Unit *otherUnit, int dmgAmount) {
+        otherUnit->health->dirtyObj()->Subtract(dmgAmount);
+        if (otherUnit->health->obj()->value <= 0){
+            this->game->unitManager->queueUnitForDeletion(otherUnit);
+        }
     }
 }

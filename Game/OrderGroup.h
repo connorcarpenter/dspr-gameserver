@@ -25,15 +25,17 @@ namespace DsprGameServer {
         void unitUnarrived();
         bool isAttacking();
 
-        Unit* targetUnit = nullptr;
+        int targetUnitId = -1;
         UnitOrder orderIndex;
         std::shared_ptr<DsprGameServer::Path> path = nullptr;
 
         bool targetHasMoved();
 
+        Unit *getTargetUnit();
+
     private:
 
-        std::list<Unit*> units;
+        std::list<int> unitIds;
         int unitsArrived = 0;
         Point lastTargetPosition = DsprGameServer::Point(0, 0);
         Game* game = nullptr;
@@ -41,5 +43,6 @@ namespace DsprGameServer {
         bool targetOffPath();
 
         void targetUpdatePosition();
+
     };
 }

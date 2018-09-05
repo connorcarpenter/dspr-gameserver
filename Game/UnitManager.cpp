@@ -3,6 +3,7 @@
 //
 
 #include <sstream>
+#include <iostream>
 #include "UnitManager.h"
 #include "../Math/MathUtils.h"
 #include "../GameServer.h"
@@ -77,9 +78,11 @@ namespace DsprGameServer
 
         for (const auto& i : idList)
         {
-            Unit* unit = unitMap.at(i);
-            unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
-            unit->setOrderGroup(newOrderGroup);
+            if (unitMap.count(i) != 0){
+                Unit* unit = unitMap.at(i);
+                unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
+                unit->setOrderGroup(newOrderGroup);
+            }
         }
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY, false);
@@ -87,8 +90,10 @@ namespace DsprGameServer
             newOrderGroup->setPath(path);
 
             for (const auto &i : idList) {
-                Unit *unit = unitMap.at(i);
-                unit->startPath();
+                if (unitMap.count(i) != 0) {
+                    Unit *unit = unitMap.at(i);
+                    unit->startPath();
+                }
             }
         }
     }
@@ -225,5 +230,47 @@ namespace DsprGameServer
 
     void UnitManager::removeEndPosAtCoord(int x, int y) {
         this->endPosGrid->set(x, y, false);
+    }
+
+    void UnitManager::deleteUnits() {
+        for(auto unit : this->unitsToDelete)
+        {
+            std::cout << "deleting unit, w/ id: " << unit->id << "\r\n";
+
+            //clean up
+            this->removeUnitFromGrid(unit);
+            this->unitMap.erase(unit->id);
+
+            //setup sending the deletions
+            this->unitDeletionsToSend.emplace(unit->id);
+
+            //actually delete
+            delete unit;
+
+            std::cout << "deleted unit: " << unit << "\r\n";
+        }
+
+        this->unitsToDelete.clear();
+    }
+
+    void UnitManager::sendUnitDeletes(Player* player)
+    {
+        for(auto unitId : this->unitDeletionsToSend)
+        {
+            std::stringstream msg;
+            msg << "unit/1.0/delete|" << unitId << "|1" << "\r\n";
+            GameServer::get().queueMessage(player->getWs(), msg.str());
+        }
+
+        this->unitDeletionsToSend.clear();
+    }
+
+    void UnitManager::queueUnitForDeletion(Unit* deletedUnit){
+        this->unitsToDelete.emplace(deletedUnit);
+    }
+
+    Unit *UnitManager::getUnitWithId(int unitId) {
+        if (this->unitMap.count(unitId) <= 0)return nullptr;
+        return this->unitMap.at(unitId);
     }
 }

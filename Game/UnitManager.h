@@ -27,24 +27,22 @@ namespace DsprGameServer {
         void receiveAttackMoveOrder(const std::list<int> &idList, int tileX, int tileY);
 
         void updateUnits();
-
+        void deleteUnits();
         void sendUnitUpdates(Player *player);
-
         void cleanAllUnits();
-
         void removeUnitFromGrid(Unit *unit);
-
         void addUnitToGrid(Unit *unit);
-
         Unit *getUnitFromGrid(int x, int y);
-
         void initializeFirstUnits();
-
         bool getEndPosAtCoord(int x, int y);
-
         void addEndPosAtCoord(int x, int y);
-
         void removeEndPosAtCoord(int x, int y);
+
+        void queueUnitForDeletion(Unit *deletedUnit);
+
+        void sendUnitDeletes(Player *player);
+
+        Unit* getUnitWithId(int unitId);
 
     private:
         std::map<int, Unit*> unitMap;
@@ -53,6 +51,9 @@ namespace DsprGameServer {
 
         PtrIsoGrid<Unit*>* unitGrid = nullptr;
         PrimIsoGrid<bool>* endPosGrid = nullptr;
+
+        std::set<Unit*> unitsToDelete;
+        std::set<int> unitDeletionsToSend;
 
         void setUnitInGrid(int x, int y, Unit *unit);
 
