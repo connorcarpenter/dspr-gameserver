@@ -8,10 +8,12 @@ namespace DsprGameServer{
 
     class Int {
     public:
+        Int(int newValue);
         void Set(int newInt);
         int Get();
+        void Subtract(int subInt);
         std::string serialize();
     private:
-        int currentInt;
+        int value;
     };
 }

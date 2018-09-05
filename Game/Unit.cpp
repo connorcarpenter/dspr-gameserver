@@ -24,6 +24,7 @@ namespace DsprGameServer
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
         this->nextTilePosition = new Point(x,y);
+        this->health = new Synced<Int>("health", new Int(100));
         this->tribe = tribe;
     }
 
@@ -34,6 +35,7 @@ namespace DsprGameServer
         delete this->moveTarget;
         delete this->nextTilePosition;
         delete this->animationState;
+        delete this->health;
         if (this->blockedEnemyList != nullptr) delete this->blockedEnemyList;
     }
 
@@ -363,6 +365,11 @@ namespace DsprGameServer
         this->orderGroup->recalculatePathIfTargetMoved();
     }
 
+    void Unit::updateAttackMoving() {
+        this->lookForEnemyUnitsAndEngage();
+        this->updateWalking();
+    }
+
     void Unit::updateAttacking()
     {
         auto targetUnit = this->orderGroup->targetUnit;
@@ -385,7 +392,7 @@ namespace DsprGameServer
 
             this->attackFrameIndex += 1;
             if (this->attackFrameIndex == this->attackFrameToApplyDamage){
-                targetUnit->health -= this->damage;
+                targetUnit->health->dirtyObj()->Subtract(this->damage);
             }
             if (this->attackFrameIndex >= this->attackFramesNumber){
                 this->attackFrameIndex = 0;
@@ -431,6 +438,40 @@ namespace DsprGameServer
         }
 
         return nullptr;
+    }
+
+    bool Unit::withinAttackRange(int x, int y, Unit *targetUnit) {
+        int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y, targetUnit->position->x, targetUnit->position->y));
+        return (distanceToTarget <= this->range);
+    }
+
+    void Unit::lookForEnemyUnitsAndEngage() {
+        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
+        if (enemyUnitInAcquisitionRange != nullptr){
+            //ideally, we would store the current order in a stack, and just push it down.. for now, no such thing
+            std::list<std::pair<int, int>> unitPositionsList;
+
+            auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackTarget);
+            newOrderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
+
+            unitPositionsList.emplace_back(std::pair<int,int>(this->position->x, this->position->y));
+            this->setOrderGroup(newOrderGroup);
+
+            auto path = this->game->pathfinder->findPath(unitPositionsList, enemyUnitInAcquisitionRange->position->x,
+                                                         enemyUnitInAcquisitionRange->position->y, false);
+            if (path != nullptr)
+            {
+                newOrderGroup->setPath(path);
+                this->startPath();
+            }
+        }
+    }
+
+    void Unit::addToBlockedEnemyList(Unit *blockedEnemy) {
+        if (this->blockedEnemyList == nullptr){
+            this->blockedEnemyList = new std::set<Unit*>();
+        }
+        this->blockedEnemyList->insert(blockedEnemy);
     }
 
     int Unit::getDir(int x, int y)
@@ -491,6 +532,12 @@ namespace DsprGameServer
             msg << this->animationState->serialize();
         }
 
+        if (this->health->isDirty())
+        {
+            if (firstVar) { firstVar = false; } else { msg << "&"; }
+            msg << this->health->serialize();
+        }
+
         //next synced variable should follow this format
 //        if (this->nextPosition->isDirty())
 //        {
@@ -506,6 +553,7 @@ namespace DsprGameServer
         if (this->nextPosition->isDirty()) return true;
         if (this->moveTarget->isDirty()) return true;
         if (this->animationState->isDirty()) return true;
+        if (this->health->isDirty()) return true;
         //more synced vars here
         return false;
     }
@@ -514,45 +562,7 @@ namespace DsprGameServer
         this->nextPosition->clean();
         this->moveTarget->clean();
         this->animationState->clean();
+        this->health->clean();
         //more synced vars here
-    }
-
-    bool Unit::withinAttackRange(int x, int y, Unit *targetUnit) {
-        int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y, targetUnit->position->x, targetUnit->position->y));
-        return (distanceToTarget <= this->range);
-    }
-
-    void Unit::updateAttackMoving() {
-        this->lookForEnemyUnitsAndEngage();
-        this->updateWalking();
-    }
-
-    void Unit::lookForEnemyUnitsAndEngage() {
-        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
-        if (enemyUnitInAcquisitionRange != nullptr){
-            //ideally, we would store the current order in a stack, and just push it down.. for now, no such thing
-            std::list<std::pair<int, int>> unitPositionsList;
-
-            auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackTarget);
-            newOrderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
-
-            unitPositionsList.emplace_back(std::pair<int,int>(this->position->x, this->position->y));
-            this->setOrderGroup(newOrderGroup);
-
-            auto path = this->game->pathfinder->findPath(unitPositionsList, enemyUnitInAcquisitionRange->position->x,
-                                                         enemyUnitInAcquisitionRange->position->y, false);
-            if (path != nullptr)
-            {
-                newOrderGroup->setPath(path);
-                this->startPath();
-            }
-        }
-    }
-
-    void Unit::addToBlockedEnemyList(Unit *blockedEnemy) {
-        if (this->blockedEnemyList == nullptr){
-            this->blockedEnemyList = new std::set<Unit*>();
-        }
-        this->blockedEnemyList->insert(blockedEnemy);
     }
 }

@@ -11,6 +11,7 @@
 #include "Game.h"
 #include "../Math/FloatPoint.h"
 #include "AnimationState.h"
+#include "../Math/Int.h"
 
 namespace DsprGameServer
 {
@@ -55,7 +56,7 @@ namespace DsprGameServer
         int walkSpeed = 0;
         int walkAmount = 0;
 
-        int health = 100;
+        Synced<Int>* health = nullptr;
         int stamina = 100;
         int damage = 1;
         int range = 2;//make sure this is multiples of 2... to accomodate for diagonal tiles

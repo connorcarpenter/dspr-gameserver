@@ -40,6 +40,7 @@ namespace DsprGameServer {
     }
 
     bool OrderGroup::targetOffPath() {
+        if (this->path == nullptr) return true;
         return this->path->getTile(this->targetUnit->position->x, this->targetUnit->position->y) == nullptr;
     }
 
