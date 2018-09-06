@@ -106,9 +106,12 @@ namespace DsprGameServer
 
         for (const auto& i : idList)
         {
-            Unit* unit = unitMap.at(i);
-            unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
-            unit->setOrderGroup(newOrderGroup);
+            if (unitMap.count(i) != 0) {
+                Unit *unit = unitMap.at(i);
+                unitPositionsList.emplace_back(
+                        std::pair<int, int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
+                unit->setOrderGroup(newOrderGroup);
+            }
         }
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY, false);
@@ -116,26 +119,33 @@ namespace DsprGameServer
             newOrderGroup->setPath(path);
 
             for (const auto &i : idList) {
-                Unit *unit = unitMap.at(i);
-                unit->startPath();
+                if (unitMap.count(i) != 0) {
+                    Unit *unit = unitMap.at(i);
+                    unit->startPath();
+                }
             }
         }
     }
 
     void UnitManager::receiveFollowOrder(const std::list<int> &idList, int targetUnitId)
     {
+        if (unitMap.count(targetUnitId) == 0) return;
+
         std::list<std::pair<int, int>> unitPositionsList;
 
         auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Follow);
+
         auto targetUnit = unitMap.at(targetUnitId);
         newOrderGroup->setTargetUnit(targetUnit);
 
 
         for (const auto& i : idList)
         {
-            Unit* unit = unitMap.at(i);
-            unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
-            unit->setOrderGroup(newOrderGroup);
+            if (unitMap.count(i) != 0) {
+                Unit *unit = unitMap.at(i);
+                unitPositionsList.emplace_back(std::pair<int, int>(unit->position->x, unit->position->y));
+                unit->setOrderGroup(newOrderGroup);
+            }
         }
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
@@ -144,14 +154,18 @@ namespace DsprGameServer
             newOrderGroup->setPath(path);
 
             for (const auto &i : idList) {
-                Unit *unit = unitMap.at(i);
-                unit->startPath();
+                if (unitMap.count(i) != 0) {
+                    Unit *unit = unitMap.at(i);
+                    unit->startPath();
+                }
             }
         }
     }
 
     void UnitManager::receiveAttackTargetOrder(const std::list<int> &idList, int targetUnitId)
     {
+        if (unitMap.count(targetUnitId) == 0) return;
+
         std::list<std::pair<int, int>> unitPositionsList;
 
         auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackTarget);
@@ -160,9 +174,11 @@ namespace DsprGameServer
 
         for (const auto& i : idList)
         {
-            Unit* unit = unitMap.at(i);
-            unitPositionsList.emplace_back(std::pair<int,int>(unit->position->x, unit->position->y));
-            unit->setOrderGroup(newOrderGroup);
+            if (unitMap.count(i) != 0) {
+                Unit *unit = unitMap.at(i);
+                unitPositionsList.emplace_back(std::pair<int, int>(unit->position->x, unit->position->y));
+                unit->setOrderGroup(newOrderGroup);
+            }
         }
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
@@ -172,8 +188,10 @@ namespace DsprGameServer
             newOrderGroup->setPath(path);
 
             for (const auto &i : idList) {
-                Unit *unit = unitMap.at(i);
-                unit->startPath();
+                if (unitMap.count(i) != 0) {
+                    Unit *unit = unitMap.at(i);
+                    unit->startPath();
+                }
             }
         }
     }

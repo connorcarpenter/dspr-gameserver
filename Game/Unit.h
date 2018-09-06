@@ -58,7 +58,7 @@ namespace DsprGameServer
 
         Synced<Int>* health = nullptr;
         int stamina = 100;
-        int damage = 10;
+        int damage = 2;
         int range = 2;//make sure this is multiples of 2... to accomodate for diagonal tiles
         int attackFrameIndex = 0;
         int attackFramesNumber = 5;
