@@ -2,6 +2,7 @@
 // Created by connor on 7/23/18.
 //
 
+#include <sstream>
 #include "Game.h"
 #include "TileManager.h";
 #include "UnitManager.h";
@@ -10,6 +11,7 @@
 #include "../Pathfinding/SimplePathfinder.h"
 #include "../PlayerData.h"
 #include "FogManager.h"
+#include "../GameServer.h"
 
 namespace DsprGameServer
 {
@@ -47,6 +49,8 @@ namespace DsprGameServer
             this->unitManager->sendUnitDeletes(playerData);
         }
 
+        this->unitManager->finishSendUnitDeletes();
+
         // send updates to each player
         for (const auto &playerData : this->playerDataSet) {
             this->unitManager->sendUnitUpdates(playerData);
@@ -62,11 +66,23 @@ namespace DsprGameServer
         playerData->setCurrentGame(this);
 
         this->playerDataSet.insert(playerData);
+
+        auto freeTribe = this->tribeManager->getFreeTribe();
+        this->tribeManager->assignTribeToPlayer(freeTribe, playerData);
+        this->sendPlayerTribeIndex(playerData, freeTribe);
+
         this->tileManager->sendGrid(playerData);
         this->unitManager->sendUnits(playerData);
     }
 
     void Game::removePlayer(PlayerData *playerData) {
         this->playerDataSet.erase(playerData);
+        this->tribeManager->freeTribeFromPlayer(nullptr, playerData);
+    }
+
+    void Game::sendPlayerTribeIndex(PlayerData *playerData, Tribe *tribe) {
+        std::stringstream msg;
+        msg << "tribe/1.0/set|" << tribe->index << "\r\n";
+        GameServer::get().queueMessage(playerData, msg.str());
     }
 }

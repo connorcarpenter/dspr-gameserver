@@ -2,13 +2,13 @@
 // Created by connor on 9/7/18.
 //
 
-#include "../PrimIsoGrid.h"
 #include <map>
 
 namespace DsprGameServer
 {
     class Tribe;
     class Game;
+    template <class T> class PrimIsoGrid;
 
     class FogManager
     {

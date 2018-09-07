@@ -277,8 +277,6 @@ namespace DsprGameServer
             msg << "unit/1.0/delete|" << unitId << "|1" << "\r\n";
             GameServer::get().queueMessage(playerData, msg.str());
         }
-
-        this->unitDeletionsToSend.clear();
     }
 
     void UnitManager::queueUnitForDeletion(Unit* deletedUnit){
@@ -288,5 +286,9 @@ namespace DsprGameServer
     Unit *UnitManager::getUnitWithId(int unitId) {
         if (this->unitMap.count(unitId) <= 0)return nullptr;
         return this->unitMap.at(unitId);
+    }
+
+    void UnitManager::finishSendUnitDeletes() {
+        this->unitDeletionsToSend.clear();
     }
 }

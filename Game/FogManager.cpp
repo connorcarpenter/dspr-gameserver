@@ -6,6 +6,7 @@
 #include "Game.h"
 #include "TileManager.h"
 #include "Circle/CircleCache.h"
+#include "../PrimIsoGrid.h"
 
 namespace DsprGameServer
 {

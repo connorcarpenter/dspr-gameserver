@@ -43,6 +43,8 @@ namespace DsprGameServer {
 
         Unit* getUnitWithId(int unitId);
 
+        void finishSendUnitDeletes();
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;

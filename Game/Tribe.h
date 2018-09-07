@@ -6,12 +6,15 @@
 
 namespace DsprGameServer
 {
+    class PlayerData;
+
     class Tribe
     {
     public:
         Tribe(int color);
         void setEnemy(Tribe* otherTribe);
         int index = -1;
+        PlayerData* playerData = nullptr;
     private:
         std::set<Tribe*> enemies;
     };

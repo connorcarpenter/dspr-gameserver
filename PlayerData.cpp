@@ -6,12 +6,14 @@
 #include "Game/Game.h"
 #include "GameServer.h"
 
-namespace DsprGameServer {
+namespace DsprGameServer
+{
     PlayerData::PlayerData(uWS::WebSocket<1> *ws) {
         this->ws = ws;
     }
 
-    PlayerData::~PlayerData() {
+    PlayerData::~PlayerData()
+    {
         if (this->currentGame != nullptr){
             this->currentGame->removePlayer(this);
         }
@@ -30,5 +32,9 @@ namespace DsprGameServer {
 
     void PlayerData::setCurrentGame(Game *game) {
         this->currentGame = game;
+    }
+
+    void PlayerData::setTribe(DsprGameServer::Tribe *tribe) {
+        this->currentTribe = tribe;
     }
 }

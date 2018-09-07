@@ -4,6 +4,7 @@
 
 #include "TribeManager.h"
 #include "FogManager.h"
+#include "../PlayerData.h"
 
 namespace DsprGameServer
 {
@@ -29,5 +30,27 @@ namespace DsprGameServer
         {
             delete tribe;
         }
+    }
+
+    Tribe *TribeManager::getFreeTribe() {
+        for (auto tribe: tribeSet){
+            if (tribe->playerData == nullptr){
+                return tribe;
+            }
+        }
+
+        return nullptr;
+    }
+
+    void TribeManager::assignTribeToPlayer(Tribe *tribe, PlayerData *playerData) {
+        tribe->playerData = playerData;
+        playerData->setTribe(tribe);
+        this->playerToTribeMap.emplace(std::make_pair(playerData, tribe));
+    }
+
+    void TribeManager::freeTribeFromPlayer(Tribe *tribe, PlayerData *playerData) {
+        tribe->playerData = nullptr;
+        playerData->setTribe(nullptr);
+        this->playerToTribeMap.erase(playerData);
     }
 }

@@ -3,6 +3,7 @@
 //
 
 #include <set>
+#include <map>
 #include "Game.h"
 #include "Tribe.h"
 
@@ -16,8 +17,16 @@ namespace DsprGameServer
 
         Tribe* tribeA = nullptr;
         Tribe* tribeB = nullptr;
+
+        Tribe *getFreeTribe();
+
+        void assignTribeToPlayer(Tribe *tribe, PlayerData *playerData);
+
+        void freeTribeFromPlayer(Tribe *tribe, PlayerData *playerData);
+
     private:
         DsprGameServer::Game* game = nullptr;
         std::set<Tribe*> tribeSet;
+        std::map<PlayerData*, Tribe*> playerToTribeMap;
     };
 }

@@ -8,6 +8,7 @@ namespace DsprGameServer
 {
 
     class Game;
+    class Tribe;
 
     class PlayerData
     {
@@ -22,12 +23,14 @@ namespace DsprGameServer
         void setToken(std::string token);
 
         void setCurrentGame(Game* game);
-        Game* getCurrentGame();
+
+        void setTribe(DsprGameServer::Tribe *tribe);
 
     private:
 
         uWS::WebSocket<1> *ws = nullptr;
         std::string token;
         Game* currentGame = nullptr;
+        Tribe* currentTribe = nullptr;
     };
 }

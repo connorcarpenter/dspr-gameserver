@@ -8,6 +8,7 @@
 #include <list>
 #include <set>
 
+
 namespace DsprGameServer {
 
     class TileManager;
@@ -17,6 +18,7 @@ namespace DsprGameServer {
     class SimplePathfinder;
     class PlayerData;
     class FogManager;
+    class Tribe;
 
     class Game
     {
@@ -42,5 +44,6 @@ namespace DsprGameServer {
 
         std::set<PlayerData *> playerDataSet;
 
+        void sendPlayerTribeIndex(PlayerData *playerData, DsprGameServer::Tribe *tribe);
     };
 }
