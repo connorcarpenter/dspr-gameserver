@@ -62,6 +62,7 @@ namespace DsprGameServer {
                 for (const auto& unitId : unitIds)
                 {
                     auto unit = this->game->unitManager->getUnitWithId(unitId);
+                    if (unit == nullptr) continue;
                     unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
                 }
 
@@ -74,6 +75,7 @@ namespace DsprGameServer {
 
                     for (const auto &unitId : unitIds) {
                         auto unit = this->game->unitManager->getUnitWithId(unitId);
+                        if (unit == nullptr) continue;
                         unit->startPath();
                     }
 
@@ -100,6 +102,7 @@ namespace DsprGameServer {
         maxDis = INT_MIN;
         for (const auto &unitId : unitIds) {
             auto unit = this->game->unitManager->getUnitWithId(unitId);
+            if (unit == nullptr) continue;
             if(unit->disToEnd < minDis)minDis = unit->disToEnd;
             if(unit->disToEnd > maxDis)maxDis = unit->disToEnd;
         }

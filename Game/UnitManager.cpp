@@ -32,11 +32,9 @@ namespace DsprGameServer
             for (int j = 0; j<4;j++)
                 createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA);
 
-        for(int i=0;i<10;i++){
-            createUnit((MathUtils::getRandom(this->game->tileManager->width-30)+10) * 2,
-                       (MathUtils::getRandom(this->game->tileManager->height-30)+10) * 2,
-                       this->game->tribeManager->tribeB);
-        }
+        for (int i = 0; i<3; i++)
+            for (int j = 0; j<4;j++)
+                createUnit((14 + i) * 2, (14 + j) * 2, this->game->tribeManager->tribeB);
     }
 
     UnitManager::~UnitManager()

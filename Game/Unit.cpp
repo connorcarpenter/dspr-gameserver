@@ -113,8 +113,10 @@ namespace DsprGameServer
                     }
                     else
                     {
-                        if (this->orderGroup->path->getEndTile(this->position->x, this->position->y) != nullptr) {
-                            setPathArrived();
+                        if (this->orderGroup->path != nullptr) {
+                            if (this->orderGroup->path->getEndTile(this->position->x, this->position->y) != nullptr) {
+                                setPathArrived();
+                            }
                         }
                     }
                     if (this->followingPath)
@@ -373,6 +375,15 @@ namespace DsprGameServer
     void Unit::updateAttacking()
     {
         auto targetUnit = this->orderGroup->getTargetUnit();
+
+        if (targetUnit == nullptr){
+            this->orderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
+            this->followingPath = false;
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+            }
+            return;
+        }
 
         if (this->withinAttackRange(this->position->x, this->position->y, targetUnit)){
             //start to attack!
