@@ -9,6 +9,7 @@
 #include "../Pathfinding/AStarPathfinder.h"
 #include "../Pathfinding/SimplePathfinder.h"
 #include "../PlayerData.h"
+#include "FogManager.h"
 
 namespace DsprGameServer
 {
@@ -16,6 +17,7 @@ namespace DsprGameServer
     {
         this->tileManager = new TileManager(this, 64, 64);
         AStarPathfinder::setMapWidth(64);
+        this->fogManager = new FogManager(this);
         this->tribeManager = new TribeManager(this);
         this->unitManager = new UnitManager(this);
         this->unitManager->initializeFirstUnits();
@@ -29,6 +31,7 @@ namespace DsprGameServer
         delete this->unitManager;
         delete this->pathfinder;
         delete this->tribeManager;
+        delete this->fogManager;
     }
 
     void Game::update()

@@ -16,10 +16,13 @@ namespace DsprGameServer {
     class AStarPathfinder;
     class SimplePathfinder;
     class PlayerData;
+    class FogManager;
 
-    class Game {
+    class Game
+    {
 
     public:
+
         Game();
 
         ~Game();
@@ -32,8 +35,12 @@ namespace DsprGameServer {
         UnitManager* unitManager = nullptr;
         TribeManager* tribeManager = nullptr;
         AStarPathfinder* pathfinder = nullptr;
-        SimplePathfinder *simplePathfinder;
+        SimplePathfinder* simplePathfinder = nullptr;
+        FogManager* fogManager = nullptr;
+
     private:
+
         std::set<PlayerData *> playerDataSet;
+
     };
 }

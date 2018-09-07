@@ -24,7 +24,9 @@ namespace DsprGameServer
 
     class Unit
     {
+
     public:
+
         Unit(Game *game, int id, Tribe *tribe, int x, int y);
         ~Unit();
         void update();
@@ -37,6 +39,8 @@ namespace DsprGameServer
         void sendUpdate(PlayerData *playerData);
         bool anyVarIsDirty();
         void cleanAllVars();
+        bool shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding);
+        bool withinAttackRange(int x, int y, Unit *targetUnit);
 
         const int walkMax = 6;
         const int walkSpeedStraight = walkMax / 2; //2 updates to walk straight
@@ -74,50 +78,26 @@ namespace DsprGameServer
         int lostWithoutShortPath = 0;
         int pushDirection = 0;
 
-        bool shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding);
-
-        bool withinAttackRange(int x, int y, Unit *targetUnit);
-
     private:
 
         Game* game = nullptr;
-
-        void pushOtherUnit(Unit *otherUnit);
-
-        void getNextTile();
-
-        PathTile *nextTileIfFree(PathTile *nextTile);
-
-        PathTile *nextTileCheck(std::shared_ptr<DsprGameServer::Path> path, PathTile *curTile, int xAdj, int yAdj);
-
-        int getDir(int x, int y);
-
-        Point *getPointFromDir(int dir);
-
-        void setPathArrived();
-
-        Unit *getUnitAtPosition(int x, int y);
-
-        void getNextTileSimplePathfind();
-
-        int waitToPathfind = 0;
-
-        void setPathUnarrived();
-
         int timesHaventPushed = 0;
         int pushCount = 0;
-
-        void updateNextPosition(Point *newNextPosition);
-        Unit* getEnemyUnitInAcquisitionRange();
-
-        void updateAttackMoving();
-
-        void lookForEnemyUnitsAndEngage();
-
-        void addToBlockedEnemyList(Unit *blockedEnemy);
-
         std::set<Unit *> *blockedEnemyList = nullptr;
 
+        void pushOtherUnit(Unit *otherUnit);
+        void getNextTile();
+        int getDir(int x, int y);
+        Point *getPointFromDir(int dir);
+        void setPathArrived();
+        Unit *getUnitAtPosition(int x, int y);
+        void getNextTileSimplePathfind();
+        void setPathUnarrived();
+        void updateNextPosition(Point *newNextPosition);
+        Unit* getEnemyUnitInAcquisitionRange();
+        void updateAttackMoving();
+        void lookForEnemyUnitsAndEngage();
+        void addToBlockedEnemyList(Unit *blockedEnemy);
         void damageOtherUnit(Unit *otherUnit, int dmgAmount);
     };
 }

@@ -35,14 +35,16 @@ add_executable(dspr-gameserver
         Game/Tribe.h Game/Tribe.cpp
         Game/TribeManager.h Game/TribeManager.cpp
         Game/AnimationState.h Game/AnimationState.cpp
-        Math/Int.h Math/Int.cpp
-        Game/CircleCache.h Game/CircleCache.cpp
-        Game/Circle.h Game/Circle.cpp
-        Game/CircleCoord.h Game/CircleCoord.cpp
+        Game/FogManager.h Game/FogManager.cpp
+
+        Game/Circle/CircleCache.h Game/Circle/CircleCache.cpp
+        Game/Circle/Circle.h Game/Circle/Circle.cpp
+        Game/Circle/CircleCoord.h Game/Circle/CircleCoord.cpp
 
         Math/Point.h Math/Point.cpp
         Math/FloatPoint.h Math/FloatPoint.cpp
         Math/MathUtils.h
+        Math/Int.h Math/Int.cpp
 
         Pathfinding/AStarPathfinder.h Pathfinding/AStarPathfinder.cpp
         Pathfinding/SimplePathfinder.h Pathfinding/SimplePathfinder.cpp

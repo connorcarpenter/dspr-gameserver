@@ -65,7 +65,13 @@ namespace DsprGameServer {
             }
         }
 
-        void forEachCoord(std::function<void(int x, int y)> coordFunc) {
+        bool insideGrid(int x, int y)
+        {
+            return getGridIndex(x, y) != -1;
+        }
+
+        void forEachCoord(std::function<void(int x, int y)> coordFunc)
+        {
             for (int j = 0; j < halfHeight; j += 1)
             {
                 for (int i = 0;i< halfWidth; i+=1)

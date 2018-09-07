@@ -10,7 +10,8 @@
 #include "UnitManager.h"
 #include "OrderGroup.h"
 #include "../Pathfinding/SimplePathfinder.h"
-#include "CircleCache.h"
+#include "Circle/CircleCache.h"
+#include "FogManager.h"
 
 namespace DsprGameServer
 {
@@ -26,10 +27,14 @@ namespace DsprGameServer
         this->nextTilePosition = new Point(x,y);
         this->health = new Synced<Int>("health", new Int(100));
         this->tribe = tribe;
+
+        this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
     }
 
     Unit::~Unit()
     {
+        this->game->fogManager->conceilFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
+
         delete this->position;
         delete this->nextPosition;
         delete this->moveTarget;
@@ -431,10 +436,15 @@ namespace DsprGameServer
         return shouldPush;
     }
 
-    void Unit::updateNextPosition(Point *newNextPosition) {
+    void Unit::updateNextPosition(Point *newNextPosition)
+    {
         this->game->unitManager->removeUnitFromGrid(this);
+        this->game->fogManager->conceilFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
+
         this->nextPosition->dirtyObj()->Set(newNextPosition);
+
         this->game->unitManager->addUnitToGrid(this);
+        this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
     }
 
     Unit* Unit::getEnemyUnitInAcquisitionRange(){
