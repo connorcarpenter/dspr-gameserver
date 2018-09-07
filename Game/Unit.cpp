@@ -520,7 +520,7 @@ namespace DsprGameServer
         }
     }
 
-    void Unit::sendUpdate(DsprGameServer::Player* player)
+    void Unit::sendUpdate(PlayerData *playerData)
     {
         if (!this->anyVarIsDirty()) return;
         std::stringstream msg;
@@ -558,7 +558,7 @@ namespace DsprGameServer
 //        }
 
         msg << "\r\n";
-        GameServer::get().queueMessage(player->getWs(), msg.str());
+        GameServer::get().queueMessage(playerData, msg.str());
     }
 
     bool Unit::anyVarIsDirty()

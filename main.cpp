@@ -5,6 +5,7 @@
 #include "MapUtils.h"
 #include "GameServer.h"
 #include "Game/UnitManager.h"
+#include "PlayerData.h"
 
 using namespace DsprGameServer;
 
@@ -16,12 +17,18 @@ int main()
 
     h.onConnection([&h](uWS::WebSocket<uWS::SERVER> *ws, uWS::HttpRequest req)
     {
+        PlayerData* playerData = new PlayerData(ws);
+        ws->setUserData(playerData);
+
         ws->send("auth/1.0/gametoken|\r\n", uWS::BINARY);//the \r\n makes it happen on EMSC! Don't remove!
         std::cout << "dspr-gameserver: Received 'onConnection', Sent 'auth/1.0/gametoken|'" << std::endl;
     });
 
     h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> *ws, int code, char *message, size_t length)
     {
+        PlayerData* playerData = (PlayerData*) ws->getUserData();
+        delete playerData;
+
         std::cout << "dspr-gameserver: disconnection" << std::endl;
     });
 
@@ -31,6 +38,8 @@ int main()
 
     h.onMessage([&h, &bffToken](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
     {
+        PlayerData* playerData = (PlayerData*) ws->getUserData();
+
         std::string msgString = std::string(data, length);
 
         if (StringUtils::endsWith(msgString,"\r"))
@@ -67,7 +76,7 @@ int main()
         if (parts.at(0).compare("auth/1.0/gametoken") == 0)
         {
             std::cout << "dspr-gameserver: Received 'auth/1.0/gametoken', added player to game" << std::endl;
-            game->addPlayer(playerToken, ws);
+            game->addPlayer(playerToken, playerData);
         }
         else if (parts.at(0).compare("unit/1.0/order") == 0)
         {

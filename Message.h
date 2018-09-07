@@ -8,14 +8,17 @@
 #include <uWS/WebSocket.h>
 
 namespace DsprGameServer {
+
+    class PlayerData;
+
     class Message {
     public:
-        Message(uWS::WebSocket<uWS::SERVER> *ws, std::string str);
+        Message(PlayerData *playerData, std::string str);
 
         void send();
 
     private:
-        uWS::WebSocket<uWS::SERVER> *ws;
+        PlayerData* playerData = nullptr;
         std::string str;
     };
 }

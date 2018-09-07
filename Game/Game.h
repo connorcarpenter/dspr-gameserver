@@ -5,9 +5,8 @@
 //
 
 #include <uWS/WebSocket.h>
-#include <map>
 #include <list>
-#include "../Player.h"
+#include <set>
 
 namespace DsprGameServer {
 
@@ -16,6 +15,7 @@ namespace DsprGameServer {
     class TribeManager;
     class AStarPathfinder;
     class SimplePathfinder;
+    class PlayerData;
 
     class Game {
 
@@ -24,7 +24,8 @@ namespace DsprGameServer {
 
         ~Game();
 
-        void addPlayer(std::string token, uWS::WebSocket<1> *ws);
+        void addPlayer(const std::string& token, PlayerData* playerData);
+        void removePlayer(PlayerData* playerData);
         void update();
 
         TileManager* tileManager = nullptr;
@@ -33,6 +34,6 @@ namespace DsprGameServer {
         AStarPathfinder* pathfinder = nullptr;
         SimplePathfinder *simplePathfinder;
     private:
-        std::map<std::string, Player *> playerMap;
+        std::set<PlayerData *> playerDataSet;
     };
 }

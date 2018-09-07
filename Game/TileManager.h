@@ -5,7 +5,6 @@
 //
 
 #include "Tile.h"
-#include "../Player.h"
 #include "Game.h"
 #include "../PtrIsoGrid.h"
 
@@ -19,7 +18,7 @@ namespace DsprGameServer {
 
         ~TileManager();
 
-        void sendGrid(Player *player);
+        void sendGrid(PlayerData *playerData);
 
         Tile* getTileAt(int x, int y);
 

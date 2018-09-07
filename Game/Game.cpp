@@ -8,6 +8,7 @@
 #include "TribeManager.h";
 #include "../Pathfinding/AStarPathfinder.h"
 #include "../Pathfinding/SimplePathfinder.h"
+#include "../PlayerData.h"
 
 namespace DsprGameServer
 {
@@ -28,11 +29,6 @@ namespace DsprGameServer
         delete this->unitManager;
         delete this->pathfinder;
         delete this->tribeManager;
-
-        for (const auto &playerPair : playerMap) {
-            if (playerPair.second != nullptr)
-                delete playerPair.second;
-        }
     }
 
     void Game::update()
@@ -44,26 +40,30 @@ namespace DsprGameServer
         this->unitManager->deleteUnits();
 
         // send deletes to each player
-        for (const auto &playerPair : playerMap) {
-            if (playerPair.second != nullptr)
-                this->unitManager->sendUnitDeletes(playerPair.second);
+        for (const auto &playerData : this->playerDataSet) {
+            this->unitManager->sendUnitDeletes(playerData);
         }
 
         // send updates to each player
-        for (const auto &playerPair : playerMap) {
-            if (playerPair.second != nullptr)
-                this->unitManager->sendUnitUpdates(playerPair.second);
+        for (const auto &playerData : this->playerDataSet) {
+            this->unitManager->sendUnitUpdates(playerData);
         }
 
         // clean units vars
         this->unitManager->cleanAllUnits();
     }
 
-    void Game::addPlayer(std::string token, uWS::WebSocket<1> *ws)
+    void Game::addPlayer(const std::string& token, PlayerData *playerData)
     {
-        Player* p = new Player(token, ws);
-        playerMap.insert(std::pair<std::string, Player *>(token, p));
-        this->tileManager->sendGrid(p);
-        this->unitManager->sendUnits(p);
+        playerData->setToken(token);
+        playerData->setCurrentGame(this);
+
+        this->playerDataSet.insert(playerData);
+        this->tileManager->sendGrid(playerData);
+        this->unitManager->sendUnits(playerData);
+    }
+
+    void Game::removePlayer(PlayerData *playerData) {
+        this->playerDataSet.erase(playerData);
     }
 }

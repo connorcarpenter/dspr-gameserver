@@ -20,7 +20,7 @@ add_executable(dspr-gameserver
         main.cpp
         GameServer.h GameServer.cpp
         Message.h Message.cpp
-        Player.h Player.cpp
+        PlayerData.h PlayerData.cpp
         StringUtils.h
         MapUtils.h
         PtrIsoGrid.h PrimIsoGrid.h

@@ -49,7 +49,7 @@ namespace DsprGameServer
         delete endPosGrid;
     }
 
-    void UnitManager::sendUnits(DsprGameServer::Player* player)
+    void UnitManager::sendUnits(PlayerData *playerData)
     {
         for(const auto& unitPair : unitMap)
         {
@@ -58,7 +58,7 @@ namespace DsprGameServer
 
             std::stringstream msg;
             msg << "unit/1.0/create|" << id << "," << unit->position->x << "," << unit->position->y << "," << unit->tribe->index << "\r\n";
-            GameServer::get().queueMessage(player->getWs(), msg.str());
+            GameServer::get().queueMessage(playerData, msg.str());
         }
     }
 
@@ -203,12 +203,12 @@ namespace DsprGameServer
         }
     }
 
-    void UnitManager::sendUnitUpdates(Player* player)
+    void UnitManager::sendUnitUpdates(PlayerData *playerData)
     {
         for(const auto& unitPair : unitMap)
         {
             Unit* unit = unitPair.second;
-            unit->sendUpdate(player);
+            unit->sendUpdate(playerData);
         }
     }
 
@@ -269,13 +269,13 @@ namespace DsprGameServer
         this->unitsToDelete.clear();
     }
 
-    void UnitManager::sendUnitDeletes(Player* player)
+    void UnitManager::sendUnitDeletes(PlayerData *playerData)
     {
         for(auto unitId : this->unitDeletionsToSend)
         {
             std::stringstream msg;
             msg << "unit/1.0/delete|" << unitId << "|1" << "\r\n";
-            GameServer::get().queueMessage(player->getWs(), msg.str());
+            GameServer::get().queueMessage(playerData, msg.str());
         }
 
         this->unitDeletionsToSend.clear();

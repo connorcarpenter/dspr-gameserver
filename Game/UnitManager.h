@@ -8,7 +8,6 @@
 #include <queue>
 #include <list>
 #include "Unit.h"
-#include "../Player.h"
 #include "TileManager.h"
 #include "../Pathfinding/AStarPathfinder.h"
 #include "../PrimIsoGrid.h"
@@ -19,7 +18,7 @@ namespace DsprGameServer {
     public:
         UnitManager(Game *game);
         ~UnitManager();
-        void sendUnits(DsprGameServer::Player *pPlayer);
+        void sendUnits(PlayerData *playerData);
         Unit* createUnit(int x, int y, Tribe *tribe);
         void receiveMoveOrder(const std::list<int> &idList, int tileX, int tileY);
         void receiveFollowOrder(const std::list<int> &idList, int targetUnitId);
@@ -28,7 +27,7 @@ namespace DsprGameServer {
 
         void updateUnits();
         void deleteUnits();
-        void sendUnitUpdates(Player *player);
+        void sendUnitUpdates(PlayerData *playerData);
         void cleanAllUnits();
         void removeUnitFromGrid(Unit *unit);
         void addUnitToGrid(Unit *unit);
@@ -40,7 +39,7 @@ namespace DsprGameServer {
 
         void queueUnitForDeletion(Unit *deletedUnit);
 
-        void sendUnitDeletes(Player *player);
+        void sendUnitDeletes(PlayerData *playerData);
 
         Unit* getUnitWithId(int unitId);
 

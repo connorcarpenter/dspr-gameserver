@@ -32,9 +32,9 @@ namespace DsprGameServer
         }
     }
 
-    void GameServer::queueMessage(uWS::WebSocket<uWS::SERVER> *ws, std::string str)
+    void GameServer::queueMessage(PlayerData *playerData, std::string str)
     {
-        auto newMsg = new Message(ws, std::move(str));
+        auto newMsg = new Message(playerData, std::move(str));
         messageQueue.push(newMsg);
     }
 

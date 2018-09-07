@@ -29,24 +29,24 @@ namespace DsprGameServer
         delete this->tileGrid;
     }
 
-    void TileManager::sendGrid(Player* player)
+    void TileManager::sendGrid(PlayerData *playerData)
     {
         std::stringstream msg0;
         msg0 << "grid/1.0/create|" << this->width << "," << this->height << "\r\n";
-        GameServer::get().queueMessage(player->getWs(), msg0.str());
+        GameServer::get().queueMessage(playerData, msg0.str());
 
         this->tileGrid->forEachElement([&](Tile* tile, int x, int y){
             if (tile->walkable)
             {
                 std::stringstream msg;
                 msg << "tile/1.0/create|" << (x) << "," << (y) << "," << tile->frame << "\r\n";
-                GameServer::get().queueMessage(player->getWs(), msg.str());
+                GameServer::get().queueMessage(playerData, msg.str());
             }
             else
             {
                 std::stringstream msg;
                 msg << "tile/1.0/create|" << (x) << "," << (y) << ",-1" << "\r\n";
-                GameServer::get().queueMessage(player->getWs(), msg.str());
+                GameServer::get().queueMessage(playerData, msg.str());
             }
         });
     }

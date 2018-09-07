@@ -4,15 +4,16 @@
 
 #include <iostream>
 #include "Message.h"
+#include "PlayerData.h"
 
 namespace DsprGameServer {
-    Message::Message(uWS::WebSocket<uWS::SERVER> *ws, std::string str) {
-        this->ws = ws;
+    Message::Message(PlayerData *playerData, std::string str) {
+        this->playerData = playerData;
         this->str = str;
     }
 
     void Message::send() {
-        this->ws->send(str.c_str(), uWS::BINARY);
+        this->playerData->getWs()->send(str.c_str(), uWS::BINARY);
         std::cout << "gameserver: sent: " << str << std::endl;
     }
 }

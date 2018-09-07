@@ -7,7 +7,6 @@
 #include <set>
 #include "../Math/Point.h"
 #include "Synced.h"
-#include "../Player.h"
 #include "Game.h"
 #include "../Math/FloatPoint.h"
 #include "AnimationState.h"
@@ -35,7 +34,7 @@ namespace DsprGameServer
         void updateAttacking();
         void startPath();
         void setOrderGroup(std::shared_ptr<OrderGroup> group);
-        void sendUpdate(DsprGameServer::Player* player);
+        void sendUpdate(PlayerData *playerData);
         bool anyVarIsDirty();
         void cleanAllVars();
 

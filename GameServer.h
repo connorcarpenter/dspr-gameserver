@@ -5,6 +5,7 @@
 //
 
 #include <queue>
+#include <map>
 #include "Message.h"
 #include "Game/Game.h"
 
@@ -21,7 +22,7 @@ namespace DsprGameServer
         }
 
         void step();
-        void queueMessage(uWS::WebSocket<uWS::SERVER> *ws, std::string str);
+        void queueMessage(PlayerData *playerData, std::string str);
         void addPlayer(std::string playerToken);
 
         std::map<std::string, Game*> playerCodeToGameMap;
