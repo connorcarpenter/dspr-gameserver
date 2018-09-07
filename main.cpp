@@ -54,7 +54,7 @@ int main()
         {
             if (parts.at(1).compare(bffToken) == 0)
             {
-                GameServer::get().addPlayer(parts.at(2));
+                GameServer::get().addPlayerToken(parts.at(2));
                 std::cout << "dspr-gameserver: Received new player" << std::endl;
             }
             return;

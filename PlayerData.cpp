@@ -4,6 +4,7 @@
 
 #include "PlayerData.h"
 #include "Game/Game.h"
+#include "GameServer.h"
 
 namespace DsprGameServer {
     PlayerData::PlayerData(uWS::WebSocket<1> *ws) {
@@ -14,6 +15,8 @@ namespace DsprGameServer {
         if (this->currentGame != nullptr){
             this->currentGame->removePlayer(this);
         }
+
+        GameServer::get().removePlayerToken(this->token);
     }
 
     uWS::WebSocket<1> * PlayerData::getWs()

@@ -38,7 +38,11 @@ namespace DsprGameServer
         messageQueue.push(newMsg);
     }
 
-    void GameServer::addPlayer(std::string playerToken) {
+    void GameServer::addPlayerToken(std::string playerToken) {
         playerCodeToGameMap.insert(std::pair<std::string, Game*>(playerToken, this->onlyGame));
+    }
+
+    void GameServer::removePlayerToken(std::string playerToken) {
+        playerCodeToGameMap.erase(playerToken);
     }
 }
