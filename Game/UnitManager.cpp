@@ -210,20 +210,26 @@ namespace DsprGameServer
         for(const auto& unitPair : unitMap)
         {
             Unit* unit = unitPair.second;
+            bool playerIsAwareOfUnit = this->playerIsAwareOfUnit(playerData, unit);
 
-            if (this->playerIsAwareOfUnit(playerData, unit)) {
+            if (playerIsAwareOfUnit)
+            {
                 if (!unit->isVisibleToTribe(playerData->getTribe()))
                 {
                     this->makePlayerUnawareOfUnit(playerData, unit);
+                    playerIsAwareOfUnit = false;
                 }
-            } else {
+            }
+            else
+            {
                 if (unit->isVisibleToTribe(playerData->getTribe()))
                 {
                     this->makePlayerAwareOfUnit(playerData, unit);
+                    playerIsAwareOfUnit = true;
                 }
             }
 
-            if (this->playerIsAwareOfUnit(playerData, unit))
+            if (playerIsAwareOfUnit)
             {
                 unit->sendUpdate(playerData);
             }
@@ -278,6 +284,13 @@ namespace DsprGameServer
             //setup sending the deletions
             int showDeath = (unit->health->obj()->Get() <= 0) ? 1 : 0;
             this->unitDeletionsToSend.emplace(std::make_pair(unit->id, showDeath));
+
+            //remove this unit from all players aware of it
+            for(const auto& playerUnitPair : this->playerToUnitsAwareOfMap)
+            {
+                if (playerUnitPair.second != nullptr)
+                    playerUnitPair.second->erase(unit);
+            }
 
             //actually delete
             delete unit;
@@ -334,6 +347,13 @@ namespace DsprGameServer
 
     void UnitManager::addPlayer(PlayerData *playerData) {
         this->playerToUnitsAwareOfMap.emplace(std::make_pair(playerData, new std::set<Unit*>()));
+    }
+
+    void UnitManager::removePlayer(PlayerData *playerData) {
+        if (this->playerToUnitsAwareOfMap.count(playerData) <= 0) return;
+        auto unitSet = this->playerToUnitsAwareOfMap.at(playerData);
+        delete unitSet;
+        this->playerToUnitsAwareOfMap.erase(playerData);
     }
 
     bool UnitManager::playerIsAwareOfUnit(PlayerData *playerData, Unit *unit) {

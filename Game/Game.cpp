@@ -80,6 +80,7 @@ namespace DsprGameServer
     void Game::removePlayer(PlayerData *playerData) {
         this->playerDataSet.erase(playerData);
         this->tribeManager->freeTribeFromPlayer(playerData->getTribe(), playerData);
+        this->unitManager->removePlayer(playerData);
     }
 
     void Game::sendPlayerTribeIndex(PlayerData *playerData, Tribe *tribe) {

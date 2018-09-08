@@ -47,6 +47,8 @@ namespace DsprGameServer {
 
         void addPlayer(PlayerData *playerData);
 
+        void removePlayer(PlayerData *playerData);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
@@ -66,5 +68,6 @@ namespace DsprGameServer {
         bool playerIsAwareOfUnit(PlayerData *playerData, Unit *unit);
 
         void makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit);
+
     };
 }
