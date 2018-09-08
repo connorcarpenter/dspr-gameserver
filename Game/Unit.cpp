@@ -497,6 +497,17 @@ namespace DsprGameServer
         this->blockedEnemyList->insert(blockedEnemy);
     }
 
+    void Unit::damageOtherUnit(Unit *otherUnit, int dmgAmount) {
+        otherUnit->health->dirtyObj()->Subtract(dmgAmount);
+        if (otherUnit->health->obj()->value <= 0){
+            this->game->unitManager->queueUnitForDeletion(otherUnit);
+        }
+    }
+
+    bool Unit::isVisibleToTribe(Tribe *tribe) {
+        return this->game->fogManager->tileIsClear(tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y);
+    }
+
     int Unit::getDir(int x, int y)
     {
         auto dir = (std::atan2(y,x)*180/M_PI);
@@ -587,16 +598,5 @@ namespace DsprGameServer
         this->animationState->clean();
         this->health->clean();
         //more synced vars here
-    }
-
-    void Unit::damageOtherUnit(Unit *otherUnit, int dmgAmount) {
-        otherUnit->health->dirtyObj()->Subtract(dmgAmount);
-        if (otherUnit->health->obj()->value <= 0){
-            this->game->unitManager->queueUnitForDeletion(otherUnit);
-        }
-    }
-
-    bool Unit::isVisibleToTribe(Tribe *tribe) {
-        return this->game->fogManager->tileIsClear(tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y);
     }
 }

@@ -7,6 +7,7 @@
 #include "TileManager.h"
 #include "Circle/CircleCache.h"
 #include "../PrimIsoGrid.h"
+#include "Tribe.h"
 
 namespace DsprGameServer
 {
@@ -23,7 +24,7 @@ namespace DsprGameServer
     void FogManager::addTribe(DsprGameServer::Tribe *newTribe)
     {
         auto newGrid = new PrimIsoGrid<int>();
-        newGrid->initialize(this->game->tileManager->width, this->game->tileManager->height);
+        newGrid->initialize(this->game->tileManager->width * 2, this->game->tileManager->height * 2);
         this->fogGridMap.emplace(std::make_pair(newTribe, newGrid));
     }
 
@@ -55,6 +56,7 @@ namespace DsprGameServer
             if (reveal && currentFogAmount == 0)
             {
                 currentFogAmount += 2;
+                this->game->tileManager->sendTileToPlayer(x,y, tribe->playerData);
             }
             else
             {
@@ -84,6 +86,12 @@ namespace DsprGameServer
         auto fogGrid = this->fogGridMap.at(tribe);
 
         return fogGrid->get(x,y);
+    }
+
+    void FogManager::forEachFogTile(Tribe* tribe, const std::function<void(int fogAmount, int x, int y)>& elFunc){
+        if (tribe == nullptr)return;
+        auto fogGrid = this->fogGridMap.at(tribe);
+        fogGrid->forEachElement(elFunc);
     }
 }
 

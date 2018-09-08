@@ -24,6 +24,9 @@ namespace DsprGameServer {
 
         int width;
         int height;
+
+        void sendTileToPlayer(int x, int y, PlayerData *playerData);
+
     private:
 
         void makeRandomWall();
@@ -33,5 +36,7 @@ namespace DsprGameServer {
         PtrIsoGrid<Tile*>* tileGrid = nullptr;
 
         void initializeTiles();
+
+        void sendAllDiscoveredTilesToPlayer(PlayerData *playerData);
     };
 }

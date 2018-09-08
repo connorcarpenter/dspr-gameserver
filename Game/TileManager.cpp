@@ -7,6 +7,8 @@
 #include "TileManager.h"
 #include "../GameServer.h"
 #include "../Math/MathUtils.h"
+#include "FogManager.h"
+#include "../PlayerData.h"
 
 namespace DsprGameServer
 {
@@ -35,20 +37,7 @@ namespace DsprGameServer
         msg0 << "grid/1.0/create|" << this->width << "," << this->height << "\r\n";
         GameServer::get().queueMessage(playerData, msg0.str());
 
-        this->tileGrid->forEachElement([&](Tile* tile, int x, int y){
-            if (tile->walkable)
-            {
-                std::stringstream msg;
-                msg << "tile/1.0/create|" << (x) << "," << (y) << "," << tile->frame << "\r\n";
-                GameServer::get().queueMessage(playerData, msg.str());
-            }
-            else
-            {
-                std::stringstream msg;
-                msg << "tile/1.0/create|" << (x) << "," << (y) << ",-1" << "\r\n";
-                GameServer::get().queueMessage(playerData, msg.str());
-            }
-        });
+        this->sendAllDiscoveredTilesToPlayer(playerData);
     }
 
     void TileManager::initializeTiles()
@@ -104,5 +93,45 @@ namespace DsprGameServer
                 wallTile->walkable = false;
             }
         }
+    }
+
+    void TileManager::sendTileToPlayer(int x, int y, PlayerData *playerData) {
+        if (playerData == nullptr) return;
+
+        auto tile = this->tileGrid->get(x,y);
+        if (tile->walkable)
+        {
+            std::stringstream msg;
+            msg << "tile/1.0/create|" << (x) << "," << (y) << "," << tile->frame << "\r\n";
+            GameServer::get().queueMessage(playerData, msg.str());
+        }
+        else
+        {
+            std::stringstream msg;
+            msg << "tile/1.0/create|" << (x) << "," << (y) << ",-1" << "\r\n";
+            GameServer::get().queueMessage(playerData, msg.str());
+        }
+    }
+
+    void TileManager::sendAllDiscoveredTilesToPlayer(PlayerData *playerData) {
+        this->game->fogManager->forEachFogTile(playerData->getTribe(),
+            [&](int fogAmount, int x, int y)
+            {
+                if (fogAmount == 0) return;
+
+                auto tile = this->tileGrid->get(x,y);
+                if (tile->walkable)
+                {
+                    std::stringstream msg;
+                    msg << "tile/1.0/create|" << (x) << "," << (y) << "," << tile->frame << "\r\n";
+                    GameServer::get().queueMessage(playerData, msg.str());
+                }
+                else
+                {
+                    std::stringstream msg;
+                    msg << "tile/1.0/create|" << (x) << "," << (y) << ",-1" << "\r\n";
+                    GameServer::get().queueMessage(playerData, msg.str());
+                }
+            });
     }
 }

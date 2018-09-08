@@ -3,6 +3,7 @@
 //
 
 #include <map>
+#include <functional>
 
 namespace DsprGameServer
 {
@@ -27,6 +28,8 @@ namespace DsprGameServer
         bool tileIsInFog(Tribe* tribe, int x, int y);
         bool tileIsInShroud(Tribe* tribe, int x, int y);
 
+        void forEachFogTile(Tribe *tribe, const std::function<void(int, int, int)>& elFunc);
+
     private:
 
         std::map<Tribe*, PrimIsoGrid<int>*> fogGridMap;
@@ -34,5 +37,7 @@ namespace DsprGameServer
 
         void updateFog(Tribe* tribe, int x, int y, int radius, bool reveal);
         int getFogAmount(Tribe* tribe, int x, int y);
+
+
     };
 }
