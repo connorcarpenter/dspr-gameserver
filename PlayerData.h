@@ -26,6 +26,8 @@ namespace DsprGameServer
 
         void setTribe(DsprGameServer::Tribe *tribe);
 
+        Tribe* getTribe();
+
     private:
 
         uWS::WebSocket<1> *ws = nullptr;

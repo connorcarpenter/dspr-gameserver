@@ -595,4 +595,8 @@ namespace DsprGameServer
             this->game->unitManager->queueUnitForDeletion(otherUnit);
         }
     }
+
+    bool Unit::isVisibleToTribe(Tribe *tribe) {
+        return this->game->fogManager->tileIsClear(tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y);
+    }
 }

@@ -37,4 +37,8 @@ namespace DsprGameServer
     void PlayerData::setTribe(DsprGameServer::Tribe *tribe) {
         this->currentTribe = tribe;
     }
+
+    Tribe *PlayerData::getTribe() {
+        return this->currentTribe;
+    }
 }

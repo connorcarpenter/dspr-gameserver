@@ -18,7 +18,7 @@ namespace DsprGameServer {
     public:
         UnitManager(Game *game);
         ~UnitManager();
-        void sendUnits(PlayerData *playerData);
+        void initSendAllUnits(PlayerData *playerData);
         Unit* createUnit(int x, int y, Tribe *tribe);
         void receiveMoveOrder(const std::list<int> &idList, int tileX, int tileY);
         void receiveFollowOrder(const std::list<int> &idList, int targetUnitId);
@@ -45,6 +45,8 @@ namespace DsprGameServer {
 
         void finishSendUnitDeletes();
 
+        void addPlayer(PlayerData *playerData);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
@@ -54,9 +56,15 @@ namespace DsprGameServer {
         PrimIsoGrid<bool>* endPosGrid = nullptr;
 
         std::set<Unit*> unitsToDelete;
-        std::set<int> unitDeletionsToSend;
+        std::set<std::pair<int,int>> unitDeletionsToSend;
+        std::map<PlayerData*, std::set<Unit*>*> playerToUnitsAwareOfMap;
 
         void setUnitInGrid(int x, int y, Unit *unit);
 
+        void makePlayerAwareOfUnit(PlayerData *playerData, Unit *unit);
+
+        bool playerIsAwareOfUnit(PlayerData *playerData, Unit *unit);
+
+        void makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit);
     };
 }

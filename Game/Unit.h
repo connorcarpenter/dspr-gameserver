@@ -78,6 +78,8 @@ namespace DsprGameServer
         int lostWithoutShortPath = 0;
         int pushDirection = 0;
 
+        bool isVisibleToTribe(Tribe *tribe);
+
     private:
 
         Game* game = nullptr;

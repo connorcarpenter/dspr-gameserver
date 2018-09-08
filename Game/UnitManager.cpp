@@ -10,6 +10,7 @@
 #include "../Pathfinding/AStarPathfinder.h"
 #include "OrderGroup.h"
 #include "TribeManager.h"
+#include "../PlayerData.h"
 
 namespace DsprGameServer
 {
@@ -49,16 +50,17 @@ namespace DsprGameServer
         delete endPosGrid;
     }
 
-    void UnitManager::sendUnits(PlayerData *playerData)
+    void UnitManager::initSendAllUnits(PlayerData *playerData)
     {
         for(const auto& unitPair : unitMap)
         {
             int id = unitPair.first;
             Unit* unit = unitPair.second;
 
-            std::stringstream msg;
-            msg << "unit/1.0/create|" << id << "," << unit->position->x << "," << unit->position->y << "," << unit->tribe->index << "\r\n";
-            GameServer::get().queueMessage(playerData, msg.str());
+            if (unit->isVisibleToTribe(playerData->getTribe()))
+            {
+                this->makePlayerAwareOfUnit(playerData, unit);
+            }
         }
     }
 
@@ -208,7 +210,23 @@ namespace DsprGameServer
         for(const auto& unitPair : unitMap)
         {
             Unit* unit = unitPair.second;
-            unit->sendUpdate(playerData);
+
+            if (this->playerIsAwareOfUnit(playerData, unit)) {
+                if (!unit->isVisibleToTribe(playerData->getTribe()))
+                {
+                    this->makePlayerUnawareOfUnit(playerData, unit);
+                }
+            } else {
+                if (unit->isVisibleToTribe(playerData->getTribe()))
+                {
+                    this->makePlayerAwareOfUnit(playerData, unit);
+                }
+            }
+
+            if (this->playerIsAwareOfUnit(playerData, unit))
+            {
+                unit->sendUpdate(playerData);
+            }
         }
     }
 
@@ -258,7 +276,8 @@ namespace DsprGameServer
             this->unitMap.erase(unit->id);
 
             //setup sending the deletions
-            this->unitDeletionsToSend.emplace(unit->id);
+            int showDeath = (unit->health->obj()->Get() <= 0) ? 1 : 0;
+            this->unitDeletionsToSend.emplace(std::make_pair(unit->id, showDeath));
 
             //actually delete
             delete unit;
@@ -274,7 +293,7 @@ namespace DsprGameServer
         for(auto unitId : this->unitDeletionsToSend)
         {
             std::stringstream msg;
-            msg << "unit/1.0/delete|" << unitId << "|1" << "\r\n";
+            msg << "unit/1.0/delete|" << unitId.first << "|" << unitId.second << "\r\n";
             GameServer::get().queueMessage(playerData, msg.str());
         }
     }
@@ -290,5 +309,35 @@ namespace DsprGameServer
 
     void UnitManager::finishSendUnitDeletes() {
         this->unitDeletionsToSend.clear();
+    }
+
+    void UnitManager::makePlayerAwareOfUnit(PlayerData *playerData, Unit *unit) {
+
+        std::stringstream msg;
+        msg << "unit/1.0/create|" << unit->id << "," << unit->position->x << "," << unit->position->y << ","
+            << unit->tribe->index << "\r\n";
+        GameServer::get().queueMessage(playerData, msg.str());
+
+        std::set<Unit*>* unitSet = this->playerToUnitsAwareOfMap.at(playerData);
+        unitSet->emplace(unit);
+    }
+
+    void UnitManager::makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit) {
+
+        std::stringstream msg;
+        msg << "unit/1.0/delete|" << unit->id << "|0" << "\r\n";
+        GameServer::get().queueMessage(playerData, msg.str());
+
+        std::set<Unit*>* unitSet = this->playerToUnitsAwareOfMap.at(playerData);
+        unitSet->erase(unit);
+    }
+
+    void UnitManager::addPlayer(PlayerData *playerData) {
+        this->playerToUnitsAwareOfMap.emplace(std::make_pair(playerData, new std::set<Unit*>()));
+    }
+
+    bool UnitManager::playerIsAwareOfUnit(PlayerData *playerData, Unit *unit) {
+        auto playerUnitAwareSet = this->playerToUnitsAwareOfMap.at(playerData);
+        return playerUnitAwareSet->count(unit) != 0;
     }
 }

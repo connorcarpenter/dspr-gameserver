@@ -41,6 +41,14 @@ namespace DsprGameServer
         // update units
         this->unitManager->updateUnits();
 
+        // send updates to each player
+        for (const auto &playerData : this->playerDataSet) {
+            this->unitManager->sendUnitUpdates(playerData);
+        }
+
+        // clean units vars
+        this->unitManager->cleanAllUnits();
+
         // delete queued units
         this->unitManager->deleteUnits();
 
@@ -50,14 +58,6 @@ namespace DsprGameServer
         }
 
         this->unitManager->finishSendUnitDeletes();
-
-        // send updates to each player
-        for (const auto &playerData : this->playerDataSet) {
-            this->unitManager->sendUnitUpdates(playerData);
-        }
-
-        // clean units vars
-        this->unitManager->cleanAllUnits();
     }
 
     void Game::addPlayer(const std::string& token, PlayerData *playerData)
@@ -72,12 +72,14 @@ namespace DsprGameServer
         this->sendPlayerTribeIndex(playerData, freeTribe);
 
         this->tileManager->sendGrid(playerData);
-        this->unitManager->sendUnits(playerData);
+
+        this->unitManager->addPlayer(playerData);
+        this->unitManager->initSendAllUnits(playerData);
     }
 
     void Game::removePlayer(PlayerData *playerData) {
         this->playerDataSet.erase(playerData);
-        this->tribeManager->freeTribeFromPlayer(nullptr, playerData);
+        this->tribeManager->freeTribeFromPlayer(playerData->getTribe(), playerData);
     }
 
     void Game::sendPlayerTribeIndex(PlayerData *playerData, Tribe *tribe) {
