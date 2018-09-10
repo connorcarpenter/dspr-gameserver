@@ -61,15 +61,19 @@ namespace DsprGameServer
 
         Synced<Int>* health = nullptr;
         int stamina = 100;
-        int damage = 5;
+        const int minDamage = 10;
+        const int maxDamage = 15;
         int range = 2;//make sure this is multiples of 2... to accomodate for diagonal tiles
-        int attackFrameIndex = 0;
-        int attackWaitIndex = 0;
+        float attackFrameIndex = 0;
+        float attackWaitIndex = 0;
+        float attackAnimationSpeed = 1;
+        float attackWaitSpeed = 1.0f / 1.7f;
         const int attackFramesNumber = 5;
         const int attackFrameToApplyDamage = 3;
         const int attackWaitFrames = 5;
         const int sight = 6;
         const int acquisition = 6;
+        const int maxHealth = 420;
 
         Tribe *tribe = nullptr;
 

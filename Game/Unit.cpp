@@ -25,7 +25,7 @@ namespace DsprGameServer
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
         this->nextTilePosition = new Point(x,y);
-        this->health = new Synced<Int>("health", new Int(100));
+        this->health = new Synced<Int>("health", new Int(maxHealth));
         this->tribe = tribe;
 
         this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
@@ -407,9 +407,9 @@ namespace DsprGameServer
             }
 
             if (this->attackWaitIndex <= 0) {
-                this->attackFrameIndex += 1;
+                this->attackFrameIndex += this->attackAnimationSpeed;
                 if (this->attackFrameIndex == this->attackFrameToApplyDamage) {
-                    this->damageOtherUnit(targetUnit, this->damage);
+                    this->damageOtherUnit(targetUnit, MathUtils::getRandom(this->minDamage, this->maxDamage));
                 }
                 if (this->attackFrameIndex >= this->attackFramesNumber) {
                     this->attackFrameIndex = 0;
@@ -417,7 +417,7 @@ namespace DsprGameServer
                 }
             }
             else {
-                this->attackWaitIndex -= 1;
+                this->attackWaitIndex -= this->attackWaitSpeed;
             }
         }
         else {
