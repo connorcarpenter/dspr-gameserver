@@ -406,12 +406,18 @@ namespace DsprGameServer
                 }
             }
 
-            this->attackFrameIndex += 1;
-            if (this->attackFrameIndex == this->attackFrameToApplyDamage){
-                this->damageOtherUnit(targetUnit, this->damage);
+            if (this->attackWaitIndex <= 0) {
+                this->attackFrameIndex += 1;
+                if (this->attackFrameIndex == this->attackFrameToApplyDamage) {
+                    this->damageOtherUnit(targetUnit, this->damage);
+                }
+                if (this->attackFrameIndex >= this->attackFramesNumber) {
+                    this->attackFrameIndex = 0;
+                    this->attackWaitIndex = this->attackWaitFrames;
+                }
             }
-            if (this->attackFrameIndex >= this->attackFramesNumber){
-                this->attackFrameIndex = 0;
+            else {
+                this->attackWaitIndex -= 1;
             }
         }
         else {

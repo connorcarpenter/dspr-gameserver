@@ -64,10 +64,12 @@ namespace DsprGameServer
         int damage = 5;
         int range = 2;//make sure this is multiples of 2... to accomodate for diagonal tiles
         int attackFrameIndex = 0;
-        int attackFramesNumber = 5;
-        int attackFrameToApplyDamage = 3;
-        const int sight = 8;
-        const int acquisition = 8;
+        int attackWaitIndex = 0;
+        const int attackFramesNumber = 5;
+        const int attackFrameToApplyDamage = 3;
+        const int attackWaitFrames = 5;
+        const int sight = 6;
+        const int acquisition = 6;
 
         Tribe *tribe = nullptr;
 
