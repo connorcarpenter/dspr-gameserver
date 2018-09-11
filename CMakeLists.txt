@@ -36,6 +36,7 @@ add_executable(dspr-gameserver
         Game/TribeManager.h Game/TribeManager.cpp
         Game/AnimationState.h Game/AnimationState.cpp
         Game/FogManager.h Game/FogManager.cpp
+        Game/UnitOrder.h
 
         Game/Circle/CircleCache.h Game/Circle/CircleCache.cpp
         Game/Circle/Circle.h Game/Circle/Circle.cpp

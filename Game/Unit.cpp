@@ -71,6 +71,9 @@ namespace DsprGameServer
                     case AttackTarget:
                         this->updateAttacking();
                         break;
+                    case Hold:
+                        this->updateHolding();
+                        break;
                 }
             } else {
                 this->updateWalking();
@@ -162,6 +165,116 @@ namespace DsprGameServer
         }
     }
 
+    void Unit::updateFollowing()
+    {
+        this->updateWalking();
+        this->orderGroup->recalculatePathIfTargetMoved();
+    }
+
+    void Unit::updateAttackMoving() {
+        this->lookForEnemyUnitsAndEngage();
+        this->updateWalking();
+    }
+
+    void Unit::updateAttacking()
+    {
+        auto targetUnit = this->orderGroup->getTargetUnit();
+
+        if (targetUnit == nullptr){
+            this->orderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
+            this->followingPath = false;
+            this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+            }
+            return;
+        }
+
+        if (this->withinAttackRange(this->position->x, this->position->y, targetUnit)){
+            //start to attack!
+            this->handleAttackAnimation(targetUnit);
+        }
+        else {
+            //try to get in range of target unit
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+                this->orderGroup->unitUnarrived();
+            }
+
+            if(!this->followingPath) setPathUnarrived();
+            this->updateFollowing();
+        }
+    }
+
+    void Unit::handleAttackAnimation(Unit *targetUnit) {
+        if (this->animationState->obj()->GetState() != Attacking) {
+            this->animationState->dirtyObj()->SetState(Attacking);
+            int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
+            this->animationState->dirtyObj()->SetHeading(newHeading);
+            this->attackFrameIndex = 0;
+            this->orderGroup->unitArrived();
+        } else {
+            if (this->orderGroup->targetHasMoved()){
+                int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
+                if (this->animationState->obj()->GetHeading() != newHeading)
+                    this->animationState->dirtyObj()->SetHeading(newHeading);
+            }
+        }
+
+        if (this->attackWaitIndex <= 0) {
+            this->attackFrameIndex += this->attackAnimationSpeed;
+            if (this->attackFrameIndex == this->attackFrameToApplyDamage) {
+                this->damageOtherUnit(targetUnit, MathUtils::getRandom(this->minDamage, this->maxDamage));
+            }
+            if (this->attackFrameIndex >= this->attackFramesNumber) {
+                this->attackFrameIndex = 0;
+                this->attackWaitIndex = this->attackWaitFrames;
+            }
+        }
+        else {
+            this->attackWaitIndex -= this->attackWaitSpeed;
+        }
+    }
+
+    void Unit::updateHolding() {
+        if (this->orderGroup->getTargetUnit() == nullptr)
+        {
+            Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
+            if (enemyUnitInAcquisitionRange != nullptr) {
+                this->orderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
+            }
+        }
+        auto targetUnit = this->orderGroup->getTargetUnit();
+        if (targetUnit != nullptr)
+        {
+            if (this->withinAttackRange(this->position->x, this->position->y, targetUnit)){
+                //start to attack!
+                this->handleAttackAnimation(targetUnit);
+            }
+            else {
+                this->orderGroup->setTargetUnit(nullptr);
+            }
+        }
+        if (this->orderGroup->getTargetUnit() == nullptr){
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+            }
+        }
+    }
+
+    void Unit::stop(std::shared_ptr<OrderGroup> orderGroup) {
+        this->setOrderGroup(orderGroup);
+        this->followingPath = false;
+        this->moveTarget->dirtyObj()->Set(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
+    }
+
+    void Unit::hold() {
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Hold);
+        this->setOrderGroup(newOrderGroup);
+        this->followingPath = false;
+        this->moveTarget->dirtyObj()->Set(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
+    }
+
     void Unit::startPath()
     {
         this->followingPath = true;
@@ -184,6 +297,7 @@ namespace DsprGameServer
     void Unit::setPathArrived()
     {
         this->followingPath = false;
+        this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
         this->orderGroup->unitArrived();
     }
 
@@ -364,72 +478,6 @@ namespace DsprGameServer
             pushOtherUnit(unitOnTile);
         }
         delete nextPoint;
-    }
-
-    void Unit::updateFollowing()
-    {
-        this->updateWalking();
-        this->orderGroup->recalculatePathIfTargetMoved();
-    }
-
-    void Unit::updateAttackMoving() {
-        this->lookForEnemyUnitsAndEngage();
-        this->updateWalking();
-    }
-
-    void Unit::updateAttacking()
-    {
-        auto targetUnit = this->orderGroup->getTargetUnit();
-
-        if (targetUnit == nullptr){
-            this->orderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
-            this->followingPath = false;
-            if (this->animationState->obj()->GetState() != Walking) {
-                this->animationState->dirtyObj()->SetState(Walking);
-            }
-            return;
-        }
-
-        if (this->withinAttackRange(this->position->x, this->position->y, targetUnit)){
-            //start to attack!
-            if (this->animationState->obj()->GetState() != Attacking) {
-                this->animationState->dirtyObj()->SetState(Attacking);
-                int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
-                this->animationState->dirtyObj()->SetHeading(newHeading);
-                this->attackFrameIndex = 0;
-                this->orderGroup->unitArrived();
-            } else {
-                if (this->orderGroup->targetHasMoved()){
-                    int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
-                    if (this->animationState->obj()->GetHeading() != newHeading)
-                        this->animationState->dirtyObj()->SetHeading(newHeading);
-                }
-            }
-
-            if (this->attackWaitIndex <= 0) {
-                this->attackFrameIndex += this->attackAnimationSpeed;
-                if (this->attackFrameIndex == this->attackFrameToApplyDamage) {
-                    this->damageOtherUnit(targetUnit, MathUtils::getRandom(this->minDamage, this->maxDamage));
-                }
-                if (this->attackFrameIndex >= this->attackFramesNumber) {
-                    this->attackFrameIndex = 0;
-                    this->attackWaitIndex = this->attackWaitFrames;
-                }
-            }
-            else {
-                this->attackWaitIndex -= this->attackWaitSpeed;
-            }
-        }
-        else {
-            //try to get in range of target unit
-            if (this->animationState->obj()->GetState() != Walking) {
-                this->animationState->dirtyObj()->SetState(Walking);
-                this->orderGroup->unitUnarrived();
-            }
-
-            if(!this->followingPath) setPathUnarrived();
-            this->updateFollowing();
-        }
     }
 
     bool Unit::shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding) {

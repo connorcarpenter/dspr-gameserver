@@ -3,6 +3,7 @@
 //
 
 #include "Unit.h"
+#include "UnitOrder.h"
 
 namespace DsprGameServer {
     class Unit;

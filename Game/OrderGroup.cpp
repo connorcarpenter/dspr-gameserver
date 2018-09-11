@@ -87,8 +87,12 @@ namespace DsprGameServer {
     }
 
     void OrderGroup::setTargetUnit(Unit *targetUnit) {
-        this->targetUnitId = targetUnit->id;
-        this->lastTargetPosition.Set(targetUnit->position);
+        if (targetUnit == nullptr){
+            this->targetUnitId = -1;
+        }else {
+            this->targetUnitId = targetUnit->id;
+            this->lastTargetPosition.Set(targetUnit->position);
+        }
     }
 
     void OrderGroup::setPath(std::shared_ptr<DsprGameServer::Path> path) {

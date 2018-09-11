@@ -196,6 +196,24 @@ namespace DsprGameServer
         }
     }
 
+    void UnitManager::receiveStopOrder(const std::list<int> &idList)
+    {
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
+
+        for (const auto &i : idList)
+            if (unitMap.count(i) != 0) {
+                unitMap.at(i)->stop(newOrderGroup);
+            }
+    }
+
+    void UnitManager::receiveHoldOrder(const std::list<int> &idList)
+    {
+        for (const auto &i : idList)
+            if (unitMap.count(i) != 0) {
+                unitMap.at(i)->hold();
+            }
+    }
+
     void UnitManager::updateUnits()
     {
         for(const auto& unitPair : unitMap)

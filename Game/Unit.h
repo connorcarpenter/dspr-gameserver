@@ -20,8 +20,6 @@ namespace DsprGameServer
     class PathTile;
     class Tribe;
 
-    enum UnitOrder { Move, AttackMove, Follow, AttackTarget };
-
     class Unit
     {
 
@@ -86,6 +84,10 @@ namespace DsprGameServer
 
         bool isVisibleToTribe(Tribe *tribe);
 
+        void stop(std::shared_ptr<OrderGroup> orderGroup);
+
+        void hold();
+
     private:
 
         Game* game = nullptr;
@@ -107,5 +109,9 @@ namespace DsprGameServer
         void lookForEnemyUnitsAndEngage();
         void addToBlockedEnemyList(Unit *blockedEnemy);
         void damageOtherUnit(Unit *otherUnit, int dmgAmount);
+
+        void updateHolding();
+
+        void handleAttackAnimation(Unit *targetUnit);
     };
 }

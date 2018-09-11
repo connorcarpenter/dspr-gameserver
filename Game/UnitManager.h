@@ -49,6 +49,10 @@ namespace DsprGameServer {
 
         void removePlayer(PlayerData *playerData);
 
+        void receiveStopOrder(const std::list<int> &idList);
+
+        void receiveHoldOrder(const std::list<int> &idList);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;

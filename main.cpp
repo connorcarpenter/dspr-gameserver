@@ -6,6 +6,7 @@
 #include "GameServer.h"
 #include "Game/UnitManager.h"
 #include "PlayerData.h"
+#include "Game/UnitOrder.h"
 
 using namespace DsprGameServer;
 
@@ -112,6 +113,14 @@ int main()
                     int x = stoi(orderStrings[1]);
                     int y = stoi(orderStrings[2]);
                     game->unitManager->receiveAttackMoveOrder(unitIdList, x, y);
+                }
+                    break;
+                case Stop: {
+                    game->unitManager->receiveStopOrder(unitIdList);
+                }
+                    break;
+                case Hold: {
+                    game->unitManager->receiveHoldOrder(unitIdList);
                 }
                     break;
             }
