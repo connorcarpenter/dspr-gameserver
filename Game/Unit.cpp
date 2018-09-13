@@ -265,14 +265,16 @@ namespace DsprGameServer
     void Unit::stop(std::shared_ptr<OrderGroup> orderGroup) {
         this->setOrderGroup(orderGroup);
         this->followingPath = false;
-        this->moveTarget->dirtyObj()->Set(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
+        if (!this->moveTarget->obj()->Equals(this->nextPosition->obj()))
+            this->moveTarget->dirtyObj()->Set(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
     }
 
     void Unit::hold() {
         auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Hold);
         this->setOrderGroup(newOrderGroup);
         this->followingPath = false;
-        this->moveTarget->dirtyObj()->Set(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
+        if (!this->moveTarget->obj()->Equals(this->nextPosition->obj()))
+            this->moveTarget->dirtyObj()->Set(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
     }
 
     void Unit::startPath()
