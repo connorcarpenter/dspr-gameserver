@@ -6,7 +6,7 @@
 
 namespace DsprGameServer {
 
-    UnitTemplate::UnitTemplate() {
-
+    UnitTemplate::UnitTemplate(int index) {
+        this->index = index;
     }
 }

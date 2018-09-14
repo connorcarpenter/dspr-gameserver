@@ -7,6 +7,7 @@
 namespace DsprGameServer {
     class UnitTemplate {
     public:
-        UnitTemplate();
+        UnitTemplate(int index);
+        int index;
     };
 }

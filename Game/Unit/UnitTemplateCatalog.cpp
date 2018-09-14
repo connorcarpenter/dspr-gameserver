@@ -6,9 +6,9 @@
 
 namespace DsprGameServer {
     UnitTemplateCatalog::UnitTemplateCatalog() {
-        this->worker = new UnitTemplate();
+        this->worker = new UnitTemplate(0);
 
-        this->temple = new UnitTemplate();
+        this->temple = new UnitTemplate(1);
     }
 
     UnitTemplateCatalog::~UnitTemplateCatalog() {

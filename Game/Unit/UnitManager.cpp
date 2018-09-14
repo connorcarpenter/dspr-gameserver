@@ -29,14 +29,19 @@ namespace DsprGameServer
         });
     }
 
-    void UnitManager::initializeFirstUnits(){
+    void UnitManager::initializeFirstUnits()
+    {
         for (int i = 0; i<3; i++)
             for (int j = 0; j<4;j++)
-                createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
+                createUnit((15 + i) * 2, (15 + j) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
+
+        createUnit((5) * 2, (5) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->temple);
 
         for (int i = 0; i<3; i++)
             for (int j = 0; j<4;j++)
-                createUnit((14 + i) * 2, (14 + j) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->worker);
+                createUnit((40 + i) * 2, (40 + j) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->worker);
+
+        createUnit((50) * 2, (50) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->temple);
     }
 
     UnitManager::~UnitManager()
@@ -347,7 +352,7 @@ namespace DsprGameServer
 
         std::stringstream msg;
         msg << "unit/1.0/create|" << unit->id << "," << unit->position->x << "," << unit->position->y << ","
-            << unit->tribe->index << "\r\n";
+            << unit->tribe->index << "," << unit->unitTemplate->index << "\r\n";
         GameServer::get().queueMessage(playerData, msg.str());
 
         std::set<Unit*>* unitSet = this->playerToUnitsAwareOfMap.at(playerData);

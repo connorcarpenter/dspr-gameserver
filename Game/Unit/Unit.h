@@ -40,24 +40,36 @@ namespace DsprGameServer
         void cleanAllVars();
         bool shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding);
         bool withinAttackRange(int x, int y, Unit *targetUnit);
+        bool isVisibleToTribe(Tribe *tribe);
+        void stop(std::shared_ptr<OrderGroup> orderGroup);
+        void hold();
 
+        int id = -1;
+        Synced<AnimationState>* animationState = nullptr;
+        const int sight = 6;
+        Tribe *tribe = nullptr;
+        UnitTemplate *unitTemplate = nullptr;
+
+        //pathfinding vars
+        std::shared_ptr<OrderGroup> orderGroup = nullptr;
+        PathTile *lastKnownLongPathTile = nullptr;
+        int lostWithoutShortPath = 0;
+        int pushDirection = 0;
+        int disToEnd = 0;
+        bool followingPath = false;
+        int walkSpeed = 0;
+        int walkAmount = 0;
+        Point* nextTilePosition = nullptr;
+        std::shared_ptr<DsprGameServer::Path> shortPath = nullptr;
+        PathTile* shortPathCurrentTile = nullptr;
+        Point* position = nullptr;
+        Synced<Point>* nextPosition = nullptr;
+        Synced<Point>* moveTarget = nullptr;
         const int walkMax = 6;
         const int walkSpeedStraight = walkMax / 2; //2 updates to walk straight
         const int walkSpeedDiagonal = walkMax / 3; //3 updates to walk diagonal
 
-        int id = -1;
-        Point* position = nullptr;
-        Synced<Point>* nextPosition = nullptr;
-        Synced<Point>* moveTarget = nullptr;
-        Synced<AnimationState>* animationState = nullptr;
-        Point* nextTilePosition = nullptr;
-        std::shared_ptr<DsprGameServer::Path> shortPath = nullptr;
-        PathTile* shortPathCurrentTile = nullptr;
-
-        bool followingPath = false;
-        int walkSpeed = 0;
-        int walkAmount = 0;
-
+        //attacking vars
         Synced<Int>* health = nullptr;
         int stamina = 100;
         const int minDamage = 10;
@@ -70,26 +82,8 @@ namespace DsprGameServer
         const int attackFramesNumber = 5;
         const int attackFrameToApplyDamage = 3;
         const int attackWaitFrames = 5;
-        const int sight = 6;
         const int acquisition = 6;
         const int maxHealth = 420;
-
-        Tribe *tribe = nullptr;
-
-        int disToEnd = 0;
-
-        std::shared_ptr<OrderGroup> orderGroup = nullptr;
-        PathTile *lastKnownLongPathTile = nullptr;
-        int lostWithoutShortPath = 0;
-        int pushDirection = 0;
-
-        int unitTemplateIndex = -1;
-
-        bool isVisibleToTribe(Tribe *tribe);
-
-        void stop(std::shared_ptr<OrderGroup> orderGroup);
-
-        void hold();
 
     private:
 

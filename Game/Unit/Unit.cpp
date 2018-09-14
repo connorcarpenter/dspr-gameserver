@@ -28,6 +28,7 @@ namespace DsprGameServer
         this->nextTilePosition = new Point(x,y);
         this->health = new Synced<Int>("health", new Int(maxHealth));
         this->tribe = tribe;
+        this->unitTemplate = unitTemplate;
 
         this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
     }
