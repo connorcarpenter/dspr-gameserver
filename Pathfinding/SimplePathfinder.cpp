@@ -6,12 +6,12 @@
 #include <queue>
 #include "SimplePathfinder.h"
 #include "PathNode.h"
-#include "../Game/Unit.h"
+#include "../Game/Unit/Unit.h"
 #include "Path.h"
 #include "PathTile.h"
 #include "../Game/TileManager.h"
-#include "../Game/UnitManager.h"
-#include "../Game/OrderGroup.h"
+#include "../Game/Unit/UnitManager.h"
+#include "../Game/Unit/OrderGroup.h"
 #include "../Math/MathUtils.h"
 
 namespace DsprGameServer {

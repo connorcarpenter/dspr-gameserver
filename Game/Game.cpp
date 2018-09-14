@@ -5,13 +5,14 @@
 #include <sstream>
 #include "Game.h"
 #include "TileManager.h";
-#include "UnitManager.h";
+#include "Unit/UnitManager.h";
 #include "TribeManager.h";
 #include "../Pathfinding/AStarPathfinder.h"
 #include "../Pathfinding/SimplePathfinder.h"
 #include "../PlayerData.h"
 #include "FogManager.h"
 #include "../GameServer.h"
+#include "Unit/UnitTemplateCatalog.h"
 
 namespace DsprGameServer
 {
@@ -21,6 +22,7 @@ namespace DsprGameServer
         AStarPathfinder::setMapWidth(64);
         this->fogManager = new FogManager(this);
         this->tribeManager = new TribeManager(this);
+        this->unitTemplateCatalog = new UnitTemplateCatalog();
         this->unitManager = new UnitManager(this);
         this->unitManager->initializeFirstUnits();
         this->pathfinder = new AStarPathfinder(this);
@@ -34,6 +36,7 @@ namespace DsprGameServer
         delete this->pathfinder;
         delete this->tribeManager;
         delete this->fogManager;
+        delete this->unitTemplateCatalog;
     }
 
     void Game::update()

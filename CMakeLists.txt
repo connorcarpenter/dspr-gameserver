@@ -27,16 +27,19 @@ add_executable(dspr-gameserver
 
         Game/Game.h Game/Game.cpp
         Game/TileManager.h Game/TileManager.cpp
-        Game/UnitManager.h Game/UnitManager.cpp
         Game/Tile.h Game/Tile.cpp
-        Game/Unit.h Game/Unit.cpp
-        Game/OrderGroup.h Game/OrderGroup.cpp
-        Game/Synced.h
         Game/Tribe.h Game/Tribe.cpp
         Game/TribeManager.h Game/TribeManager.cpp
-        Game/AnimationState.h Game/AnimationState.cpp
         Game/FogManager.h Game/FogManager.cpp
-        Game/UnitOrder.h
+
+        Game/Unit/UnitManager.h Game/Unit/UnitManager.cpp
+        Game/Unit/Unit.h Game/Unit/Unit.cpp
+        Game/Unit/OrderGroup.h Game/Unit/OrderGroup.cpp
+        Game/Unit/Synced.h
+        Game/Unit/AnimationState.h Game/Unit/AnimationState.cpp
+        Game/Unit/UnitOrder.h
+        Game/Unit/UnitTemplateCatalog.h Game/Unit/UnitTemplateCatalog.cpp
+        Game/Unit/UnitTemplate.h Game/Unit/UnitTemplate.cpp
 
         Game/Circle/CircleCache.h Game/Circle/CircleCache.cpp
         Game/Circle/Circle.h Game/Circle/Circle.cpp

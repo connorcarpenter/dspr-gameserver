@@ -5,12 +5,13 @@
 #include <sstream>
 #include <iostream>
 #include "UnitManager.h"
-#include "../Math/MathUtils.h"
-#include "../GameServer.h"
-#include "../Pathfinding/AStarPathfinder.h"
+#include "../../Math/MathUtils.h"
+#include "../../GameServer.h"
+#include "../../Pathfinding/AStarPathfinder.h"
 #include "OrderGroup.h"
-#include "TribeManager.h"
-#include "../PlayerData.h"
+#include "../TribeManager.h"
+#include "../../PlayerData.h"
+#include "UnitTemplateCatalog.h"
 
 namespace DsprGameServer
 {
@@ -31,11 +32,11 @@ namespace DsprGameServer
     void UnitManager::initializeFirstUnits(){
         for (int i = 0; i<3; i++)
             for (int j = 0; j<4;j++)
-                createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA);
+                createUnit((6 + i) * 2, (6 + j) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
 
         for (int i = 0; i<3; i++)
             for (int j = 0; j<4;j++)
-                createUnit((14 + i) * 2, (14 + j) * 2, this->game->tribeManager->tribeB);
+                createUnit((14 + i) * 2, (14 + j) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->worker);
     }
 
     UnitManager::~UnitManager()
@@ -64,9 +65,9 @@ namespace DsprGameServer
         }
     }
 
-    Unit* UnitManager::createUnit(int x, int y, Tribe* tribe)
+    Unit * UnitManager::createUnit(int x, int y, Tribe *tribe, UnitTemplate* unitTemplate)
     {
-        Unit* newUnit = new Unit(this->game, (int) unitMap.size(), tribe, x, y);
+        Unit* newUnit = new Unit(this->game, (int) unitMap.size(), tribe, x, y, unitTemplate);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
     }
 

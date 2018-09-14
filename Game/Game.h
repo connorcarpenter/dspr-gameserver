@@ -19,6 +19,7 @@ namespace DsprGameServer {
     class PlayerData;
     class FogManager;
     class Tribe;
+    class UnitTemplateCatalog;
 
     class Game
     {
@@ -39,6 +40,7 @@ namespace DsprGameServer {
         AStarPathfinder* pathfinder = nullptr;
         SimplePathfinder* simplePathfinder = nullptr;
         FogManager* fogManager = nullptr;
+        UnitTemplateCatalog* unitTemplateCatalog = nullptr;
 
     private:
 

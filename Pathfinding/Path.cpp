@@ -4,7 +4,7 @@
 
 #include "Path.h"
 #include "PathTile.h"
-#include "../Game/UnitManager.h"
+#include "../Game/Unit/UnitManager.h"
 
 namespace DsprGameServer
 {

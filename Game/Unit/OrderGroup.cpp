@@ -4,8 +4,8 @@
 
 #include "OrderGroup.h"
 #include "Unit.h"
-#include "../Pathfinding/Path.h"
-#include "../Pathfinding/AStarPathfinder.h"
+#include "../../Pathfinding/Path.h"
+#include "../../Pathfinding/AStarPathfinder.h"
 #include "UnitManager.h"
 
 namespace DsprGameServer {

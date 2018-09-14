@@ -4,18 +4,19 @@
 
 #include <sstream>
 #include "Unit.h"
-#include "../Math/MathUtils.h"
-#include "../GameServer.h"
-#include "../Pathfinding/PathTile.h"
+#include "../../Math/MathUtils.h"
+#include "../../GameServer.h"
+#include "../../Pathfinding/PathTile.h"
 #include "UnitManager.h"
 #include "OrderGroup.h"
-#include "../Pathfinding/SimplePathfinder.h"
-#include "Circle/CircleCache.h"
-#include "FogManager.h"
+#include "../../Pathfinding/SimplePathfinder.h"
+#include "../Circle/CircleCache.h"
+#include "../FogManager.h"
+#include "UnitTemplate.h"
 
 namespace DsprGameServer
 {
-    Unit::Unit(Game *game, int id, Tribe* tribe, int x, int y)
+    Unit::Unit(Game *game, int id, Tribe *tribe, int x, int y, UnitTemplate *unitTemplate)
     {
         this->game = game;
         this->id = id;

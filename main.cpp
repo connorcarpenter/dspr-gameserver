@@ -4,9 +4,9 @@
 #include "StringUtils.h"
 #include "MapUtils.h"
 #include "GameServer.h"
-#include "Game/UnitManager.h"
+#include "Game/Unit/UnitManager.h"
 #include "PlayerData.h"
-#include "Game/UnitOrder.h"
+#include "Game/Unit/UnitOrder.h"
 
 using namespace DsprGameServer;
 

@@ -5,12 +5,13 @@
 //
 
 #include <set>
-#include "../Math/Point.h"
+#include "../../Math/Point.h"
 #include "Synced.h"
-#include "Game.h"
-#include "../Math/FloatPoint.h"
+#include "../Game.h"
+#include "../../Math/FloatPoint.h"
 #include "AnimationState.h"
-#include "../Math/Int.h"
+#include "../../Math/Int.h"
+#include "UnitTemplate.h"
 
 namespace DsprGameServer
 {
@@ -25,7 +26,7 @@ namespace DsprGameServer
 
     public:
 
-        Unit(Game *game, int id, Tribe *tribe, int x, int y);
+        Unit(Game *game, int id, Tribe *tribe, int x, int y, UnitTemplate *unitTemplate);
         ~Unit();
         void update();
         void updateStanding();
@@ -81,6 +82,8 @@ namespace DsprGameServer
         PathTile *lastKnownLongPathTile = nullptr;
         int lostWithoutShortPath = 0;
         int pushDirection = 0;
+
+        int unitTemplateIndex = -1;
 
         bool isVisibleToTribe(Tribe *tribe);
 

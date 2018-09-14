@@ -7,7 +7,7 @@
 #include "AStarPathfinder.h"
 #include "PathTile.h"
 #include "PathNode.h"
-#include "../Game/UnitManager.h"
+#include "../Game/Unit/UnitManager.h"
 
 namespace DsprGameServer {
 

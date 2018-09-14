@@ -8,9 +8,9 @@
 #include <queue>
 #include <list>
 #include "Unit.h"
-#include "TileManager.h"
-#include "../Pathfinding/AStarPathfinder.h"
-#include "../PrimIsoGrid.h"
+#include "../TileManager.h"
+#include "../../Pathfinding/AStarPathfinder.h"
+#include "../../PrimIsoGrid.h"
 
 namespace DsprGameServer {
 
@@ -19,7 +19,7 @@ namespace DsprGameServer {
         UnitManager(Game *game);
         ~UnitManager();
         void initSendAllUnits(PlayerData *playerData);
-        Unit* createUnit(int x, int y, Tribe *tribe);
+        Unit *createUnit(int x, int y, Tribe *tribe, UnitTemplate *unitTemplate);
         void receiveMoveOrder(const std::list<int> &idList, int tileX, int tileY);
         void receiveFollowOrder(const std::list<int> &idList, int targetUnitId);
         void receiveAttackTargetOrder(const std::list<int> &idList, int targetUnitId);
