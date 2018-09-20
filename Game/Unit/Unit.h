@@ -46,7 +46,6 @@ namespace DsprGameServer
 
         int id = -1;
         Synced<AnimationState>* animationState = nullptr;
-        const int sight = 6;
         Tribe *tribe = nullptr;
         UnitTemplate *unitTemplate = nullptr;
 

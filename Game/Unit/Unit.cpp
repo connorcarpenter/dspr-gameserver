@@ -30,12 +30,12 @@ namespace DsprGameServer
         this->tribe = tribe;
         this->unitTemplate = unitTemplate;
 
-        this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
+        this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
     }
 
     Unit::~Unit()
     {
-        this->game->fogManager->conceilFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
+        this->game->fogManager->conceilFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
 
         delete this->position;
         delete this->nextPosition;
@@ -497,12 +497,12 @@ namespace DsprGameServer
     void Unit::updateNextPosition(Point *newNextPosition)
     {
         this->game->unitManager->removeUnitFromGrid(this);
-        this->game->fogManager->conceilFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
+        this->game->fogManager->conceilFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
 
         this->nextPosition->dirtyObj()->Set(newNextPosition);
 
         this->game->unitManager->addUnitToGrid(this);
-        this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->sight);
+        this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
     }
 
     Unit* Unit::getEnemyUnitInAcquisitionRange(){

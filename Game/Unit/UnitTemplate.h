@@ -9,5 +9,6 @@ namespace DsprGameServer {
     public:
         UnitTemplate(int index);
         int index;
+        int sight;
     };
 }
