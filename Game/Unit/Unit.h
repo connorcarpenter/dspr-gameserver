@@ -64,9 +64,6 @@ namespace DsprGameServer
         Point* position = nullptr;
         Synced<Point>* nextPosition = nullptr;
         Synced<Point>* moveTarget = nullptr;
-        const int walkMax = 6;
-        const int walkSpeedStraight = walkMax / 2; //2 updates to walk straight
-        const int walkSpeedDiagonal = walkMax / 3; //3 updates to walk diagonal
 
         //attacking vars
         Synced<Int>* health = nullptr;
@@ -83,6 +80,10 @@ namespace DsprGameServer
         const int attackWaitFrames = 5;
         const int acquisition = 6;
         const int maxHealth = 420;
+
+        bool canMove();
+
+        bool canAttack();
 
     private:
 
@@ -109,5 +110,6 @@ namespace DsprGameServer
         void updateHolding();
 
         void handleAttackAnimation(Unit *targetUnit);
+
     };
 }

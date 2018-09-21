@@ -8,9 +8,13 @@ namespace DsprGameServer {
     UnitTemplateCatalog::UnitTemplateCatalog() {
         this->worker = new UnitTemplate(0);
         this->worker->sight = 6;
+        this->worker->acquisition = 6;
+        this->worker->setWalkSpeed(2,3);
 
         this->temple = new UnitTemplate(1);
         this->temple->sight = 12;
+        this->temple->acquisition = 0;
+        this->temple->setWalkSpeed(0,0);
     }
 
     UnitTemplateCatalog::~UnitTemplateCatalog() {

@@ -86,10 +86,14 @@ namespace DsprGameServer
         {
             if (unitMap.count(i) != 0){
                 Unit* unit = unitMap.at(i);
+                if (!unit->canMove()) continue;
+
                 unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
                 unit->setOrderGroup(newOrderGroup);
             }
         }
+
+        if (unitPositionsList.empty()) return;
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY, false);
         if (path!= nullptr) {
@@ -114,11 +118,14 @@ namespace DsprGameServer
         {
             if (unitMap.count(i) != 0) {
                 Unit *unit = unitMap.at(i);
+                if (!unit->canMove() || !unit->canAttack()) continue;
                 unitPositionsList.emplace_back(
                         std::pair<int, int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
                 unit->setOrderGroup(newOrderGroup);
             }
         }
+
+        if (unitPositionsList.empty()) return;
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, tileX, tileY, false);
         if (path!= nullptr) {
@@ -144,15 +151,17 @@ namespace DsprGameServer
         auto targetUnit = unitMap.at(targetUnitId);
         newOrderGroup->setTargetUnit(targetUnit);
 
-
         for (const auto& i : idList)
         {
             if (unitMap.count(i) != 0) {
                 Unit *unit = unitMap.at(i);
+                if (!unit->canMove()) continue;
                 unitPositionsList.emplace_back(std::pair<int, int>(unit->position->x, unit->position->y));
                 unit->setOrderGroup(newOrderGroup);
             }
         }
+
+        if (unitPositionsList.empty()) return;
 
         auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
                                                      targetUnit->position->y, false);
@@ -182,11 +191,13 @@ namespace DsprGameServer
         {
             if (unitMap.count(i) != 0) {
                 Unit *unit = unitMap.at(i);
+                if (!unit->canAttack()) continue;
                 unitPositionsList.emplace_back(std::pair<int, int>(unit->position->x, unit->position->y));
                 unit->setOrderGroup(newOrderGroup);
             }
         }
 
+        if (unitPositionsList.empty()) return;
         auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
                                                      targetUnit->position->y, true);
         if (path != nullptr)
@@ -208,7 +219,9 @@ namespace DsprGameServer
 
         for (const auto &i : idList)
             if (unitMap.count(i) != 0) {
-                unitMap.at(i)->stop(newOrderGroup);
+                auto unit = unitMap.at(i);
+                if (!unit->canMove() && !unit->canAttack()) continue;
+                unit->stop(newOrderGroup);
             }
     }
 
@@ -216,7 +229,9 @@ namespace DsprGameServer
     {
         for (const auto &i : idList)
             if (unitMap.count(i) != 0) {
-                unitMap.at(i)->hold();
+                auto unit = unitMap.at(i);
+                if (!unit->canMove() || !unit->canAttack()) continue;
+                unit->hold();
             }
     }
 

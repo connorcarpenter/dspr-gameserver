@@ -4,11 +4,22 @@
 // Created by connor on 9/12/18.
 //
 
-namespace DsprGameServer {
-    class UnitTemplate {
+namespace DsprGameServer
+{
+    class UnitTemplate
+    {
+
     public:
+
         UnitTemplate(int index);
+
+        void setWalkSpeed(int straightTicks, int diagTicks);
+
         int index;
         int sight;
+        int acquisition;
+        int walkMax = 0;
+        int walkSpeedStraight = 0;
+        int walkSpeedDiagonal = 0;
     };
 }

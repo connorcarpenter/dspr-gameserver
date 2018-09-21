@@ -48,13 +48,13 @@ namespace DsprGameServer
 
     void Unit::update() {
 
-        if (!this->position->Equals(this->nextPosition->obj()))
-        {
-            this->walkAmount += this->walkSpeed;
-            if (this->walkAmount >= this->walkMax)
-            {
-                walkAmount = 0;
-                this->position->Set(this->nextPosition->obj());
+        if (this->walkSpeed != 0) {
+            if (!this->position->Equals(this->nextPosition->obj())) {
+                this->walkAmount += this->walkSpeed;
+                if (this->walkAmount >= this->unitTemplate->walkMax) {
+                    walkAmount = 0;
+                    this->position->Set(this->nextPosition->obj());
+                }
             }
         }
 
@@ -89,11 +89,11 @@ namespace DsprGameServer
 
             if (difx == 0 || dify == 0)
             {
-                this->walkSpeed = this->walkSpeedDiagonal;
+                this->walkSpeed = this->unitTemplate->walkSpeedDiagonal;
             }
             else
             {
-                this->walkSpeed = this->walkSpeedStraight;
+                this->walkSpeed = this->unitTemplate->walkSpeedStraight;
             }
 
             this->updateNextPosition(this->nextTilePosition);
@@ -241,6 +241,7 @@ namespace DsprGameServer
     void Unit::updateHolding() {
         if (this->orderGroup->getTargetUnit() == nullptr)
         {
+            if (this->unitTemplate->acquisition <= 0) return;
             Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
             if (enemyUnitInAcquisitionRange != nullptr) {
                 this->orderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
@@ -506,7 +507,7 @@ namespace DsprGameServer
     }
 
     Unit* Unit::getEnemyUnitInAcquisitionRange(){
-        auto acquiCircle = CircleCache::get().getCircle(this->acquisition);
+        auto acquiCircle = CircleCache::get().getCircle(this->unitTemplate->acquisition);
 
         for(auto circleCoord : acquiCircle->coordList){
             auto unitAtPosition = this->getUnitAtPosition(this->position->x + circleCoord->x, this->position->y + circleCoord->y);
@@ -527,6 +528,8 @@ namespace DsprGameServer
     }
 
     void Unit::lookForEnemyUnitsAndEngage() {
+        if (this->unitTemplate->acquisition <= 0) return;
+
         Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
         if (enemyUnitInAcquisitionRange != nullptr){
             //ideally, we would store the current order in a stack, and just push it down.. for now, no such thing
@@ -656,5 +659,13 @@ namespace DsprGameServer
         this->animationState->clean();
         this->health->clean();
         //more synced vars here
+    }
+
+    bool Unit::canMove() {
+        return this->unitTemplate->walkMax > 0;
+    }
+
+    bool Unit::canAttack() {
+        return this->unitTemplate->acquisition > 0;
     }
 }
