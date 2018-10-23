@@ -28,7 +28,7 @@ namespace DsprGameServer {
             delete[] this->gridArrayB;
         }
 
-        T* initialize(int width, int height)
+        void initialize(int width, int height)
         {
             assert(!this->initialized);
             assert(width % 2 == 0);
