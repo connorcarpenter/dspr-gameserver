@@ -22,13 +22,14 @@ namespace DsprGameServer
         this->id = id;
         this->position = new Point(x, y);
         this->nextPosition = new Synced<Point>("nextPosition", new Point(x, y));
-        this->game->unitManager->addUnitToGrid(this);
+
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
         this->nextTilePosition = new Point(x,y);
         this->health = new Synced<Int>("health", new Int(maxHealth));
         this->tribe = tribe;
         this->unitTemplate = unitTemplate;
+        this->game->unitManager->addUnitToGrid(this);
 
         this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
     }
@@ -488,6 +489,7 @@ namespace DsprGameServer
     bool Unit::shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding) {
         if (otherUnit->tribe != this->tribe && !inPathfinding) return false;
         if (otherUnit->animationState->obj()->GetState() == Attacking) return false;
+        if (!otherUnit->canMove()) return false;
         if (inPathfinding)
             return (!otherUnit->followingPath || otherUnit->timesHaventPushed>20) && (otherUnit->orderGroup.get() != this->orderGroup.get() || (this->timesHaventPushed>20));
         bool shouldPush = (!otherUnit->followingPath || otherUnit->timesHaventPushed>20) && (otherUnit->orderGroup.get() != this->orderGroup.get() || (this->timesHaventPushed>20));

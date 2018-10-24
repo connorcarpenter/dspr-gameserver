@@ -7,8 +7,10 @@
 #include "CircleCoord.h"
 #include <list>
 
-namespace DsprGameServer {
-    class Circle {
+namespace DsprGameServer
+{
+    class Circle
+    {
 
     public:
         Circle(int radius);

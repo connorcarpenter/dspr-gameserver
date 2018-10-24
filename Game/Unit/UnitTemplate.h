@@ -21,5 +21,7 @@ namespace DsprGameServer
         int walkMax = 0;
         int walkSpeedStraight = 0;
         int walkSpeedDiagonal = 0;
+        unsigned int tileWidth = 1;
+        unsigned int tileHeight = 1;
     };
 }

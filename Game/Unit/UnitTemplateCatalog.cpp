@@ -15,6 +15,8 @@ namespace DsprGameServer {
         this->temple->sight = 12;
         this->temple->acquisition = 0;
         this->temple->setWalkSpeed(0,0);
+        this->temple->tileWidth = 5;
+        this->temple->tileHeight = 5;
     }
 
     UnitTemplateCatalog::~UnitTemplateCatalog() {

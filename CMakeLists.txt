@@ -45,6 +45,9 @@ add_executable(dspr-gameserver
         Game/Circle/Circle.h Game/Circle/Circle.cpp
         Game/Circle/CircleCoord.h Game/Circle/CircleCoord.cpp
 
+        Game/IsoBox/IsoBoxCache.h Game/IsoBox/IsoBoxCache.cpp
+        Game/IsoBox/IsoBox.h Game/IsoBox/IsoBox.cpp
+
         Math/Point.h Math/Point.cpp
         Math/FloatPoint.h Math/FloatPoint.cpp
         Math/MathUtils.h

@@ -12,6 +12,7 @@
 #include "../TribeManager.h"
 #include "../../PlayerData.h"
 #include "UnitTemplateCatalog.h"
+#include "../IsoBox/IsoBoxCache.h"
 
 namespace DsprGameServer
 {
@@ -283,8 +284,22 @@ namespace DsprGameServer
         }
     }
 
-    void UnitManager::setUnitInGrid(int x, int y, Unit* unit){
-        return this->unitGrid->set(x,y, unit);
+    void UnitManager::setUnitInGrid(int x, int y, Unit* unit, UnitTemplate* unitTemplate) {
+        //return this->unitGrid->set(x,y, unit);
+
+        if (unitTemplate->tileWidth == 1 && unitTemplate->tileHeight==1)
+        {
+            this->unitGrid->set(x,y, unit);
+        }
+        else
+        {
+            auto unitIsoBoxBase = IsoBoxCache::get().getIsoBox(unitTemplate->tileWidth, unitTemplate->tileHeight);
+
+            for(auto isoBoxCoord : unitIsoBoxBase->coordList)
+            {
+                this->unitGrid->set(x + isoBoxCoord->x, y + isoBoxCoord->y, unit);
+            }
+        }
     }
 
     Unit* UnitManager::getUnitFromGrid(int x, int y){
@@ -292,11 +307,11 @@ namespace DsprGameServer
     }
 
     void UnitManager::removeUnitFromGrid(Unit *unit) {
-        setUnitInGrid(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y, nullptr);
+        setUnitInGrid(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y, nullptr, unit->unitTemplate);
     }
 
     void UnitManager::addUnitToGrid(Unit *unit) {
-        setUnitInGrid(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y, unit);
+        setUnitInGrid(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y, unit, unit->unitTemplate);
     }
 
     bool UnitManager::getEndPosAtCoord(int x, int y) {

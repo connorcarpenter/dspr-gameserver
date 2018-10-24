@@ -65,7 +65,7 @@ namespace DsprGameServer {
         std::set<std::pair<int,int>> unitDeletionsToSend;
         std::map<PlayerData*, std::set<Unit*>*> playerToUnitsAwareOfMap;
 
-        void setUnitInGrid(int x, int y, Unit *unit);
+        void setUnitInGrid(int x, int y, Unit *unit, UnitTemplate *unitTemplate);
 
         void makePlayerAwareOfUnit(PlayerData *playerData, Unit *unit);
 
