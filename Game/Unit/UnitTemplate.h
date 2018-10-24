@@ -15,6 +15,7 @@ namespace DsprGameServer
 
         void setWalkSpeed(int straightTicks, int diagTicks);
 
+        int maxHealth;
         int index;
         int sight;
         int acquisition;

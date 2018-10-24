@@ -42,7 +42,7 @@ namespace DsprGameServer
             for (int j = 0; j<4;j++)
                 createUnit((40 + i) * 2, (40 + j) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->worker);
 
-        createUnit((50) * 2, (50) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->temple);
+        createUnit((52) * 2, (45) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->temple);
     }
 
     UnitManager::~UnitManager()

@@ -79,7 +79,6 @@ namespace DsprGameServer
         const int attackFrameToApplyDamage = 3;
         const int attackWaitFrames = 5;
         const int acquisition = 6;
-        const int maxHealth = 420;
 
         bool canMove();
 
@@ -111,5 +110,6 @@ namespace DsprGameServer
 
         void handleAttackAnimation(Unit *targetUnit);
 
+        void setAnimationStateHeading(Unit *targetUnit);
     };
 }

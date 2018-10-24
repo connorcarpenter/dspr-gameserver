@@ -13,6 +13,7 @@
 #include "../Circle/CircleCache.h"
 #include "../FogManager.h"
 #include "UnitTemplate.h"
+#include "../IsoBox/IsoBoxCache.h"
 
 namespace DsprGameServer
 {
@@ -22,15 +23,14 @@ namespace DsprGameServer
         this->id = id;
         this->position = new Point(x, y);
         this->nextPosition = new Synced<Point>("nextPosition", new Point(x, y));
-
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
         this->nextTilePosition = new Point(x,y);
-        this->health = new Synced<Int>("health", new Int(maxHealth));
         this->tribe = tribe;
-        this->unitTemplate = unitTemplate;
-        this->game->unitManager->addUnitToGrid(this);
 
+        this->unitTemplate = unitTemplate;
+        this->health = new Synced<Int>("health", new Int(unitTemplate->maxHealth));
+        this->game->unitManager->addUnitToGrid(this);
         this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
     }
 
@@ -209,71 +209,85 @@ namespace DsprGameServer
         }
     }
 
-    void Unit::handleAttackAnimation(Unit *targetUnit) {
-        if (this->animationState->obj()->GetState() != Attacking) {
+    void Unit::handleAttackAnimation(Unit* targetUnit)
+    {
+        if (this->animationState->obj()->GetState() != Attacking)
+        {
             this->animationState->dirtyObj()->SetState(Attacking);
-            int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
-            this->animationState->dirtyObj()->SetHeading(newHeading);
+            setAnimationStateHeading(targetUnit);
             this->attackFrameIndex = 0;
             this->orderGroup->unitArrived();
-        } else {
-            if (this->orderGroup->targetHasMoved()){
-                int newHeading = getDir(targetUnit->position->x - this->position->x, targetUnit->position->y - this->position->y);
-                if (this->animationState->obj()->GetHeading() != newHeading)
-                    this->animationState->dirtyObj()->SetHeading(newHeading);
+        }
+        else
+        {
+            if (this->orderGroup->targetHasMoved())
+            {
+                setAnimationStateHeading(targetUnit);
             }
         }
 
-        if (this->attackWaitIndex <= 0) {
+        if (this->attackWaitIndex <= 0)
+        {
             this->attackFrameIndex += this->attackAnimationSpeed;
-            if (this->attackFrameIndex == this->attackFrameToApplyDamage) {
+            if (this->attackFrameIndex == this->attackFrameToApplyDamage)
+            {
                 this->damageOtherUnit(targetUnit, MathUtils::getRandom(this->minDamage, this->maxDamage));
             }
-            if (this->attackFrameIndex >= this->attackFramesNumber) {
+            if (this->attackFrameIndex >= this->attackFramesNumber)
+            {
                 this->attackFrameIndex = 0;
                 this->attackWaitIndex = this->attackWaitFrames;
             }
         }
-        else {
+        else
+        {
             this->attackWaitIndex -= this->attackWaitSpeed;
         }
     }
 
-    void Unit::updateHolding() {
+    void Unit::updateHolding()
+    {
         if (this->orderGroup->getTargetUnit() == nullptr)
         {
             if (this->unitTemplate->acquisition <= 0) return;
             Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
-            if (enemyUnitInAcquisitionRange != nullptr) {
+            if (enemyUnitInAcquisitionRange != nullptr)
+            {
                 this->orderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
             }
         }
         auto targetUnit = this->orderGroup->getTargetUnit();
         if (targetUnit != nullptr)
         {
-            if (this->withinAttackRange(this->position->x, this->position->y, targetUnit)){
+            if (this->withinAttackRange(this->position->x, this->position->y, targetUnit))
+            {
                 //start to attack!
                 this->handleAttackAnimation(targetUnit);
             }
-            else {
+            else
+            {
                 this->orderGroup->setTargetUnit(nullptr);
             }
         }
-        if (this->orderGroup->getTargetUnit() == nullptr){
-            if (this->animationState->obj()->GetState() != Walking) {
+        if (this->orderGroup->getTargetUnit() == nullptr)
+        {
+            if (this->animationState->obj()->GetState() != Walking)
+            {
                 this->animationState->dirtyObj()->SetState(Walking);
             }
         }
     }
 
-    void Unit::stop(std::shared_ptr<OrderGroup> orderGroup) {
+    void Unit::stop(std::shared_ptr<OrderGroup> orderGroup)
+    {
         this->setOrderGroup(orderGroup);
         this->followingPath = false;
         if (!this->moveTarget->obj()->Equals(this->nextPosition->obj()))
             this->moveTarget->dirtyObj()->Set(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
     }
 
-    void Unit::hold() {
+    void Unit::hold()
+    {
         auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Hold);
         this->setOrderGroup(newOrderGroup);
         this->followingPath = false;
@@ -286,15 +300,18 @@ namespace DsprGameServer
         this->followingPath = true;
         this->moveTarget->dirtyObj()->Set(this->orderGroup->path->targetX, this->orderGroup->path->targetY);
         auto currentTile = this->orderGroup->path->getTile(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
-        if (currentTile == nullptr){
+        if (currentTile == nullptr)
+        {
             this->disToEnd = INT_MAX;
         }
-        else {
+        else
+        {
             this->disToEnd = currentTile->disToEnd;
         }
         this->lastKnownLongPathTile = currentTile;
 
-        if (this->blockedEnemyList != nullptr){
+        if (this->blockedEnemyList != nullptr)
+        {
             delete this->blockedEnemyList;
             this->blockedEnemyList = nullptr;
         }
@@ -511,11 +528,14 @@ namespace DsprGameServer
     Unit* Unit::getEnemyUnitInAcquisitionRange(){
         auto acquiCircle = CircleCache::get().getCircle(this->unitTemplate->acquisition);
 
-        for(auto circleCoord : acquiCircle->coordList){
+        for(auto circleCoord : acquiCircle->coordList)
+        {
             auto unitAtPosition = this->getUnitAtPosition(this->position->x + circleCoord->x, this->position->y + circleCoord->y);
             if (unitAtPosition == nullptr)continue;
             if (unitAtPosition->tribe == this->tribe)continue;
-            if (this->blockedEnemyList != nullptr) if (this->blockedEnemyList->count(unitAtPosition) > 0) continue;
+            if (this->blockedEnemyList != nullptr)
+                if (this->blockedEnemyList->count(unitAtPosition) > 0)
+                    continue;
             return unitAtPosition;
         }
 
@@ -525,8 +545,26 @@ namespace DsprGameServer
     bool Unit::withinAttackRange(int x, int y, Unit *targetUnit) {
         if (targetUnit == nullptr)
             return false;
-        int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y, targetUnit->position->x, targetUnit->position->y));
-        return (distanceToTarget <= this->range);
+        if (targetUnit->unitTemplate->tileWidth == 1 && targetUnit->unitTemplate->tileHeight == 1)
+        {
+            int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y, targetUnit->position->x, targetUnit->position->y));
+            return (distanceToTarget <= this->range);
+        }
+        else
+        {
+            auto targetIsoBoxBase = IsoBoxCache::get().getIsoBox(targetUnit->unitTemplate->tileWidth, targetUnit->unitTemplate->tileHeight);
+
+            for(auto isoBoxCoord : targetIsoBoxBase->coordList)
+            {
+                int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y,
+                                                                              targetUnit->position->x + isoBoxCoord->x,
+                                                                              targetUnit->position->y + isoBoxCoord->y));
+                if(distanceToTarget <= this->range)
+                    return true;
+            }
+
+            return false;
+        }
     }
 
     void Unit::lookForEnemyUnitsAndEngage() {
@@ -669,5 +707,35 @@ namespace DsprGameServer
 
     bool Unit::canAttack() {
         return this->unitTemplate->acquisition > 0;
+    }
+
+    void Unit::setAnimationStateHeading(Unit *targetUnit)
+    {
+        if (targetUnit->unitTemplate->tileWidth == 1 && targetUnit->unitTemplate->tileHeight == 1)
+        {
+            int newHeading = getDir(targetUnit->position->x - this->position->x,
+                                    targetUnit->position->y - this->position->y);
+            if (this->animationState->obj()->GetHeading() != newHeading)
+                this->animationState->dirtyObj()->SetHeading(newHeading);
+        }
+        else
+        {
+            auto targetIsoBoxBase = IsoBoxCache::get().getIsoBox(targetUnit->unitTemplate->tileWidth, targetUnit->unitTemplate->tileHeight);
+
+            for(auto isoBoxCoord : targetIsoBoxBase->coordList)
+            {
+                int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(this->position->x, this->position->y,
+                                                                              targetUnit->position->x + isoBoxCoord->x,
+                                                                              targetUnit->position->y + isoBoxCoord->y));
+                if(distanceToTarget <= this->range)
+                {
+                    int newHeading = getDir(targetUnit->position->x + isoBoxCoord->x - this->position->x,
+                                            targetUnit->position->y + isoBoxCoord->y - this->position->y);
+                    if (this->animationState->obj()->GetHeading() != newHeading)
+                        this->animationState->dirtyObj()->SetHeading(newHeading);
+                    return;
+                }
+            }
+        }
     }
 }
