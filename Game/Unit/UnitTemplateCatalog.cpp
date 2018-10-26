@@ -13,7 +13,7 @@ namespace DsprGameServer
         this->worker->acquisition = 6;
         this->worker->setWalkSpeed(2,3);
         this->worker->maxHealth = 420;
-        this->worker->buildTime = 50;
+        this->worker->buildTime = 100;
         this->templateMap.emplace(this->worker->index, this->worker);
 
         this->temple = new UnitTemplate(1);
@@ -26,7 +26,7 @@ namespace DsprGameServer
         this->temple->hasConstructionQueue = true;
         this->temple->buildableUnits = new std::set<int>();
         this->temple->buildableUnits->insert(0);
-        this->temple->buildTime = 100;
+        this->temple->buildTime = 1000;
         this->templateMap.emplace(this->temple->index, this->temple);
     }
 
