@@ -14,7 +14,7 @@ namespace DsprGameServer
 
     public:
 
-        IsoBox(unsigned int width, unsigned int height);
+        IsoBox(unsigned int width, unsigned int height, bool hollow);
         ~IsoBox();
 
         std::list<Point*> coordList;

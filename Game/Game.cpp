@@ -4,9 +4,9 @@
 
 #include <sstream>
 #include "Game.h"
-#include "TileManager.h";
-#include "Unit/UnitManager.h";
-#include "TribeManager.h";
+#include "TileManager.h"
+#include "Unit/UnitManager.h"
+#include "TribeManager.h"
 #include "../Pathfinding/AStarPathfinder.h"
 #include "../Pathfinding/SimplePathfinder.h"
 #include "../PlayerData.h"

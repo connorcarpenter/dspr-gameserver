@@ -32,14 +32,15 @@ namespace DsprGameServer
 
     void UnitManager::initializeFirstUnits()
     {
-        for (int i = 0; i<3; i++)
-            for (int j = 0; j<4;j++)
+        int i = 0;
+        //for (int i = 0; i<3; i++)
+            for (int j = 0; j<3;j++)
                 createUnit((15 + i) * 2, (15 + j) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
 
         createUnit((5) * 2, (5) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->temple);
 
-        for (int i = 0; i<3; i++)
-            for (int j = 0; j<4;j++)
+        //for (int i = 0; i<3; i++)
+            for (int j = 0; j<3;j++)
                 createUnit((40 + i) * 2, (40 + j) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->worker);
 
         createUnit((52) * 2, (45) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->temple);
@@ -103,6 +104,7 @@ namespace DsprGameServer
             for (const auto &i : idList) {
                 if (unitMap.count(i) != 0) {
                     Unit *unit = unitMap.at(i);
+                    if (!unit->canMove()) continue;
                     unit->startPath();
                 }
             }
@@ -135,6 +137,7 @@ namespace DsprGameServer
             for (const auto &i : idList) {
                 if (unitMap.count(i) != 0) {
                     Unit *unit = unitMap.at(i);
+                    if (!unit->canMove() || !unit->canAttack()) continue;
                     unit->startPath();
                 }
             }
@@ -172,6 +175,7 @@ namespace DsprGameServer
             for (const auto &i : idList) {
                 if (unitMap.count(i) != 0) {
                     Unit *unit = unitMap.at(i);
+                    if (!unit->canMove()) continue;
                     unit->startPath();
                 }
             }
@@ -208,6 +212,7 @@ namespace DsprGameServer
             for (const auto &i : idList) {
                 if (unitMap.count(i) != 0) {
                     Unit *unit = unitMap.at(i);
+                    if (!unit->canAttack()) continue;
                     unit->startPath();
                 }
             }
@@ -233,6 +238,19 @@ namespace DsprGameServer
                 auto unit = unitMap.at(i);
                 if (!unit->canMove() || !unit->canAttack()) continue;
                 unit->hold();
+            }
+    }
+
+    void UnitManager::receiveTrainOrder(const std::list<int> &idList, int unitTemplateIndex)
+    {
+        for (const auto &i : idList)
+            if (unitMap.count(i) != 0) {
+                auto unit = unitMap.at(i);
+                if (!unit->unitTemplate->hasConstructionQueue) continue;
+                if (unit->unitTemplate->buildableUnits == nullptr) continue;
+                if (unit->unitTemplate->buildableUnits->count(unitTemplateIndex) == 0) continue;
+                auto unitTemplate = this->game->unitTemplateCatalog->getTemplateFromIndex(unitTemplateIndex);
+                unit->trainUnit(unitTemplate);
             }
     }
 

@@ -18,10 +18,12 @@ namespace DsprGameServer
         }
         ~IsoBoxCache();
         IsoBox* getIsoBox(int width, int height);
+        IsoBox* getHollowIsoBox(int width, int height);
     private:
 
         IsoBoxCache();
 
         std::map<int, IsoBox*> isoBoxMap;
+        std::map<int, IsoBox*> hollowIsoBoxMap;
     };
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include "UnitTemplate.h"
 
 //
@@ -11,7 +12,10 @@ namespace DsprGameServer {
     public:
         UnitTemplateCatalog();
         ~UnitTemplateCatalog();
+        UnitTemplate* getTemplateFromIndex(int index);
         UnitTemplate* worker = nullptr;
         UnitTemplate* temple = nullptr;
+    private:
+        std::map<int, UnitTemplate*> templateMap;
     };
 }

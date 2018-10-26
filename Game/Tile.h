@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 
 //
 // Created by connor on 7/23/18.

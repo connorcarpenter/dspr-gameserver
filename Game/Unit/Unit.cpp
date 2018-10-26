@@ -32,6 +32,11 @@ namespace DsprGameServer
         this->health = new Synced<Int>("health", new Int(unitTemplate->maxHealth));
         this->game->unitManager->addUnitToGrid(this);
         this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
+
+        if (this->unitTemplate->hasConstructionQueue)
+        {
+            this->constructionQueue = new ConstructionQueue(this);
+        }
     }
 
     Unit::~Unit()
@@ -45,6 +50,11 @@ namespace DsprGameServer
         delete this->animationState;
         delete this->health;
         if (this->blockedEnemyList != nullptr) delete this->blockedEnemyList;
+
+        if (this->unitTemplate->hasConstructionQueue)
+        {
+            delete this->constructionQueue;
+        }
     }
 
     void Unit::update() {
@@ -105,6 +115,12 @@ namespace DsprGameServer
             {
                 this->updateStanding();
             }
+        }
+
+        //construction queue
+        if (this->constructionQueue != nullptr)
+        {
+            this->constructionQueue->update();
         }
     }
 
@@ -736,6 +752,60 @@ namespace DsprGameServer
                     return;
                 }
             }
+        }
+    }
+
+    void Unit::trainUnit(UnitTemplate *unitTemplate) {
+        if (!this->constructionQueue->atMaxQueue()){
+            this->constructionQueue->enqueue(unitTemplate);
+        }
+    }
+
+    std::list<Point*> shuffle(std::list<Point*>& lst ) // shuffle contents of a list
+    {
+        // create a vector of (wrapped) references to elements in the list
+        // http://en.cppreference.com/w/cpp/utility/functional/reference_wrapper
+        std::vector< std::reference_wrapper<Point* > > vec( lst.begin(), lst.end() ) ;
+
+        // shuffle (the references in) the vector
+        std::shuffle( vec.begin(), vec.end(), std::mt19937{ std::random_device{}() } ) ;
+
+        // copy the shuffled sequence into a new list
+        std::list<Point*> shuffled_list {  vec.begin(), vec.end() } ;
+
+        // swap the old list with the shuffled list
+        return shuffled_list;
+    }
+
+    void Unit::finishTraining(UnitTemplate *unitTemplate)
+    {
+        auto outsideIsoBox = IsoBoxCache::get().getHollowIsoBox(this->unitTemplate->tileWidth+2, this->unitTemplate->tileHeight+2);
+        std::list<Point*> isoBoxCoords = shuffle(outsideIsoBox->coordList);
+
+        int spawnX;
+        int spawnY;
+        bool foundSpawn = false;
+        while (true)
+        {
+            if (isoBoxCoords.size() <= 0)
+            {
+                    break;
+            }
+
+            Point* spawnPoint = isoBoxCoords.front();
+            isoBoxCoords.pop_front();
+            spawnX = this->position->x + spawnPoint->x;
+            spawnY = this->position->y + spawnPoint->y;
+            if (this->game->unitManager->getUnitFromGrid(spawnX, spawnY) != nullptr) continue;
+            auto tileAtSpawn = this->game->tileManager->getTileAt(spawnX, spawnY);
+            if (tileAtSpawn == nullptr || !tileAtSpawn->walkable) continue;
+            foundSpawn = true;
+            break;
+        }
+
+        if (foundSpawn)
+        {
+            this->game->unitManager->createUnit(spawnX, spawnY, this->tribe, unitTemplate);
         }
     }
 }

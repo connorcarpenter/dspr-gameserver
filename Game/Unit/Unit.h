@@ -12,6 +12,7 @@
 #include "AnimationState.h"
 #include "../../Math/Int.h"
 #include "UnitTemplate.h"
+#include "ConstructionQueue.h"
 
 namespace DsprGameServer
 {
@@ -84,6 +85,10 @@ namespace DsprGameServer
 
         bool canAttack();
 
+        void trainUnit(UnitTemplate *unitTemplate);
+
+        void finishTraining(UnitTemplate *unitTemplate);
+
     private:
 
         Game* game = nullptr;
@@ -111,5 +116,7 @@ namespace DsprGameServer
         void handleAttackAnimation(Unit *targetUnit);
 
         void setAnimationStateHeading(Unit *targetUnit);
+
+        ConstructionQueue *constructionQueue = nullptr;
     };
 }

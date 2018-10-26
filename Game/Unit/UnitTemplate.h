@@ -4,6 +4,8 @@
 // Created by connor on 9/12/18.
 //
 
+#include <set>
+
 namespace DsprGameServer
 {
     class UnitTemplate
@@ -24,5 +26,8 @@ namespace DsprGameServer
         int walkSpeedDiagonal = 0;
         unsigned int tileWidth = 1;
         unsigned int tileHeight = 1;
+        bool hasConstructionQueue = false;
+        std::set<int>* buildableUnits = nullptr;
+        int buildTime;
     };
 }

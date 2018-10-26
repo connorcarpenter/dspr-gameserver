@@ -11,6 +11,7 @@ namespace DsprGameServer {
         Follow,
         AttackTarget,
         Stop,
-        Hold
+        Hold,
+        Train
     };
 }

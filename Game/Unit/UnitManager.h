@@ -53,6 +53,8 @@ namespace DsprGameServer {
 
         void receiveHoldOrder(const std::list<int> &idList);
 
+        void receiveTrainOrder(const std::list<int> &idList, int unitTemplateIndex);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
@@ -72,6 +74,5 @@ namespace DsprGameServer {
         bool playerIsAwareOfUnit(PlayerData *playerData, Unit *unit);
 
         void makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit);
-
     };
 }
