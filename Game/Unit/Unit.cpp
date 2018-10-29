@@ -14,6 +14,7 @@
 #include "../FogManager.h"
 #include "UnitTemplate.h"
 #include "../IsoBox/IsoBoxCache.h"
+#include "../Tribe.h"
 
 namespace DsprGameServer
 {
@@ -164,15 +165,23 @@ namespace DsprGameServer
 
                         auto unitOnTile = getUnitAtPosition(nextX, nextY);
                         bool tileIsOccupied = unitOnTile != nullptr;
-                        if (tileIsOccupied) {
+                        if (tileIsOccupied && shouldPushOtherUnit(unitOnTile, false)) {
                             pushOtherUnit(unitOnTile);
                             this->pushDirection+=1;
                             if (this->pushDirection>7)this->pushDirection-=8;
                         } else {
-                            nextTilePosition->x = nextX;
-                            nextTilePosition->y = nextY;
-                            this->pushCount = 0;
-                            setPathUnarrived();
+                            if (!tileIsOccupied) {
+                                if (!canMove()) {
+                                    int i = 0; // how did we get here?
+                                }
+                                if (game->unitManager->getUnitFromGrid(nextX, nextY) != nullptr) {
+                                    int i = 0; // how did we get here?
+                                }
+                                nextTilePosition->x = nextX;
+                                nextTilePosition->y = nextY;
+                                this->pushCount = 0;
+                                setPathUnarrived();
+                            }
                         }
                     } else {
                         this->pushDirection+=1;
@@ -388,6 +397,14 @@ namespace DsprGameServer
                         }
                         else
                         {
+                            if (!canMove())
+                            {
+                                int i = 0; // how did we get here?
+                            }
+                            if (game->unitManager->getUnitFromGrid(nextTile->x, nextTile->y) != nullptr)
+                            {
+                                int i = 0; // how did we get here?
+                            }
                             this->shortPathCurrentTile = nextTile;
                             this->nextTilePosition->Set(nextTile->x, nextTile->y);
                             this->disToEnd = nextTile->disToEnd;
@@ -436,6 +453,14 @@ namespace DsprGameServer
                 }
                 else
                 {
+                    if (!canMove())
+                    {
+                        int i = 0; // how did we get here?
+                    }
+                    if (game->unitManager->getUnitFromGrid(nextTile->x, nextTile->y) != nullptr)
+                    {
+                        int i = 0; // how did we get here?
+                    }
                     this->nextTilePosition->Set(nextTile->x, nextTile->y);
                     return;
                 }
@@ -511,7 +536,15 @@ namespace DsprGameServer
         }
         this->lostWithoutShortPath = 0;
         auto unitOnTile = getUnitAtPosition(nextPoint->x, nextPoint->y);
-        if (unitOnTile == nullptr) {
+        if (unitOnTile == nullptr || !shouldPushOtherUnit(unitOnTile, false)) {
+            if (!canMove())
+            {
+                int i = 0; // how did we get here?
+            }
+            if (game->unitManager->getUnitFromGrid(nextPoint->x, nextPoint->y) != nullptr)
+            {
+                int i = 0; // how did we get here?
+            }
             this->nextTilePosition->Set(nextPoint);
         } else {
             pushOtherUnit(unitOnTile);
@@ -520,6 +553,7 @@ namespace DsprGameServer
     }
 
     bool Unit::shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding) {
+        if (otherUnit == nullptr) return false;
         if (otherUnit->tribe != this->tribe && !inPathfinding) return false;
         if (otherUnit->animationState->obj()->GetState() == Attacking) return false;
         if (!otherUnit->canMove()) return false;
@@ -548,6 +582,7 @@ namespace DsprGameServer
         {
             auto unitAtPosition = this->getUnitAtPosition(this->position->x + circleCoord->x, this->position->y + circleCoord->y);
             if (unitAtPosition == nullptr)continue;
+            if (unitAtPosition->tribe->isNeutral())continue;
             if (unitAtPosition->tribe == this->tribe)continue;
             if (this->blockedEnemyList != nullptr)
                 if (this->blockedEnemyList->count(unitAtPosition) > 0)
@@ -615,6 +650,7 @@ namespace DsprGameServer
     }
 
     void Unit::damageOtherUnit(Unit *otherUnit, int dmgAmount) {
+        if (otherUnit->unitTemplate->isInvincible)return;
         otherUnit->health->dirtyObj()->Subtract(dmgAmount);
         if (otherUnit->health->obj()->value <= 0){
             this->game->unitManager->queueUnitForDeletion(otherUnit);

@@ -13,4 +13,8 @@ namespace DsprGameServer
     void Tribe::setEnemy(Tribe* otherTribe) {
         this->enemies.insert(otherTribe);
     }
+
+    bool Tribe::isNeutral() {
+        return index == -1;
+    }
 }

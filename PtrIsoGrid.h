@@ -46,6 +46,11 @@ namespace DsprGameServer {
 
         void set(int x, int y, T obj)
         {
+            if (obj != nullptr && get(x,y)!=nullptr)
+            {
+                int i = 0;
+            }
+
             int gridIndex = getGridIndex(x, y);
             if (gridIndex == -1) return;
             int tileIndex = getTileIndex(gridIndex, x, y);

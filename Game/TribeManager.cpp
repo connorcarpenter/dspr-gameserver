@@ -12,6 +12,7 @@ namespace DsprGameServer
     {
         this->game = game;
 
+        this->neutral = new Tribe(-1);
         this->tribeA = new Tribe(0);
         this->tribeB = new Tribe(1);
 
@@ -30,6 +31,8 @@ namespace DsprGameServer
         {
             delete tribe;
         }
+
+        delete this->neutral;
     }
 
     Tribe *TribeManager::getFreeTribe() {

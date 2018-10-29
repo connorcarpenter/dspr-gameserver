@@ -15,6 +15,7 @@ namespace DsprGameServer {
         UnitTemplate* getTemplateFromIndex(int index);
         UnitTemplate* worker = nullptr;
         UnitTemplate* temple = nullptr;
+        UnitTemplate* manafount = nullptr;
     private:
         std::map<int, UnitTemplate*> templateMap;
     };

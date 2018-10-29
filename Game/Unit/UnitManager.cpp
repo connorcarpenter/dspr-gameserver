@@ -35,9 +35,10 @@ namespace DsprGameServer
         int i = 0;
         //for (int i = 0; i<3; i++)
             for (int j = 0; j<3;j++)
-                createUnit((15 + i) * 2, (15 + j) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
+                createUnit((2 + j) * 2, (8 + i) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
 
-        createUnit((5) * 2, (5) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->temple);
+        createUnit((3) * 2, (3) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->temple);
+        createUnit((7) * 2, (7) * 2, this->game->tribeManager->neutral, this->game->unitTemplateCatalog->manafount);
 
         //for (int i = 0; i<3; i++)
             for (int j = 0; j<3;j++)

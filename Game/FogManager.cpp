@@ -40,6 +40,9 @@ namespace DsprGameServer
 
     void FogManager::updateFog(Tribe *tribe, int centerX, int centerY, int radius, bool reveal)
     {
+        if (tribe == nullptr)return;
+        if (tribe->isNeutral())return;
+
         auto fogGrid = this->fogGridMap.at(tribe);
 
         auto sightCircle = CircleCache::get().getCircle(radius);

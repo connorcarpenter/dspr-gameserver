@@ -19,6 +19,7 @@ namespace DsprGameServer
 
         Tribe* tribeA = nullptr;
         Tribe* tribeB = nullptr;
+        Tribe* neutral = nullptr;
 
         Tribe *getFreeTribe();
 

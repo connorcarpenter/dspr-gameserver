@@ -29,5 +29,6 @@ namespace DsprGameServer
         bool hasConstructionQueue = false;
         std::set<int>* buildableUnits = nullptr;
         int buildTime;
+        bool isInvincible = false;
     };
 }

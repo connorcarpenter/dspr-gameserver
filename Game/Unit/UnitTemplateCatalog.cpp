@@ -28,6 +28,13 @@ namespace DsprGameServer
         this->temple->buildableUnits->insert(0);
         this->temple->buildTime = 1000;
         this->templateMap.emplace(this->temple->index, this->temple);
+
+        this->manafount = new UnitTemplate(2);
+        this->manafount->setWalkSpeed(0,0);
+        this->manafount->tileWidth = 2;
+        this->manafount->tileHeight = 2;
+        this->manafount->isInvincible = true;
+        this->templateMap.emplace(this->manafount->index, this->manafount);
     }
 
     UnitTemplateCatalog::~UnitTemplateCatalog()

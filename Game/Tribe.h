@@ -17,6 +17,7 @@ namespace DsprGameServer
         void setEnemy(Tribe* otherTribe);
         int index = -1;
         PlayerData* playerData = nullptr;
+        bool isNeutral();
     private:
         std::set<Tribe*> enemies;
     };
