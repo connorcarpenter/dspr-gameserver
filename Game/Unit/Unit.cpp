@@ -88,6 +88,9 @@ namespace DsprGameServer
                     case Hold:
                         this->updateHolding();
                         break;
+                    case Gather:
+                        this->updateGather();
+                        break;
                 }
             } else {
                 this->updateWalking();
@@ -135,7 +138,8 @@ namespace DsprGameServer
                 if (this->orderGroup != nullptr) {
                     if (this->orderGroup->orderIndex == AttackTarget)
                     {
-                        if (this->withinAttackRange(this->position->x, this->position->y, orderGroup->getTargetUnit())) {
+                        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->range,
+                                                    orderGroup->getTargetUnit())) {
                             setPathArrived();
                         }
                     }
@@ -172,10 +176,10 @@ namespace DsprGameServer
                         } else {
                             if (!tileIsOccupied) {
                                 if (!canMove()) {
-                                    int i = 0; // how did we get here?
+                                    int i = 1/0; // how did we get here?
                                 }
                                 if (game->unitManager->getUnitFromGrid(nextX, nextY) != nullptr) {
-                                    int i = 0; // how did we get here?
+                                    int i = 1/0; // how did we get here?
                                 }
                                 nextTilePosition->x = nextX;
                                 nextTilePosition->y = nextY;
@@ -218,7 +222,7 @@ namespace DsprGameServer
             return;
         }
 
-        if (this->withinAttackRange(this->position->x, this->position->y, targetUnit)){
+        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->range, targetUnit)){
             //start to attack!
             this->handleAttackAnimation(targetUnit);
         }
@@ -270,6 +274,53 @@ namespace DsprGameServer
         }
     }
 
+    void Unit::updateGather()
+    {
+        auto targetUnit = this->orderGroup->getTargetUnit();
+
+        if (targetUnit == nullptr){
+            this->orderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
+            this->followingPath = false;
+            this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+            }
+            return;
+        }
+
+        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->range, targetUnit)){
+            //start to gather!
+            this->handleGatherAnimation(targetUnit);
+        }
+        else {
+            //try to get in range of target unit
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+                this->orderGroup->unitUnarrived();
+            }
+
+            if(!this->followingPath) setPathUnarrived();
+            this->updateFollowing();
+        }
+    }
+
+    void Unit::handleGatherAnimation(Unit* targetUnit)
+    {
+        if (this->animationState->obj()->GetState() != Gathering)
+        {
+            this->animationState->dirtyObj()->SetState(Gathering);
+            setAnimationStateHeading(targetUnit);
+            this->gatherFrameIndex = 0;
+            this->orderGroup->unitArrived();
+        }
+
+            this->gatherFrameIndex += 1;
+            if (this->gatherFrameIndex == this->gatherFrameToReceiveResource)
+            {
+                this->gatherFrameIndex = 0;
+            }
+    }
+
     void Unit::updateHolding()
     {
         if (this->orderGroup->getTargetUnit() == nullptr)
@@ -284,7 +335,7 @@ namespace DsprGameServer
         auto targetUnit = this->orderGroup->getTargetUnit();
         if (targetUnit != nullptr)
         {
-            if (this->withinAttackRange(this->position->x, this->position->y, targetUnit))
+            if (this->withinRangeOfUnit(this->position->x, this->position->y, this->range, targetUnit))
             {
                 //start to attack!
                 this->handleAttackAnimation(targetUnit);
@@ -399,11 +450,11 @@ namespace DsprGameServer
                         {
                             if (!canMove())
                             {
-                                int i = 0; // how did we get here?
+                                int i = 1/0; // how did we get here?
                             }
                             if (game->unitManager->getUnitFromGrid(nextTile->x, nextTile->y) != nullptr)
                             {
-                                int i = 0; // how did we get here?
+                                int i = 1/0; // how did we get here?
                             }
                             this->shortPathCurrentTile = nextTile;
                             this->nextTilePosition->Set(nextTile->x, nextTile->y);
@@ -455,11 +506,11 @@ namespace DsprGameServer
                 {
                     if (!canMove())
                     {
-                        int i = 0; // how did we get here?
+                        int i = 1/0; // how did we get here?
                     }
                     if (game->unitManager->getUnitFromGrid(nextTile->x, nextTile->y) != nullptr)
                     {
-                        int i = 0; // how did we get here?
+                        int i = 1/0; // how did we get here?
                     }
                     this->nextTilePosition->Set(nextTile->x, nextTile->y);
                     return;
@@ -539,11 +590,11 @@ namespace DsprGameServer
         if (unitOnTile == nullptr || !shouldPushOtherUnit(unitOnTile, false)) {
             if (!canMove())
             {
-                int i = 0; // how did we get here?
+                int i = 1/0; // how did we get here?
             }
             if (game->unitManager->getUnitFromGrid(nextPoint->x, nextPoint->y) != nullptr)
             {
-                int i = 0; // how did we get here?
+                int i = 1/0; // how did we get here?
             }
             this->nextTilePosition->Set(nextPoint);
         } else {
@@ -593,13 +644,13 @@ namespace DsprGameServer
         return nullptr;
     }
 
-    bool Unit::withinAttackRange(int x, int y, Unit *targetUnit) {
+    bool Unit::withinRangeOfUnit(int x, int y, int range, Unit *targetUnit) {
         if (targetUnit == nullptr)
             return false;
         if (targetUnit->unitTemplate->tileWidth == 1 && targetUnit->unitTemplate->tileHeight == 1)
         {
             int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y, targetUnit->position->x, targetUnit->position->y));
-            return (distanceToTarget <= this->range);
+            return (distanceToTarget <= range);
         }
         else
         {
@@ -610,7 +661,7 @@ namespace DsprGameServer
                 int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y,
                                                                               targetUnit->position->x + isoBoxCoord->x,
                                                                               targetUnit->position->y + isoBoxCoord->y));
-                if(distanceToTarget <= this->range)
+                if(distanceToTarget <= range)
                     return true;
             }
 

@@ -128,6 +128,11 @@ int main()
                     game->unitManager->receiveTrainOrder(unitIdList, unitTemplateIndex);
                 }
                     break;
+                case Gather: {
+                    int targetUnitId = stoi(orderStrings[1]);
+                    game->unitManager->receiveGatherOrder(unitIdList, targetUnitId);
+                }
+                    break;
             }
 
             std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;

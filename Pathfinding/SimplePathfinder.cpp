@@ -61,7 +61,8 @@ namespace DsprGameServer {
             PathTile* endTileInPath = nullptr;
             if (!pathFindSuccess) {
                 if (unit->orderGroup->orderIndex == AttackTarget) {
-                    if (unit->withinAttackRange(currentNode->x, currentNode->y, unit->orderGroup->getTargetUnit()))
+                    if (unit->withinRangeOfUnit(currentNode->x, currentNode->y, unit->range,
+                                                unit->orderGroup->getTargetUnit()))
                         pathFindSuccess = true;
                 } else {
                     endTileInPath = path->getEndTile(currentNode->x, currentNode->y);

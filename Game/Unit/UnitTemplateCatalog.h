@@ -18,5 +18,11 @@ namespace DsprGameServer {
         UnitTemplate* manafount = nullptr;
     private:
         std::map<int, UnitTemplate*> templateMap;
+
+        void initWorker();
+
+        void initTemple();
+
+        void initManafount();
     };
 }

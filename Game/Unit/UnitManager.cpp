@@ -255,6 +255,45 @@ namespace DsprGameServer
             }
     }
 
+    void UnitManager::receiveGatherOrder(const std::list<int> &idList, int targetUnitId)
+    {
+        if (unitMap.count(targetUnitId) == 0) return;
+
+        std::list<std::pair<int, int>> unitPositionsList;
+
+        auto targetUnit = unitMap.at(targetUnitId);
+        if (!targetUnit->unitTemplate->isGatherable)return;
+
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Gather);
+        newOrderGroup->setTargetUnit(targetUnit);
+
+        for (const auto& i : idList)
+        {
+            if (unitMap.count(i) != 0) {
+                Unit *unit = unitMap.at(i);
+                if (!unit->unitTemplate->canGather) continue;
+                unitPositionsList.emplace_back(std::pair<int, int>(unit->position->x, unit->position->y));
+                unit->setOrderGroup(newOrderGroup);
+            }
+        }
+
+        if (unitPositionsList.empty()) return;
+        auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
+                                                     targetUnit->position->y, true);
+        if (path != nullptr)
+        {
+            newOrderGroup->setPath(path);
+
+            for (const auto &i : idList) {
+                if (unitMap.count(i) != 0) {
+                    Unit *unit = unitMap.at(i);
+                    if (!unit->unitTemplate->canGather) continue;
+                    unit->startPath();
+                }
+            }
+        }
+    }
+
     void UnitManager::updateUnits()
     {
         for(const auto& unitPair : unitMap)

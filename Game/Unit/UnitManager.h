@@ -24,6 +24,10 @@ namespace DsprGameServer {
         void receiveFollowOrder(const std::list<int> &idList, int targetUnitId);
         void receiveAttackTargetOrder(const std::list<int> &idList, int targetUnitId);
         void receiveAttackMoveOrder(const std::list<int> &idList, int tileX, int tileY);
+        void receiveStopOrder(const std::list<int> &idList);
+        void receiveHoldOrder(const std::list<int> &idList);
+        void receiveTrainOrder(const std::list<int> &idList, int unitTemplateIndex);
+        void receiveGatherOrder(const std::list<int> &idList, int targetUnitId);
 
         void updateUnits();
         void deleteUnits();
@@ -36,24 +40,12 @@ namespace DsprGameServer {
         bool getEndPosAtCoord(int x, int y);
         void addEndPosAtCoord(int x, int y);
         void removeEndPosAtCoord(int x, int y);
-
         void queueUnitForDeletion(Unit *deletedUnit);
-
         void sendUnitDeletes(PlayerData *playerData);
-
         Unit* getUnitWithId(int unitId);
-
         void finishSendUnitDeletes();
-
         void addPlayer(PlayerData *playerData);
-
         void removePlayer(PlayerData *playerData);
-
-        void receiveStopOrder(const std::list<int> &idList);
-
-        void receiveHoldOrder(const std::list<int> &idList);
-
-        void receiveTrainOrder(const std::list<int> &idList, int unitTemplateIndex);
 
     private:
         std::map<int, Unit*> unitMap;

@@ -7,7 +7,7 @@
 #include <string>
 
 namespace DsprGameServer{
-    enum AnimationStates { Walking, Attacking };
+    enum AnimationStates { Walking, Attacking, Gathering };
     class AnimationState {
     public:
         void SetState(AnimationStates newState);

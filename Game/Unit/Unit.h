@@ -30,20 +30,20 @@ namespace DsprGameServer
         Unit(Game *game, int id, Tribe *tribe, int x, int y, UnitTemplate *unitTemplate);
         ~Unit();
         void update();
-        void updateStanding();
-        void updateWalking();
-        void updateFollowing();
-        void updateAttacking();
         void startPath();
         void setOrderGroup(std::shared_ptr<OrderGroup> group);
         void sendUpdate(PlayerData *playerData);
         bool anyVarIsDirty();
         void cleanAllVars();
         bool shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding);
-        bool withinAttackRange(int x, int y, Unit *targetUnit);
+        bool withinRangeOfUnit(int x, int y, int range, Unit *targetUnit);
         bool isVisibleToTribe(Tribe *tribe);
         void stop(std::shared_ptr<OrderGroup> orderGroup);
         void hold();
+        bool canMove();
+        bool canAttack();
+        void trainUnit(UnitTemplate *unitTemplate);
+        void finishTraining(UnitTemplate *unitTemplate);
 
         int id = -1;
         Synced<AnimationState>* animationState = nullptr;
@@ -69,6 +69,7 @@ namespace DsprGameServer
         //attacking vars
         Synced<Int>* health = nullptr;
         int stamina = 100;
+
         const int minDamage = 10;
         const int maxDamage = 15;
         int range = 2;//make sure this is multiples of 2... to accomodate for diagonal tiles
@@ -81,13 +82,8 @@ namespace DsprGameServer
         const int attackWaitFrames = 5;
         const int acquisition = 6;
 
-        bool canMove();
-
-        bool canAttack();
-
-        void trainUnit(UnitTemplate *unitTemplate);
-
-        void finishTraining(UnitTemplate *unitTemplate);
+        int gatherFrameIndex = 0;
+        const int gatherFrameToReceiveResource = 100;
 
     private:
 
@@ -111,12 +107,22 @@ namespace DsprGameServer
         void addToBlockedEnemyList(Unit *blockedEnemy);
         void damageOtherUnit(Unit *otherUnit, int dmgAmount);
 
+        void updateStanding();
+        void updateWalking();
+        void updateFollowing();
+        void updateAttacking();
         void updateHolding();
+        void updateGather();
 
         void handleAttackAnimation(Unit *targetUnit);
+        void handleGatherAnimation(Unit *targetUnit);
 
         void setAnimationStateHeading(Unit *targetUnit);
 
         ConstructionQueue *constructionQueue = nullptr;
+
+
+
+
     };
 }

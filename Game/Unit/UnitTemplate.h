@@ -30,5 +30,7 @@ namespace DsprGameServer
         std::set<int>* buildableUnits = nullptr;
         int buildTime;
         bool isInvincible = false;
+        bool canGather = false;
+        bool isGatherable = false;
     };
 }

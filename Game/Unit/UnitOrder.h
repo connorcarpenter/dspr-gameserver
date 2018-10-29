@@ -12,6 +12,7 @@ namespace DsprGameServer {
         AttackTarget,
         Stop,
         Hold,
-        Train
+        Train,
+        Gather
     };
 }
