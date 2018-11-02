@@ -119,6 +119,10 @@ namespace DsprGameServer
         this->playerToManaMap.at(tribe)->dirtyObj()->Set(value);
     }
 
+    void EconomyManager::setManaClean(Tribe *tribe, int value) {
+        this->playerToManaMap.at(tribe)->obj()->Set(value);
+    }
+
     int EconomyManager::getMana(Tribe* tribe) {
         return this->playerToManaMap.at(tribe)->obj()->Get();
     }

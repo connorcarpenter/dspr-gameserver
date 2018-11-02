@@ -85,6 +85,7 @@ namespace DsprGameServer
 
         int gatherFrameIndex = 0;
         const int gatherFrameToReceiveResource = 100;
+        Synced<Point>* gatherYield = nullptr;
 
     private:
 

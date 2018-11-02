@@ -27,6 +27,7 @@ namespace DsprGameServer
         this->nextPosition = new Synced<Point>("nextPosition", new Point(x, y));
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
+        this->gatherYield = new Synced<Point>("gatherYield", new Point(0,0));
         this->nextTilePosition = new Point(x,y);
         this->tribe = tribe;
 
@@ -51,6 +52,7 @@ namespace DsprGameServer
         delete this->moveTarget;
         delete this->nextTilePosition;
         delete this->animationState;
+        delete this->gatherYield;
         delete this->health;
         delete this->syncedTargetUnitId;
         if (this->blockedEnemyList != nullptr) delete this->blockedEnemyList;
@@ -321,7 +323,9 @@ namespace DsprGameServer
             if (this->gatherFrameIndex == this->gatherFrameToReceiveResource)
             {
                 auto curMana = this->game->economyManager->getMana(this->tribe);
-                this->game->economyManager->setMana(this->tribe, curMana + 10);
+                curMana += 10;
+                this->game->economyManager->setManaClean(this->tribe, curMana);
+                this->gatherYield->dirtyObj()->Set(10, curMana);
                 this->gatherFrameIndex = 0;
             }
     }
@@ -789,6 +793,12 @@ namespace DsprGameServer
             msg << this->syncedTargetUnitId->serialize();
         }
 
+        if (overrideDirty || this->gatherYield->isDirty())
+        {
+            if (firstVar) { firstVar = false; } else { msg << "&"; }
+            msg << this->gatherYield->serialize();
+        }
+
         //next synced variable should follow this format
 //        if (this->nextPosition->isDirty())
 //        {
@@ -806,6 +816,7 @@ namespace DsprGameServer
         if (this->animationState->isDirty()) return true;
         if (this->health->isDirty()) return true;
         if (this->syncedTargetUnitId->isDirty()) return true;
+        if (this->gatherYield->isDirty()) return true;
         //more synced vars here
         return false;
     }
@@ -816,6 +827,7 @@ namespace DsprGameServer
         this->animationState->clean();
         this->health->clean();
         this->syncedTargetUnitId->clean();
+        this->gatherYield->clean();
         //more synced vars here
     }
 

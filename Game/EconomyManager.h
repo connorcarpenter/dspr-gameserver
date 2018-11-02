@@ -31,6 +31,8 @@ namespace DsprGameServer {
 
         void clean();
 
+        void setManaClean(Tribe *pTribe, int value);
+
     private:
 
         std::map<Tribe*, Synced<Int>*> playerToPopMap;
