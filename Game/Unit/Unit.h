@@ -32,7 +32,7 @@ namespace DsprGameServer
         void update();
         void startPath();
         void setOrderGroup(std::shared_ptr<OrderGroup> group);
-        void sendUpdate(PlayerData *playerData);
+        void sendUpdate(PlayerData *playerData, bool overrideDirty = false);
         bool anyVarIsDirty();
         void cleanAllVars();
         bool shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding);
@@ -68,6 +68,7 @@ namespace DsprGameServer
 
         //attacking vars
         Synced<Int>* health = nullptr;
+        Synced<Int>* syncedTargetUnitId = nullptr;
         int stamina = 100;
 
         const int minDamage = 10;

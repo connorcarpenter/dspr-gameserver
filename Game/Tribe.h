@@ -5,6 +5,7 @@
 //
 
 #include <set>
+#include "Game.h"
 
 namespace DsprGameServer
 {
@@ -13,12 +14,14 @@ namespace DsprGameServer
     class Tribe
     {
     public:
-        Tribe(int color);
+        Tribe(Game *game, int color);
+        ~Tribe();
         void setEnemy(Tribe* otherTribe);
         int index = -1;
         PlayerData* playerData = nullptr;
         bool isNeutral();
     private:
         std::set<Tribe*> enemies;
+        Game *game = nullptr;
     };
 }

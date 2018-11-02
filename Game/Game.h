@@ -12,6 +12,7 @@
 namespace DsprGameServer {
 
     class TileManager;
+    class EconomyManager;
     class UnitManager;
     class TribeManager;
     class AStarPathfinder;
@@ -36,6 +37,7 @@ namespace DsprGameServer {
 
         TileManager* tileManager = nullptr;
         UnitManager* unitManager = nullptr;
+        EconomyManager* economyManager = nullptr;
         TribeManager* tribeManager = nullptr;
         AStarPathfinder* pathfinder = nullptr;
         SimplePathfinder* simplePathfinder = nullptr;

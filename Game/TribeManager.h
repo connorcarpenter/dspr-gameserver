@@ -27,6 +27,8 @@ namespace DsprGameServer
 
         void freeTribeFromPlayer(Tribe *tribe, PlayerData *playerData);
 
+        Tribe* getTribeFromPlayer(PlayerData* playerData);
+
     private:
         DsprGameServer::Game* game = nullptr;
         std::set<Tribe*> tribeSet;

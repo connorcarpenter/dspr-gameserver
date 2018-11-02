@@ -15,6 +15,7 @@
 #include "UnitTemplate.h"
 #include "../IsoBox/IsoBoxCache.h"
 #include "../Tribe.h"
+#include "../EconomyManager.h"
 
 namespace DsprGameServer
 {
@@ -31,6 +32,7 @@ namespace DsprGameServer
 
         this->unitTemplate = unitTemplate;
         this->health = new Synced<Int>("health", new Int(unitTemplate->maxHealth));
+        this->syncedTargetUnitId = new Synced<Int>("targetUnitId", new Int(-1));
         this->game->unitManager->addUnitToGrid(this);
         this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
 
@@ -50,6 +52,7 @@ namespace DsprGameServer
         delete this->nextTilePosition;
         delete this->animationState;
         delete this->health;
+        delete this->syncedTargetUnitId;
         if (this->blockedEnemyList != nullptr) delete this->blockedEnemyList;
 
         if (this->unitTemplate->hasConstructionQueue)
@@ -317,6 +320,8 @@ namespace DsprGameServer
             this->gatherFrameIndex += 1;
             if (this->gatherFrameIndex == this->gatherFrameToReceiveResource)
             {
+                auto curMana = this->game->economyManager->getMana(this->tribe);
+                this->game->economyManager->setMana(this->tribe, curMana + 10);
                 this->gatherFrameIndex = 0;
             }
     }
@@ -535,6 +540,8 @@ namespace DsprGameServer
 
         this->orderGroup = group;
         this->orderGroup->addUnit(this);
+
+        this->syncedTargetUnitId->dirtyObj()->Set(this->orderGroup->targetUnitId);
     }
 
     void Unit::pushOtherUnit(Unit *otherUnit)
@@ -745,35 +752,41 @@ namespace DsprGameServer
         }
     }
 
-    void Unit::sendUpdate(PlayerData *playerData)
+    void Unit::sendUpdate(PlayerData *playerData, bool overrideDirty)
     {
-        if (!this->anyVarIsDirty()) return;
+        if (!overrideDirty && !this->anyVarIsDirty()) return;
         std::stringstream msg;
         msg << "unit/1.0/update|" << id << "|";
         bool firstVar = true;
 
-        if (this->nextPosition->isDirty())
+        if (overrideDirty || this->nextPosition->isDirty())
         {
             if (firstVar) { firstVar = false; } else { msg << "&"; }
             msg << this->nextPosition->serialize();
         }
 
-        if (this->moveTarget->isDirty())
+        if (overrideDirty || this->moveTarget->isDirty())
         {
             if (firstVar) { firstVar = false; } else { msg << "&"; }
             msg << this->moveTarget->serialize();
         }
 
-        if (this->animationState->isDirty())
+        if (overrideDirty || this->animationState->isDirty())
         {
             if (firstVar) { firstVar = false; } else { msg << "&"; }
             msg << this->animationState->serialize();
         }
 
-        if (this->health->isDirty())
+        if (overrideDirty || this->health->isDirty())
         {
             if (firstVar) { firstVar = false; } else { msg << "&"; }
             msg << this->health->serialize();
+        }
+
+        if (overrideDirty || this->syncedTargetUnitId->isDirty())
+        {
+            if (firstVar) { firstVar = false; } else { msg << "&"; }
+            msg << this->syncedTargetUnitId->serialize();
         }
 
         //next synced variable should follow this format
@@ -792,6 +805,7 @@ namespace DsprGameServer
         if (this->moveTarget->isDirty()) return true;
         if (this->animationState->isDirty()) return true;
         if (this->health->isDirty()) return true;
+        if (this->syncedTargetUnitId->isDirty()) return true;
         //more synced vars here
         return false;
     }
@@ -801,6 +815,7 @@ namespace DsprGameServer
         this->moveTarget->clean();
         this->animationState->clean();
         this->health->clean();
+        this->syncedTargetUnitId->clean();
         //more synced vars here
     }
 

@@ -12,9 +12,9 @@ namespace DsprGameServer
     {
         this->game = game;
 
-        this->neutral = new Tribe(-1);
-        this->tribeA = new Tribe(0);
-        this->tribeB = new Tribe(1);
+        this->neutral = new Tribe(game, -1);
+        this->tribeA = new Tribe(game, 0);
+        this->tribeB = new Tribe(game, 1);
 
         tribeSet.insert(this->tribeA);
         this->tribeA->setEnemy(this->tribeB);
@@ -55,5 +55,9 @@ namespace DsprGameServer
         tribe->playerData = nullptr;
         playerData->setTribe(nullptr);
         this->playerToTribeMap.erase(playerData);
+    }
+
+    Tribe *TribeManager::getTribeFromPlayer(PlayerData *playerData) {
+        return this->playerToTribeMap.at(playerData);
     }
 }

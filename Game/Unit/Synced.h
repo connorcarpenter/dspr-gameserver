@@ -12,10 +12,11 @@ namespace DsprGameServer
     class Synced
     {
     public:
-        explicit Synced(const std::string& name, T* newObj)
+        explicit Synced(const std::string& name, T* newObj, bool startsDirty = false)
         {
             this->internal = newObj;
             this->varName = name;
+            this->dataIsDirty = startsDirty;
         }
 
         ~Synced()

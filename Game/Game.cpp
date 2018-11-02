@@ -13,6 +13,7 @@
 #include "FogManager.h"
 #include "../GameServer.h"
 #include "Unit/UnitTemplateCatalog.h"
+#include "EconomyManager.h"
 
 namespace DsprGameServer
 {
@@ -21,6 +22,7 @@ namespace DsprGameServer
         this->tileManager = new TileManager(this, 64, 64);
         AStarPathfinder::setMapWidth(64);
         this->fogManager = new FogManager(this);
+        this->economyManager = new EconomyManager(this);
         this->tribeManager = new TribeManager(this);
         this->unitTemplateCatalog = new UnitTemplateCatalog();
         this->unitManager = new UnitManager(this);
@@ -46,10 +48,15 @@ namespace DsprGameServer
 
         // send updates to each player
         for (const auto &playerData : this->playerDataSet) {
+            this->economyManager->sendUpdates(playerData, false);
+        }
+
+        for (const auto &playerData : this->playerDataSet) {
             this->unitManager->sendUnitUpdates(playerData);
         }
 
         // clean units vars
+        this->economyManager->clean();
         this->unitManager->cleanAllUnits();
 
         // delete queued units
@@ -75,6 +82,8 @@ namespace DsprGameServer
         this->sendPlayerTribeIndex(playerData, freeTribe);
 
         this->tileManager->sendGrid(playerData);
+
+        this->economyManager->sendUpdates(playerData, true);
 
         this->unitManager->addPlayer(playerData);
         this->unitManager->initSendAllUnits(playerData);

@@ -3,11 +3,20 @@
 //
 
 #include "Tribe.h"
+#include "Game.h"
+#include "EconomyManager.h"
 
 namespace DsprGameServer
 {
-    Tribe::Tribe(int index) {
+    Tribe::Tribe(Game *game, int index) {
         this->index = index;
+        this->game = game;
+        game->economyManager->addTribe(this);
+    }
+
+    Tribe::~Tribe()
+    {
+        game->economyManager->removeTribe(this);
     }
 
     void Tribe::setEnemy(Tribe* otherTribe) {

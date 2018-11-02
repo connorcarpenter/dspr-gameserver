@@ -57,6 +57,12 @@ namespace DsprGameServer
 
         delete unitGrid;
         delete endPosGrid;
+
+        for(const auto& mapPair : this->playerToUnitsAwareOfMap)
+        {
+            std::set<Unit*>* set = mapPair.second;
+            delete set;
+        }
     }
 
     void UnitManager::initSendAllUnits(PlayerData *playerData)
@@ -329,7 +335,7 @@ namespace DsprGameServer
 
             if (playerIsAwareOfUnit)
             {
-                unit->sendUpdate(playerData);
+                unit->sendUpdate(playerData, false);
             }
         }
     }
@@ -441,7 +447,9 @@ namespace DsprGameServer
         std::stringstream msg;
         msg << "unit/1.0/create|" << unit->id << "," << unit->position->x << "," << unit->position->y << ","
             << unit->tribe->index << "," << unit->unitTemplate->index << "\r\n";
+
         GameServer::get().queueMessage(playerData, msg.str());
+        unit->sendUpdate(playerData, true);
 
         std::set<Unit*>* unitSet = this->playerToUnitsAwareOfMap.at(playerData);
         unitSet->emplace(unit);

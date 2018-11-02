@@ -93,6 +93,15 @@ namespace DsprGameServer {
             this->targetUnitId = targetUnit->id;
             this->lastTargetPosition.Set(targetUnit->position);
         }
+
+        for (const auto &unitId : unitIds) {
+            auto unit = this->game->unitManager->getUnitWithId(unitId);
+            if (unit == nullptr) continue;
+            if (unit->syncedTargetUnitId->obj()->Get() != this->targetUnitId)
+            {
+                unit->syncedTargetUnitId->dirtyObj()->Set(this->targetUnitId);
+            }
+        }
     }
 
     void OrderGroup::setPath(std::shared_ptr<DsprGameServer::Path> path) {
