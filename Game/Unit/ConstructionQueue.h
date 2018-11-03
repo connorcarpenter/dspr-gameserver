@@ -21,10 +21,19 @@ namespace DsprGameServer {
 
         void update();
 
+        bool isDirty();
+
+        std::string getUpdate(bool overrideDirty);
+
+        void clean();
+
     private:
         std::queue<UnitTemplate*> unitQueue;
         const int maxQueue = 7;
         int currentBuildTime = 0;
         Unit* masterUnit = nullptr;
+        bool dirtyTime = false;
+        bool dirtyQueue = false;
+        int updateTime = 0;
     };
 }

@@ -356,7 +356,7 @@ namespace DsprGameServer
         if (this->orderGroup->getTargetUnit() == nullptr)
         {
             if (this->unitTemplate->acquisition <= 0) return;
-            Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
+            Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->range);
             if (enemyUnitInAcquisitionRange != nullptr)
             {
                 this->orderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
@@ -658,8 +658,8 @@ namespace DsprGameServer
         this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
     }
 
-    Unit* Unit::getEnemyUnitInAcquisitionRange(){
-        auto acquiCircle = CircleCache::get().getCircle(this->unitTemplate->acquisition);
+    Unit * Unit::getEnemyUnitInRange(int range) {
+        auto acquiCircle = CircleCache::get().getCircle(range);
 
         for(auto circleCoord : acquiCircle->coordList)
         {
@@ -704,7 +704,7 @@ namespace DsprGameServer
     void Unit::lookForEnemyUnitsAndEngage() {
         if (this->unitTemplate->acquisition <= 0) return;
 
-        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInAcquisitionRange();
+        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->unitTemplate->acquisition);
         if (enemyUnitInAcquisitionRange != nullptr){
             //ideally, we would store the current order in a stack, and just push it down.. for now, no such thing
             std::list<std::pair<int, int>> unitPositionsList;
@@ -779,7 +779,7 @@ namespace DsprGameServer
 
     void Unit::sendUpdate(PlayerData *playerData, bool overrideDirty)
     {
-        if (!overrideDirty && !this->anyVarIsDirty()) return;
+        if (!overrideDirty && !this->anyVarIsDirty(playerData)) return;
         std::stringstream msg;
         msg << "unit/1.0/update|" << id << "|";
         bool firstVar = true;
@@ -817,7 +817,22 @@ namespace DsprGameServer
         if (overrideDirty || this->gatherYield->isDirty())
         {
             if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->gatherYield->serialize();
+            if (playerData == this->tribe->playerData) {
+                msg << this->gatherYield->serialize();
+            } else {
+                msg << "gatherYield:";
+                msg << std::to_string(this->gatherYield->obj()->x);
+            }
+        }
+
+        if (this->constructionQueue != nullptr)
+        {
+            if (playerData == this->tribe->playerData) {
+                if (overrideDirty || this->constructionQueue->isDirty()) {
+                    if (firstVar) { firstVar = false; } else { msg << "&"; }
+                    msg << this->constructionQueue->getUpdate(overrideDirty);
+                }
+            }
         }
 
         //next synced variable should follow this format
@@ -830,14 +845,17 @@ namespace DsprGameServer
         GameServer::get().queueMessage(playerData, msg.str());
     }
 
-    bool Unit::anyVarIsDirty()
+    bool Unit::anyVarIsDirty(PlayerData *playerData)
     {
+        bool sendingToControllerPlayer = playerData == this->tribe->playerData;
+
         if (this->nextPosition->isDirty()) return true;
         if (this->moveTarget->isDirty()) return true;
         if (this->animationState->isDirty()) return true;
         if (this->health->isDirty()) return true;
         if (this->syncedTargetUnitId->isDirty()) return true;
         if (this->gatherYield->isDirty()) return true;
+        if (sendingToControllerPlayer && this->constructionQueue!=nullptr && this->constructionQueue->isDirty()) return true;
         //more synced vars here
         return false;
     }
@@ -849,6 +867,7 @@ namespace DsprGameServer
         this->health->clean();
         this->syncedTargetUnitId->clean();
         this->gatherYield->clean();
+        if (this->constructionQueue!=nullptr) this->constructionQueue->clean();
         //more synced vars here
     }
 

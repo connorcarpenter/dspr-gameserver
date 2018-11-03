@@ -34,7 +34,7 @@ namespace DsprGameServer
         void startPath();
         void setOrderGroup(std::shared_ptr<OrderGroup> group);
         void sendUpdate(PlayerData *playerData, bool overrideDirty = false);
-        bool anyVarIsDirty();
+        bool anyVarIsDirty(PlayerData *playerData);
         void cleanAllVars();
         bool shouldPushOtherUnit(Unit *otherUnit, bool inPathfinding);
         bool withinRangeOfUnit(int x, int y, int range, Unit *targetUnit);
@@ -82,7 +82,6 @@ namespace DsprGameServer
         const int attackFramesNumber = 5;
         const int attackFrameToApplyDamage = 3;
         const int attackWaitFrames = 5;
-        const int acquisition = 6;
 
         int gatherFrameIndex = 0;
         const int gatherFrameToReceiveResource = 100;
@@ -106,7 +105,7 @@ namespace DsprGameServer
         void getNextTileSimplePathfind();
         void setPathUnarrived();
         void updateNextPosition(Point *newNextPosition);
-        Unit* getEnemyUnitInAcquisitionRange();
+        Unit *getEnemyUnitInRange(int range);
         void updateAttackMoving();
         void lookForEnemyUnitsAndEngage();
         void addToBlockedEnemyList(Unit *blockedEnemy);
