@@ -15,10 +15,13 @@ namespace DsprGameServer{
 
         void SetHeading(int newHeading);
         int GetHeading();
+        void SetStateChangeFunction(std::function<void()> func);
 
         std::string serialize();
+
     private:
         AnimationStates currentState = Walking;
         int currentHeading = 0;
+        std::function<void()> stateChangeFunction = nullptr;
     };
 }

@@ -3,6 +3,7 @@
 //
 
 #include "UnitTemplateCatalog.h"
+#include "SpecificUnit/Manafount.h"
 
 namespace DsprGameServer
 {
@@ -59,6 +60,9 @@ namespace DsprGameServer
         this->manafount->tileHeight = 2;
         this->manafount->isInvincible = true;
         this->manafount->isGatherable = true;
+        this->manafount->createSpecificUnitFunction = [&](Unit* unit) {
+            return new Manafount(unit);
+        };
 
         this->templateMap.emplace(this->manafount->index, this->manafount);
     }

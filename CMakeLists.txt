@@ -43,6 +43,9 @@ add_executable(dspr-gameserver
         Game/Unit/UnitTemplate.h Game/Unit/UnitTemplate.cpp
         Game/Unit/ConstructionQueue.h Game/Unit/ConstructionQueue.cpp
 
+        Game/Unit/SpecificUnit/SpecificUnit.h Game/Unit/SpecificUnit/SpecificUnit.cpp
+        Game/Unit/SpecificUnit/Manafount.h Game/Unit/SpecificUnit/Manafount.cpp
+
         Game/Circle/CircleCache.h Game/Circle/CircleCache.cpp
         Game/Circle/Circle.h Game/Circle/Circle.cpp
         Game/Circle/CircleCoord.h Game/Circle/CircleCoord.cpp

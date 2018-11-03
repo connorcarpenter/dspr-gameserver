@@ -5,9 +5,13 @@
 //
 
 #include <set>
+#include <functional>
 
 namespace DsprGameServer
 {
+    class SpecificUnit;
+    class Unit;
+
     class UnitTemplate
     {
 
@@ -32,5 +36,7 @@ namespace DsprGameServer
         bool isInvincible = false;
         bool canGather = false;
         bool isGatherable = false;
+
+        std::function<SpecificUnit*(Unit* unit)> createSpecificUnitFunction = nullptr;
     };
 }

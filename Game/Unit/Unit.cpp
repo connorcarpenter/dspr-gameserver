@@ -16,6 +16,7 @@
 #include "../IsoBox/IsoBoxCache.h"
 #include "../Tribe.h"
 #include "../EconomyManager.h"
+#include "SpecificUnit/Manafount.h"
 
 namespace DsprGameServer
 {
@@ -41,6 +42,11 @@ namespace DsprGameServer
         {
             this->constructionQueue = new ConstructionQueue(this);
         }
+
+        if (this->unitTemplate->createSpecificUnitFunction != nullptr)
+        {
+            this->specificUnit = this->unitTemplate->createSpecificUnitFunction(this);
+        }
     }
 
     Unit::~Unit()
@@ -60,6 +66,11 @@ namespace DsprGameServer
         if (this->unitTemplate->hasConstructionQueue)
         {
             delete this->constructionQueue;
+        }
+
+        if (this->specificUnit != nullptr)
+        {
+            delete this->specificUnit;
         }
     }
 
@@ -317,17 +328,27 @@ namespace DsprGameServer
             setAnimationStateHeading(targetUnit);
             this->gatherFrameIndex = 0;
             this->orderGroup->unitArrived();
+            auto manafount = static_cast<Manafount*>(targetUnit->specificUnit);
+            manafount->addGatheringUnit();
+
+            auto animState = this->animationState->obj();
+            animState->SetStateChangeFunction([animState, manafount](){
+                manafount->removeGatheringUnit();
+                animState->SetStateChangeFunction(nullptr);
+            });
         }
 
-            this->gatherFrameIndex += 1;
-            if (this->gatherFrameIndex == this->gatherFrameToReceiveResource)
-            {
-                auto curMana = this->game->economyManager->getMana(this->tribe);
-                curMana += 10;
-                this->game->economyManager->setManaClean(this->tribe, curMana);
-                this->gatherYield->dirtyObj()->Set(10, curMana);
-                this->gatherFrameIndex = 0;
-            }
+        this->gatherFrameIndex += 1;
+
+        if (this->gatherFrameIndex == this->gatherFrameToReceiveResource)
+        {
+            auto curMana = this->game->economyManager->getMana(this->tribe);
+            auto gatherRate = static_cast<Manafount*>(targetUnit->specificUnit)->gatherRate;
+            curMana += gatherRate;
+            this->game->economyManager->setManaClean(this->tribe, curMana);
+            this->gatherYield->dirtyObj()->Set(gatherRate, curMana);
+            this->gatherFrameIndex = 0;
+        }
     }
 
     void Unit::updateHolding()

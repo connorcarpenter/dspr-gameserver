@@ -13,6 +13,7 @@
 #include "../../Math/Int.h"
 #include "UnitTemplate.h"
 #include "ConstructionQueue.h"
+#include "SpecificUnit/SpecificUnit.h"
 
 namespace DsprGameServer
 {
@@ -86,13 +87,15 @@ namespace DsprGameServer
         int gatherFrameIndex = 0;
         const int gatherFrameToReceiveResource = 100;
         Synced<Point>* gatherYield = nullptr;
+        SpecificUnit* specificUnit = nullptr;
 
     private:
 
         Game* game = nullptr;
         int timesHaventPushed = 0;
         int pushCount = 0;
-        std::set<Unit *> *blockedEnemyList = nullptr;
+        std::set<Unit*>* blockedEnemyList = nullptr;
+        ConstructionQueue* constructionQueue = nullptr;
 
         void pushOtherUnit(Unit *otherUnit);
         void getNextTile();
@@ -120,11 +123,6 @@ namespace DsprGameServer
         void handleGatherAnimation(Unit *targetUnit);
 
         void setAnimationStateHeading(Unit *targetUnit);
-
-        ConstructionQueue *constructionQueue = nullptr;
-
-
-
 
     };
 }
