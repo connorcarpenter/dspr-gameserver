@@ -28,6 +28,9 @@ namespace DsprGameServer {
         static int Abs(int value) {
             return value * Sign(value);
         }
+        static double Abs(double value) {
+            return value * Sign(value);
+        }
         static int Min(int value1, int value2) {
             return (value1 < value2) ? value1 : value2;
         }
@@ -50,6 +53,13 @@ namespace DsprGameServer {
             return (int) value + 1;
         }
 
+        static int Round(double value) {
+            int intVal = (int) value;
+            double dec = value - intVal;
+            if (Abs(dec) < 0.5f) return intVal;
+            return intVal+Sign(intVal);
+        }
+
         static int Pow(int value, int exponent){
             return (int) std::pow(value, exponent);
         }
@@ -57,5 +67,7 @@ namespace DsprGameServer {
         {
             return std::pow(value, power);
         }
+
+
     };
 }

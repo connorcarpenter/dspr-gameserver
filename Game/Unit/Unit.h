@@ -123,5 +123,6 @@ namespace DsprGameServer
 
         void setAnimationStateHeading(Unit *targetUnit);
 
+        int getAdjustedDir(float x, float y);
     };
 }

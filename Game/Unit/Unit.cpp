@@ -201,6 +201,9 @@ namespace DsprGameServer
                                 nextTilePosition->y = nextY;
                                 this->pushCount = 0;
                                 setPathUnarrived();
+                            } else {
+                                this->pushDirection+=1;
+                                if (this->pushDirection>7)this->pushDirection-=8;
                             }
                         }
                     } else {
@@ -619,7 +622,7 @@ namespace DsprGameServer
         }
         this->lostWithoutShortPath = 0;
         auto unitOnTile = getUnitAtPosition(nextPoint->x, nextPoint->y);
-        if (unitOnTile == nullptr || !shouldPushOtherUnit(unitOnTile, false)) {
+        if (unitOnTile == nullptr) {
             if (!canMove())
             {
                 int i = 1/0; // how did we get here?
@@ -630,7 +633,14 @@ namespace DsprGameServer
             }
             this->nextTilePosition->Set(nextPoint);
         } else {
-            pushOtherUnit(unitOnTile);
+            if (shouldPushOtherUnit(unitOnTile, false))
+            {
+                pushOtherUnit(unitOnTile);
+            }
+            else {
+                int i = 0;
+            }
+
         }
         delete nextPoint;
     }
@@ -752,6 +762,23 @@ namespace DsprGameServer
         else
             dir = 360-dir;
         return (int) (dir/45);
+    }
+
+    int Unit::getAdjustedDir(float x, float y)
+    {
+        auto dir = (std::atan2(y,x)*180/M_PI);
+        if (dir <= 0)
+            dir = -dir;
+        else
+            dir = 360-dir;
+        if (MathUtils::Abs(0-dir)<1) return 0;
+        if (MathUtils::Abs(90-dir)<1) return 2;
+        if (MathUtils::Abs(180-dir)<1) return 4;
+        if (MathUtils::Abs(270-dir)<1) return 6;
+        if (MathUtils::Abs(360-dir)<1) return 0;
+
+        int newDir =  ((MathUtils::Round((dir-45)/90))*2)+1;
+        return newDir;
     }
 
     Point *Unit::getPointFromDir(int dir)
@@ -881,32 +908,31 @@ namespace DsprGameServer
 
     void Unit::setAnimationStateHeading(Unit *targetUnit)
     {
+        int newHeading;
         if (targetUnit->unitTemplate->tileWidth == 1 && targetUnit->unitTemplate->tileHeight == 1)
         {
-            int newHeading = getDir(targetUnit->position->x - this->position->x,
-                                    targetUnit->position->y - this->position->y);
-            if (this->animationState->obj()->GetHeading() != newHeading)
-                this->animationState->dirtyObj()->SetHeading(newHeading);
+            newHeading = getDir(targetUnit->position->x - this->position->x,
+                                targetUnit->position->y - this->position->y);
         }
         else
         {
             auto targetIsoBoxBase = IsoBoxCache::get().getIsoBox(targetUnit->unitTemplate->tileWidth, targetUnit->unitTemplate->tileHeight);
 
+            float avgX = 0; float avgY = 0;
             for(auto isoBoxCoord : targetIsoBoxBase->coordList)
             {
-                int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(this->position->x, this->position->y,
-                                                                              targetUnit->position->x + isoBoxCoord->x,
-                                                                              targetUnit->position->y + isoBoxCoord->y));
-                if(distanceToTarget <= this->range)
-                {
-                    int newHeading = getDir(targetUnit->position->x + isoBoxCoord->x - this->position->x,
-                                            targetUnit->position->y + isoBoxCoord->y - this->position->y);
-                    if (this->animationState->obj()->GetHeading() != newHeading)
-                        this->animationState->dirtyObj()->SetHeading(newHeading);
-                    return;
-                }
+                avgX += targetUnit->position->x + isoBoxCoord->x;
+                avgY += targetUnit->position->y + isoBoxCoord->y;
             }
+
+            avgX /= targetIsoBoxBase->coordList.size();
+            avgY /= targetIsoBoxBase->coordList.size();
+
+            newHeading = getAdjustedDir(avgX - this->position->x,
+                                avgY - this->position->y);
         }
+        if (this->animationState->obj()->GetHeading() != newHeading)
+            this->animationState->dirtyObj()->SetHeading(newHeading);
     }
 
     void Unit::trainUnit(UnitTemplate *unitTemplate) {
