@@ -24,6 +24,8 @@ namespace DsprGameServer {
 
         void initSendAllItems(PlayerData *player);
 
+        void sendItemUpdates(PlayerData *playerData);
+
     private:
         Game *game = nullptr;
 
@@ -36,8 +38,6 @@ namespace DsprGameServer {
         void createItem(int x, int y, int templateIndex, int id);
 
         void setItemInGrid(int x, int y, Item *item);
-
-        void sendItemUpdates(PlayerData *playerData);
 
         void makePlayerAwareOfItem(PlayerData *playerData, Item *item);
 

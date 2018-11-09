@@ -58,6 +58,10 @@ namespace DsprGameServer
             this->unitManager->sendUnitUpdates(playerData);
         }
 
+        for (const auto &playerData : this->playerDataSet) {
+            this->itemManager->sendItemUpdates(playerData);
+        }
+
         // clean units vars
         this->economyManager->clean();
         this->unitManager->cleanAllUnits();

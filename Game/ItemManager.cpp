@@ -36,10 +36,10 @@ namespace DsprGameServer {
 
     void ItemManager::initializeFirstItems() {
         this->createItem((3) * 2, (10) * 2, 0, 0);
-        this->createItem((4) * 2, (10) * 2, 2, 0);
-        this->createItem((5) * 2, (10) * 2, 3, 0);
-        this->createItem((6) * 2, (10) * 2, 4, 0);
-        this->createItem((7) * 2, (10) * 2, 5, 0);
+        this->createItem((4) * 2, (10) * 2, 2, 1);
+        this->createItem((5) * 2, (10) * 2, 3, 2);
+        this->createItem((6) * 2, (10) * 2, 4, 3);
+        this->createItem((4) * 2, (11) * 2, 5, 4);
     }
     
     void ItemManager::createItem(int x, int y, int templateIndex, int id) {
@@ -67,7 +67,6 @@ namespace DsprGameServer {
                 if (!item->isVisibleToTribe(playerData->getTribe()))
                 {
                     this->makePlayerUnawareOfItem(playerData, item);
-                    playerIsAwareOfItem = false;
                 }
             }
             else
@@ -75,7 +74,6 @@ namespace DsprGameServer {
                 if (item->isVisibleToTribe(playerData->getTribe()))
                 {
                     this->makePlayerAwareOfItem(playerData, item);
-                    playerIsAwareOfItem = true;
                 }
             }
         }
