@@ -84,7 +84,7 @@ namespace DsprGameServer
         const int attackWaitFrames = 5;
 
         int gatherFrameIndex = 0;
-        const int gatherFrameToReceiveResource = 100;
+        const int gatherFrameToReceiveResource = 110;
         Synced<Point>* gatherYield = nullptr;
         SpecificUnit* specificUnit = nullptr;
 

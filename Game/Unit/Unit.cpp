@@ -329,7 +329,7 @@ namespace DsprGameServer
         {
             this->animationState->dirtyObj()->SetState(Gathering);
             setAnimationStateHeading(targetUnit);
-            this->gatherFrameIndex = 0;
+            this->gatherFrameIndex = MathUtils::getRandom(-10,10);
             this->orderGroup->unitArrived();
             auto manafount = static_cast<Manafount*>(targetUnit->specificUnit);
             manafount->addGatheringUnit();
@@ -343,14 +343,14 @@ namespace DsprGameServer
 
         this->gatherFrameIndex += 1;
 
-        if (this->gatherFrameIndex == this->gatherFrameToReceiveResource)
+        if (this->gatherFrameIndex >= this->gatherFrameToReceiveResource)
         {
             auto curMana = this->game->economyManager->getMana(this->tribe);
             auto gatherRate = static_cast<Manafount*>(targetUnit->specificUnit)->gatherRate;
             curMana += gatherRate;
             this->game->economyManager->setManaClean(this->tribe, curMana);
             this->gatherYield->dirtyObj()->Set(gatherRate, curMana);
-            this->gatherFrameIndex = 0;
+            this->gatherFrameIndex = MathUtils::getRandom(-10,10);
         }
     }
 
