@@ -4,8 +4,8 @@
 // Created by connor on 11/8/18.
 //
 
-#include "Game.h"
-#include "../Math/Point.h"
+#include "../Game.h"
+#include "../../Math/Point.h"
 
 namespace DsprGameServer {
     class Item {

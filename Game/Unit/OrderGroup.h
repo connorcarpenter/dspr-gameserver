@@ -6,6 +6,7 @@
 
 #include "Unit.h"
 #include "UnitOrder.h"
+#include "../Item/Item.h"
 
 namespace DsprGameServer {
     class Unit;
@@ -36,6 +37,10 @@ namespace DsprGameServer {
 
         Unit *getTargetUnit();
 
+        void setTargetItem(DsprGameServer::Item *targetItem);
+
+        Item *getTargetItem();
+
     private:
 
         std::list<int> unitIds;
@@ -46,6 +51,8 @@ namespace DsprGameServer {
         bool targetOffPath();
 
         void targetUpdatePosition();
+
+        int targetItemId;
 
     };
 }

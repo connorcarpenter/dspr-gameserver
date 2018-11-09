@@ -36,6 +36,7 @@ namespace DsprGameServer
         bool isInvincible = false;
         bool canGather = false;
         bool isGatherable = false;
+        bool hasInventory = false;
 
         std::function<SpecificUnit*(Unit* unit)> createSpecificUnitFunction = nullptr;
     };

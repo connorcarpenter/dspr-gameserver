@@ -14,7 +14,7 @@
 #include "../GameServer.h"
 #include "Unit/UnitTemplateCatalog.h"
 #include "EconomyManager.h"
-#include "ItemManager.h"
+#include "Item/ItemManager.h"
 
 namespace DsprGameServer
 {

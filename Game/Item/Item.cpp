@@ -4,7 +4,7 @@
 
 #include "Item.h"
 #include "ItemManager.h"
-#include "FogManager.h"
+#include "../FogManager.h"
 
 namespace DsprGameServer {
 

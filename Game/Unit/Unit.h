@@ -13,7 +13,9 @@
 #include "../../Math/Int.h"
 #include "UnitTemplate.h"
 #include "ConstructionQueue.h"
+#include "Inventory.h"
 #include "SpecificUnit/SpecificUnit.h"
+#include "../Item/Item.h"
 
 namespace DsprGameServer
 {
@@ -22,6 +24,7 @@ namespace DsprGameServer
     class Path;
     class PathTile;
     class Tribe;
+    class Inventory;
 
     class Unit
     {
@@ -95,6 +98,7 @@ namespace DsprGameServer
         int pushCount = 0;
         std::set<Unit*>* blockedEnemyList = nullptr;
         ConstructionQueue* constructionQueue = nullptr;
+        Inventory *inventory = nullptr;
 
         void pushOtherUnit(Unit *otherUnit);
         void getNextTile();
@@ -124,5 +128,13 @@ namespace DsprGameServer
         void setAnimationStateHeading(Unit *targetUnit);
 
         int getAdjustedDir(float x, float y);
+
+        void updatePickup();
+
+        bool withinRangeOfPoint(int x, int y, int range, int tx, int ty);
+
+        void pickupItem(DsprGameServer::Item *item);
+
+
     };
 }

@@ -133,6 +133,11 @@ int main()
                     game->unitManager->receiveGatherOrder(unitIdList, targetUnitId);
                 }
                     break;
+                case Pickup: {
+                    int targetItemId = stoi(orderStrings[1]);
+                    game->unitManager->receivePickupOrder(unitIdList, targetItemId);
+                }
+                    break;
             }
 
             std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;

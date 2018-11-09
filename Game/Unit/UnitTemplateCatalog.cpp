@@ -33,6 +33,7 @@ namespace DsprGameServer
         this->worker->maxHealth = 420;
         this->worker->buildTime = 100;
         this->worker->canGather = true;
+        this->worker->hasInventory = true;
 
         this->templateMap.emplace(this->worker->index, this->worker);
     }

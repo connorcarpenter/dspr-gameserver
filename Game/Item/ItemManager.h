@@ -3,7 +3,7 @@
 // Created by connor on 11/8/18.
 //
 
-#include "../PtrIsoGrid.h"
+#include "../../PtrIsoGrid.h"
 #include "Item.h"
 #include <map>
 
@@ -25,6 +25,11 @@ namespace DsprGameServer {
         void initSendAllItems(PlayerData *player);
 
         void sendItemUpdates(PlayerData *playerData);
+        bool itemExists(int itemId);
+
+        Item *getItem(int id);
+
+        void removeItem(Item *item);
 
     private:
         Game *game = nullptr;

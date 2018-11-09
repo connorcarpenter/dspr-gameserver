@@ -13,6 +13,7 @@
 #include "../../PlayerData.h"
 #include "UnitTemplateCatalog.h"
 #include "../IsoBox/IsoBoxCache.h"
+#include "../Item/ItemManager.h"
 
 namespace DsprGameServer
 {
@@ -295,6 +296,45 @@ namespace DsprGameServer
                     Unit *unit = unitMap.at(i);
                     if (!unit->unitTemplate->canGather) continue;
                     unit->startPath();
+                }
+            }
+        }
+    }
+
+    void UnitManager::receivePickupOrder(std::list<int> unitIdList, int targetItemId) {
+        if (!this->game->itemManager->itemExists(targetItemId)) return;
+
+        std::list<std::pair<int, int>> unitPositionsList;
+
+        auto targetItem = this->game->itemManager->getItem(targetItemId);
+
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Pickup);
+        newOrderGroup->setTargetItem(targetItem);
+
+        for (const auto& i : unitIdList)
+        {
+            if (unitMap.count(i) != 0) {
+                Unit *unit = unitMap.at(i);
+                if (!unit->unitTemplate->hasInventory) continue;
+                unitPositionsList.emplace_back(std::pair<int, int>(unit->position->x, unit->position->y));
+                unit->setOrderGroup(newOrderGroup);
+                break;
+            }
+        }
+
+        if (unitPositionsList.empty()) return;
+        auto path = this->game->pathfinder->findPath(unitPositionsList, targetItem->position->x,
+                                                     targetItem->position->y, true);
+        if (path != nullptr)
+        {
+            newOrderGroup->setPath(path);
+
+            for (const auto &i : unitIdList) {
+                if (unitMap.count(i) != 0) {
+                    Unit *unit = unitMap.at(i);
+                    if (!unit->unitTemplate->hasInventory) continue;
+                    unit->startPath();
+                    break;
                 }
             }
         }

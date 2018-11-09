@@ -4,10 +4,10 @@
 
 #include <sstream>
 #include "ItemManager.h"
-#include "Game.h"
-#include "TileManager.h"
-#include "../GameServer.h"
-#include "../PlayerData.h"
+#include "../Game.h"
+#include "../TileManager.h"
+#include "../../GameServer.h"
+#include "../../PlayerData.h"
 
 namespace DsprGameServer {
 
@@ -127,6 +127,26 @@ namespace DsprGameServer {
             {
                 this->makePlayerAwareOfItem(playerData, item);
             }
+        }
+    }
+
+    bool ItemManager::itemExists(int itemId) {
+        return this->itemMap.count(itemId) != 0;
+    }
+
+    Item *ItemManager::getItem(int id) {
+        if (this->itemMap.count(id) ==0) return nullptr;
+        return this->itemMap.at(id);
+    }
+
+    void ItemManager::removeItem(Item *item) {
+        this->itemMap.erase(item->id);
+        this->itemGrid->set(item->position->x, item->position->y, nullptr);
+
+        for( const auto& playerSetPair : this->playerToItemsAwareOfMap )
+        {
+            if (playerSetPair.second->count(item) > 0)
+                this->makePlayerUnawareOfItem(playerSetPair.first, item);
         }
     }
 }

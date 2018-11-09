@@ -13,6 +13,7 @@ namespace DsprGameServer {
         Stop,
         Hold,
         Train,
-        Gather
+        Gather,
+        Pickup
     };
 }

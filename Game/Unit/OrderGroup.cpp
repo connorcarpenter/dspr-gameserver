@@ -7,6 +7,8 @@
 #include "../../Pathfinding/Path.h"
 #include "../../Pathfinding/AStarPathfinder.h"
 #include "UnitManager.h"
+#include "../Item/Item.h"
+#include "../Item/ItemManager.h"
 
 namespace DsprGameServer {
 
@@ -104,6 +106,23 @@ namespace DsprGameServer {
         }
     }
 
+    void OrderGroup::setTargetItem(Item* targetItem) {
+        if (targetItem == nullptr){
+            this->targetItemId = -1;
+        }else {
+            this->targetItemId = targetItem->id;
+        }
+
+//        for (const auto &unitId : unitIds) {
+//            auto unit = this->game->unitManager->getUnitWithId(unitId);
+//            if (unit == nullptr) continue;
+//            if (unit->syncedTargetUnitId->obj()->Get() != this->targetUnitId)
+//            {
+//                unit->syncedTargetUnitId->dirtyObj()->Set(this->targetUnitId);
+//            }
+//        }
+    }
+
     void OrderGroup::setPath(std::shared_ptr<DsprGameServer::Path> path) {
         this->path = path;
     }
@@ -131,5 +150,9 @@ namespace DsprGameServer {
 
     Unit *OrderGroup::getTargetUnit() {
         return this->game->unitManager->getUnitWithId(this->targetUnitId);
+    }
+
+    Item *OrderGroup::getTargetItem() {
+        return this->game->itemManager->getItem(this->targetItemId);
     }
 }

@@ -47,6 +47,8 @@ namespace DsprGameServer {
         void addPlayer(PlayerData *playerData);
         void removePlayer(PlayerData *playerData);
 
+        void receivePickupOrder(std::list<int> unitIdList, int targetItemId);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;

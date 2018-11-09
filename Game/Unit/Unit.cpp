@@ -17,6 +17,8 @@
 #include "../Tribe.h"
 #include "../EconomyManager.h"
 #include "SpecificUnit/Manafount.h"
+#include "Inventory.h"
+#include "../Item/ItemManager.h"
 
 namespace DsprGameServer
 {
@@ -41,6 +43,11 @@ namespace DsprGameServer
         if (this->unitTemplate->hasConstructionQueue)
         {
             this->constructionQueue = new ConstructionQueue(this);
+        }
+
+        if (this->unitTemplate->hasInventory)
+        {
+            this->inventory = new Inventory(this);
         }
 
         if (this->unitTemplate->createSpecificUnitFunction != nullptr)
@@ -106,6 +113,9 @@ namespace DsprGameServer
                         break;
                     case Gather:
                         this->updateGather();
+                        break;
+                    case Pickup:
+                        this->updatePickup();
                         break;
                 }
             } else {
@@ -352,6 +362,40 @@ namespace DsprGameServer
             this->gatherYield->dirtyObj()->Set(gatherRate, curMana);
             this->gatherFrameIndex = MathUtils::getRandom(-10,10);
         }
+    }
+
+    void Unit::updatePickup()
+    {
+        auto targetItem = this->orderGroup->getTargetItem();
+
+        if (targetItem == nullptr){
+            this->orderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
+            this->followingPath = false;
+            this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+            }
+            return;
+        }
+
+        if (this->withinRangeOfPoint(this->position->x, this->position->y, 2, targetItem->position->x, targetItem->position->y)){
+            this->pickupItem(targetItem);
+        }
+        else {
+            //try to get in range of target unit
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+                this->orderGroup->unitUnarrived();
+            }
+
+            if(!this->followingPath) setPathUnarrived();
+            this->updateWalking();
+        }
+    }
+
+    void Unit::pickupItem(DsprGameServer::Item *item) {
+        this->game->itemManager->removeItem(item);
+        this->inventory->addItem(item);
     }
 
     void Unit::updateHolding()
@@ -709,6 +753,12 @@ namespace DsprGameServer
 
             return false;
         }
+    }
+
+    bool Unit::withinRangeOfPoint(int x, int y, int range, int tx, int ty) {
+
+            int distanceToTarget = MathUtils::Ceiling(MathUtils::Distance(x, y, tx, ty));
+            return (distanceToTarget <= range);
     }
 
     void Unit::lookForEnemyUnitsAndEngage() {
