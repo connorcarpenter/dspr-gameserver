@@ -13,30 +13,26 @@ namespace DsprGameServer {
     class Game;
 
     class TileManager {
-    public:
-        TileManager(Game* game, int width, int height);
 
+    public:
+
+        TileManager(Game* game, int width, int height);
         ~TileManager();
 
-        void sendGrid(PlayerData *playerData);
-
         Tile* getTileAt(int x, int y);
+        void sendGrid(PlayerData *playerData);
+        void sendTileToPlayer(int x, int y, PlayerData *playerData);
 
         int width;
         int height;
 
-        void sendTileToPlayer(int x, int y, PlayerData *playerData);
-
     private:
 
         void makeRandomWall();
+        void initializeTiles();
+        void sendAllDiscoveredTilesToPlayer(PlayerData *playerData);
 
         Game *game = nullptr;
-
         PtrIsoGrid<Tile*>* tileGrid = nullptr;
-
-        void initializeTiles();
-
-        void sendAllDiscoveredTilesToPlayer(PlayerData *playerData);
     };
 }

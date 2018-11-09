@@ -14,6 +14,7 @@
 #include "../GameServer.h"
 #include "Unit/UnitTemplateCatalog.h"
 #include "EconomyManager.h"
+#include "ItemManager.h"
 
 namespace DsprGameServer
 {
@@ -29,6 +30,8 @@ namespace DsprGameServer
         this->unitManager->initializeFirstUnits();
         this->pathfinder = new AStarPathfinder(this);
         this->simplePathfinder = new SimplePathfinder(this);
+        this->itemManager = new ItemManager(this);
+        this->itemManager->initializeFirstItems();
     }
 
     Game::~Game()
@@ -87,12 +90,16 @@ namespace DsprGameServer
 
         this->unitManager->addPlayer(playerData);
         this->unitManager->initSendAllUnits(playerData);
+
+        this->itemManager->addPlayer(playerData);
+        this->itemManager->initSendAllItems(playerData);
     }
 
     void Game::removePlayer(PlayerData *playerData) {
         this->playerDataSet.erase(playerData);
         this->tribeManager->freeTribeFromPlayer(playerData->getTribe(), playerData);
         this->unitManager->removePlayer(playerData);
+        this->itemManager->removePlayer(playerData);
     }
 
     void Game::sendPlayerTribeIndex(PlayerData *playerData, Tribe *tribe) {

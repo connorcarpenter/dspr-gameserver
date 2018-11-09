@@ -638,7 +638,7 @@ namespace DsprGameServer
                 pushOtherUnit(unitOnTile);
             }
             else {
-                int i = 0;
+                int i = 0;///FIX THIS!
             }
 
         }

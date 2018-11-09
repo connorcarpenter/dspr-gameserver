@@ -21,6 +21,7 @@ namespace DsprGameServer {
     class FogManager;
     class Tribe;
     class UnitTemplateCatalog;
+    class ItemManager;
 
     class Game
     {
@@ -28,7 +29,6 @@ namespace DsprGameServer {
     public:
 
         Game();
-
         ~Game();
 
         void addPlayer(const std::string& token, PlayerData* playerData);
@@ -43,6 +43,7 @@ namespace DsprGameServer {
         SimplePathfinder* simplePathfinder = nullptr;
         FogManager* fogManager = nullptr;
         UnitTemplateCatalog* unitTemplateCatalog = nullptr;
+        ItemManager* itemManager = nullptr;
 
     private:
 
