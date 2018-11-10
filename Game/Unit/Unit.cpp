@@ -912,6 +912,16 @@ namespace DsprGameServer
             }
         }
 
+        if (this->inventory != nullptr)
+        {
+            if (playerData == this->tribe->playerData) {
+                if (overrideDirty || this->inventory->isDirty()) {
+                    if (firstVar) { firstVar = false; } else { msg << "&"; }
+                    msg << this->inventory->getUpdate(overrideDirty);
+                }
+            }
+        }
+
         //next synced variable should follow this format
 //        if (this->nextPosition->isDirty())
 //        {
@@ -933,6 +943,7 @@ namespace DsprGameServer
         if (this->syncedTargetUnitId->isDirty()) return true;
         if (this->gatherYield->isDirty()) return true;
         if (sendingToControllerPlayer && this->constructionQueue!=nullptr && this->constructionQueue->isDirty()) return true;
+        if (sendingToControllerPlayer && this->inventory!=nullptr && this->inventory->isDirty()) return true;
         //more synced vars here
         return false;
     }
@@ -945,6 +956,7 @@ namespace DsprGameServer
         this->syncedTargetUnitId->clean();
         this->gatherYield->clean();
         if (this->constructionQueue!=nullptr) this->constructionQueue->clean();
+        if (this->inventory!=nullptr) this->inventory->clean();
         //more synced vars here
     }
 

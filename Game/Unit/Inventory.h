@@ -20,7 +20,12 @@ namespace DsprGameServer {
         void addItem(Item *item);
         Item* getItem(ItemSlot slot);
 
-        Unit *masterUnit;
+        bool isDirty();
+        std::string getUpdate(bool overrideDirty);
+        void clean();
+
+        Unit *masterUnit = nullptr;
         Item** items = nullptr;
+        bool dirty = false;
     };
 }

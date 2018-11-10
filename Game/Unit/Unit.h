@@ -98,7 +98,7 @@ namespace DsprGameServer
         int pushCount = 0;
         std::set<Unit*>* blockedEnemyList = nullptr;
         ConstructionQueue* constructionQueue = nullptr;
-        Inventory *inventory = nullptr;
+        Inventory* inventory = nullptr;
 
         void pushOtherUnit(Unit *otherUnit);
         void getNextTile();
