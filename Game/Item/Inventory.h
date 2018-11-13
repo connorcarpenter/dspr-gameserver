@@ -4,11 +4,10 @@
 // Created by connor on 11/9/18.
 //
 
-#include "Unit.h"
+#include "../Unit/Unit.h"
+#include "BodyPart.h"
 
 namespace DsprGameServer {
-
-    enum ItemSlot { Head, Body, LeftHand, RightHand, Belt1, Belt2};
 
     class Item;
 
@@ -18,8 +17,10 @@ namespace DsprGameServer {
         Inventory(DsprGameServer::Unit *masterUnit);
         ~Inventory();
         void addItem(Item *item);
-        Item* getItem(ItemSlot slot);
+        Item* getItem(int slot);
         void swapSlots(int beforeIndex, int afterIndex);
+        void removeItem(Item *item);
+        bool canPlaceInSlot(int slotIndex, Item *item);
 
         bool isDirty();
         std::string getUpdate(bool overrideDirty);
@@ -31,10 +32,12 @@ namespace DsprGameServer {
 
         Item* itemToDrop = nullptr;
 
-        Item *getItem(int slotIndex);
+    private:
+        static const BodyPart slotAllowsPart(int index){
+            static const BodyPart slotAllowsArr[] = { Head, Hand, Hand, Body, Any, Any };
+            return slotAllowsArr[index];
+        }
 
-        void removeItemAtSlot(int slotIndex);
-
-        void removeItem(Item *item);
+        void setItemInSlot(int slotIndex, Item *item);
     };
 }

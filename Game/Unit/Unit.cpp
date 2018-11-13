@@ -17,7 +17,7 @@
 #include "../Tribe.h"
 #include "../EconomyManager.h"
 #include "SpecificUnit/Manafount.h"
-#include "Inventory.h"
+#include "../Item/Inventory.h"
 #include "../Item/ItemManager.h"
 
 namespace DsprGameServer

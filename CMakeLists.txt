@@ -38,6 +38,9 @@ add_executable(dspr-gameserver
         Game/Item/ItemManager.h Game/Item/ItemManager.cpp
         Game/Item/ItemTemplate.h Game/Item/ItemTemplate.cpp
         Game/Item/ItemTemplateCatalog.h Game/Item/ItemTemplateCatalog.cpp
+        Game/Item/Inventory.h Game/Item/Inventory.cpp
+        Game/Item/BodyPart.h
+        Game/Item/ItemSlot.h
 
         Game/Unit/UnitManager.h Game/Unit/UnitManager.cpp
         Game/Unit/Unit.h Game/Unit/Unit.cpp
@@ -48,7 +51,7 @@ add_executable(dspr-gameserver
         Game/Unit/UnitTemplateCatalog.h Game/Unit/UnitTemplateCatalog.cpp
         Game/Unit/UnitTemplate.h Game/Unit/UnitTemplate.cpp
         Game/Unit/ConstructionQueue.h Game/Unit/ConstructionQueue.cpp
-        Game/Unit/Inventory.h Game/Unit/Inventory.cpp
+
 
         Game/Unit/SpecificUnit/SpecificUnit.h Game/Unit/SpecificUnit/SpecificUnit.cpp
         Game/Unit/SpecificUnit/Manafount.h Game/Unit/SpecificUnit/Manafount.cpp

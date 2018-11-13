@@ -13,7 +13,7 @@
 #include "../../Math/Int.h"
 #include "UnitTemplate.h"
 #include "ConstructionQueue.h"
-#include "Inventory.h"
+#include "../Item/Inventory.h"
 #include "SpecificUnit/SpecificUnit.h"
 #include "../Item/Item.h"
 

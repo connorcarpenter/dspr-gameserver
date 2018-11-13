@@ -3,7 +3,7 @@
 //
 
 #include "Inventory.h"
-#include "../Item/Item.h"
+#include "Item.h"
 
 namespace DsprGameServer
 {
@@ -22,10 +22,9 @@ namespace DsprGameServer
     void Inventory::addItem(Item *item) {
         for(int i=0;i<6;i++)
         {
-            if(this->items[i] == nullptr)
+            if(this->items[i] == nullptr && this->canPlaceInSlot(i, item))
             {
-                this->items[i] = item;
-                this->dirty = true;
+                setItemInSlot(i, item);
                 return;
             }
         }
@@ -43,12 +42,8 @@ namespace DsprGameServer
         }
     }
 
-    Item* Inventory::getItem(ItemSlot slot){
+    Item* Inventory::getItem(int slot){
         return this->items[slot];
-    }
-
-    Item* Inventory::getItem(int slotIndex){
-        return this->items[slotIndex];
     }
 
     bool Inventory::isDirty() {
@@ -81,17 +76,32 @@ namespace DsprGameServer
         return newStr;
     }
 
+    void Inventory::setItemInSlot(int slotIndex, Item* item){
+        if (!canPlaceInSlot(slotIndex, item)) {
+            int i = 1/0; //how did we get here?
+        }
+        this->items[slotIndex] = item;
+        this->dirty = true;
+    }
+
     void Inventory::swapSlots(int beforeIndex, int afterIndex) {
         auto itemA = this->items[beforeIndex];
         auto itemB = this->items[afterIndex];
 
-        this->items[beforeIndex] = itemB;
-        this->items[afterIndex] = itemA;
+        if (canPlaceInSlot(beforeIndex, itemB) && canPlaceInSlot(afterIndex, itemA)) {
+            setItemInSlot(beforeIndex, itemB);
+            setItemInSlot(afterIndex, itemA);
+        }
 
         this->dirty = true;
     }
 
-    void Inventory::removeItemAtSlot(int slotIndex) {
-        this->items[slotIndex] = nullptr;
+    bool Inventory::canPlaceInSlot(int slotIndex, Item *item) {
+        auto partAllowed = this->slotAllowsPart(slotIndex);
+        if (partAllowed == Any)return true;
+        if (partAllowed == None)return false;
+        if (item == nullptr) return true;
+        if (partAllowed == item->itemTemplate->wornOn)return true;
+        return false;
     }
 }
