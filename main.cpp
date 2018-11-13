@@ -2,11 +2,10 @@
 #include <iostream>
 #include "Game/Game.h"
 #include "StringUtils.h"
-#include "MapUtils.h"
 #include "GameServer.h"
 #include "Game/Unit/UnitManager.h"
 #include "PlayerData.h"
-#include "Game/Unit/UnitOrder.h"
+#include "MessageReceiver.h"
 
 using namespace DsprGameServer;
 
@@ -15,6 +14,7 @@ int main()
     std::string bffToken = "nwlrbbmqbhcdacon";
 
     uWS::Hub h;
+    MessageReceiver mr;
 
     h.onConnection([&h](uWS::WebSocket<uWS::SERVER> *ws, uWS::HttpRequest req)
     {
@@ -37,7 +37,7 @@ int main()
         std::cout << "dspr-gameserver: error" << std::endl;
     });
 
-    h.onMessage([&h, &bffToken](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
+    h.onMessage([&h, &bffToken, &mr](uWS::WebSocket<uWS::SERVER> *ws, char *data, size_t length, uWS::OpCode opCode)
     {
         PlayerData* playerData = (PlayerData*) ws->getUserData();
 
@@ -48,100 +48,7 @@ int main()
         if (StringUtils::endsWith(msgString,"\n"))
             msgString = msgString.substr(0, msgString.length()-1);
 
-        std::vector <std::string> parts = StringUtils::split(msgString, '|');
-
-        // Add new player
-        if (parts.at(0).compare("player/1.0/add") == 0)
-        {
-            if (parts.at(1).compare(bffToken) == 0)
-            {
-                GameServer::get().addPlayerToken(parts.at(2));
-                std::cout << "dspr-gameserver: Received new player" << std::endl;
-            }
-            return;
-        }
-
-        std::string playerToken = parts.at(1);
-
-        // Validate the playertoken
-        if (!MapUtils::mapContains(GameServer::get().playerCodeToGameMap, playerToken))
-        {
-            std::cout << "dspr-gameserver: Received invalid playertoken: " << playerToken << std::endl;
-            return;
-        }
-
-        // Get the game associated with the token
-        Game* game = GameServer::get().playerCodeToGameMap.at(playerToken);
-
-        // Process message
-        if (parts.at(0).compare("auth/1.0/gametoken") == 0)
-        {
-            std::cout << "dspr-gameserver: Received 'auth/1.0/gametoken', added player to game" << std::endl;
-            game->addPlayer(playerToken, playerData);
-        }
-        else if (parts.at(0).compare("unit/1.0/order") == 0)
-        {
-            auto unitIdListStrings = StringUtils::split(parts[2], ',');
-            auto orderStrings = StringUtils::split(parts[3], ',');
-
-            std::list<int> unitIdList;
-            for (const auto &str : unitIdListStrings){
-                unitIdList.push_front(stoi(str));
-            }
-
-            UnitOrder orderIndex = static_cast<UnitOrder>(stoi(orderStrings[0]));
-
-            switch (orderIndex)
-            {
-                case Move: {
-                    int x = stoi(orderStrings[1]);
-                    int y = stoi(orderStrings[2]);
-                    game->unitManager->receiveMoveOrder(unitIdList, x, y);
-                }
-                    break;
-                case Follow: {
-                    int targetUnitId = stoi(orderStrings[1]);
-                    game->unitManager->receiveFollowOrder(unitIdList, targetUnitId);
-                }
-                    break;
-                case AttackTarget: {
-                    int targetUnitId = stoi(orderStrings[1]);
-                    game->unitManager->receiveAttackTargetOrder(unitIdList, targetUnitId);
-                }
-                    break;
-                case AttackMove: {
-                    int x = stoi(orderStrings[1]);
-                    int y = stoi(orderStrings[2]);
-                    game->unitManager->receiveAttackMoveOrder(unitIdList, x, y);
-                }
-                    break;
-                case Stop: {
-                    game->unitManager->receiveStopOrder(unitIdList);
-                }
-                    break;
-                case Hold: {
-                    game->unitManager->receiveHoldOrder(unitIdList);
-                }
-                    break;
-                case Train: {
-                    int unitTemplateIndex = stoi(orderStrings[1]);
-                    game->unitManager->receiveTrainOrder(unitIdList, unitTemplateIndex);
-                }
-                    break;
-                case Gather: {
-                    int targetUnitId = stoi(orderStrings[1]);
-                    game->unitManager->receiveGatherOrder(unitIdList, targetUnitId);
-                }
-                    break;
-                case Pickup: {
-                    int targetItemId = stoi(orderStrings[1]);
-                    game->unitManager->receivePickupOrder(unitIdList, targetItemId);
-                }
-                    break;
-            }
-
-            std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;
-        }
+        mr.receive(playerData, bffToken, msgString);
     });
 
     auto timer = new Timer(h.getLoop());

@@ -27,5 +27,7 @@ namespace DsprGameServer {
         Unit *masterUnit = nullptr;
         Item** items = nullptr;
         bool dirty = false;
+
+        void swapSlots(int beforeIndex, int afterIndex);
     };
 }

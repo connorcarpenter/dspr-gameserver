@@ -340,6 +340,15 @@ namespace DsprGameServer
         }
     }
 
+    void UnitManager::receiveItemOrder(int unitId, int beforeSlotIndex, int afterSlotIndex)
+    {
+        if (unitMap.count(unitId) == 0) return;
+
+        Unit *unit = unitMap.at(unitId);
+        if (!unit->unitTemplate->hasInventory) return;
+        unit->inventory->swapSlots(beforeSlotIndex, afterSlotIndex);
+    }
+
     void UnitManager::updateUnits()
     {
         for(const auto& unitPair : unitMap)

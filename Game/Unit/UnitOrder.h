@@ -14,6 +14,7 @@ namespace DsprGameServer {
         Hold,
         Train,
         Gather,
-        Pickup
+        Pickup,
+        ItemSwap
     };
 }

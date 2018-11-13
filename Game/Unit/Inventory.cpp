@@ -16,7 +16,7 @@ namespace DsprGameServer
     }
 
     Inventory::~Inventory() {
-        delete this->items;
+        delete [] this->items;
     }
 
     void Inventory::addItem(Item *item) {
@@ -63,5 +63,15 @@ namespace DsprGameServer
             first = false;
         }
         return newStr;
+    }
+
+    void Inventory::swapSlots(int beforeIndex, int afterIndex) {
+        auto itemA = this->items[beforeIndex];
+        auto itemB = this->items[afterIndex];
+
+        this->items[beforeIndex] = itemB;
+        this->items[afterIndex] = itemA;
+
+        this->dirty = true;
     }
 }

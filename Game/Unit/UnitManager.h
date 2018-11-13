@@ -49,6 +49,8 @@ namespace DsprGameServer {
 
         void receivePickupOrder(std::list<int> unitIdList, int targetItemId);
 
+        void receiveItemOrder(int unitId, int beforeSlotIndex, int afterSlotIndex);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;
@@ -68,5 +70,6 @@ namespace DsprGameServer {
         bool playerIsAwareOfUnit(PlayerData *playerData, Unit *unit);
 
         void makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit);
+
     };
 }

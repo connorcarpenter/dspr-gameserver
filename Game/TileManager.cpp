@@ -47,12 +47,12 @@ namespace DsprGameServer
             int frameIndex = 5;
             if (randomNumber < 99) frameIndex = 4;
             if (randomNumber < 98) frameIndex = 3;
-            if (randomNumber < 97) frameIndex = 8;
-            if (randomNumber < 95) frameIndex = 7;
-            if (randomNumber < 93) frameIndex = 6;
-            if (randomNumber < 91) frameIndex = 2;
-            if (randomNumber < 70) frameIndex = 1;
-            if (randomNumber < 50) frameIndex = 0;
+            if (randomNumber < 97) frameIndex = 2;
+            if (randomNumber < 95) frameIndex = 1;
+            if (randomNumber < 93) frameIndex = 0;
+            if (randomNumber < 91) frameIndex = 8;
+            if (randomNumber < 70) frameIndex = 7;
+            if (randomNumber < 50) frameIndex = 6;
 
             this->tileGrid->set(x, y, new Tile(frameIndex));
         });

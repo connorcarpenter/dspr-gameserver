@@ -91,6 +91,7 @@ namespace DsprGameServer
         Synced<Point>* gatherYield = nullptr;
         SpecificUnit* specificUnit = nullptr;
 
+        Inventory* inventory = nullptr;
     private:
 
         Game* game = nullptr;
@@ -98,7 +99,6 @@ namespace DsprGameServer
         int pushCount = 0;
         std::set<Unit*>* blockedEnemyList = nullptr;
         ConstructionQueue* constructionQueue = nullptr;
-        Inventory* inventory = nullptr;
 
         void pushOtherUnit(Unit *otherUnit);
         void getNextTile();

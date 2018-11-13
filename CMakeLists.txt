@@ -24,6 +24,7 @@ add_executable(dspr-gameserver
         StringUtils.h
         MapUtils.h
         PtrIsoGrid.h PrimIsoGrid.h
+        MessageReceiver.h
 
         Game/Game.h Game/Game.cpp
         Game/TileManager.h Game/TileManager.cpp
