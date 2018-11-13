@@ -120,6 +120,9 @@ namespace DsprGameServer
                     case ItemDrop:
                         this->updateItemDrop();
                         break;
+                    case ItemGive:
+                        this->updateItemGive();
+                        break;
                 }
             } else {
                 this->updateWalking();
@@ -245,12 +248,7 @@ namespace DsprGameServer
         auto targetUnit = this->orderGroup->getTargetUnit();
 
         if (targetUnit == nullptr){
-            this->orderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
-            this->followingPath = false;
-            this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
-            if (this->animationState->obj()->GetState() != Walking) {
-                this->animationState->dirtyObj()->SetState(Walking);
-            }
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
             return;
         }
 
@@ -311,12 +309,7 @@ namespace DsprGameServer
         auto targetUnit = this->orderGroup->getTargetUnit();
 
         if (targetUnit == nullptr){
-            this->orderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
-            this->followingPath = false;
-            this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
-            if (this->animationState->obj()->GetState() != Walking) {
-                this->animationState->dirtyObj()->SetState(Walking);
-            }
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
             return;
         }
 
@@ -372,12 +365,7 @@ namespace DsprGameServer
         auto targetItem = this->orderGroup->getTargetItem();
 
         if (targetItem == nullptr){
-            this->orderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
-            this->followingPath = false;
-            this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
-            if (this->animationState->obj()->GetState() != Walking) {
-                this->animationState->dirtyObj()->SetState(Walking);
-            }
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
             return;
         }
 
@@ -429,6 +417,33 @@ namespace DsprGameServer
         this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
     }
 
+    void Unit::updateItemGive()
+    {
+        auto targetUnit = this->orderGroup->getTargetUnit();
+
+        if (targetUnit == nullptr){
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
+            return;
+        }
+
+        if (this->withinRangeOfUnit(this->position->x, this->position->y, 2, targetUnit)){
+            targetUnit->inventory->addItem(this->inventory->itemToDrop);
+            this->inventory->removeItem(this->inventory->itemToDrop);
+            this->inventory->itemToDrop = nullptr;
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
+        }
+        else {
+            //try to get in range of target unit
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+                this->orderGroup->unitUnarrived();
+            }
+
+            if(!this->followingPath) setPathUnarrived();
+            this->updateFollowing();
+        }
+    }
+
     void Unit::updateHolding()
     {
         if (this->orderGroup->getTargetUnit() == nullptr)
@@ -468,6 +483,9 @@ namespace DsprGameServer
         this->followingPath = false;
         if (!this->moveTarget->obj()->Equals(this->nextPosition->obj()))
             this->moveTarget->dirtyObj()->Set(this->nextPosition->obj()->x, this->nextPosition->obj()->y);
+        if (this->animationState->obj()->GetState() != Walking) {
+            this->animationState->dirtyObj()->SetState(Walking);
+        }
     }
 
     void Unit::hold()

@@ -53,6 +53,8 @@ namespace DsprGameServer {
 
         void receiveItemDropOrder(int unitId, int slotIndex, int x, int y);
 
+        void receiveItemGiveOrder(int unitId, int slotIndex, int targetUnitId);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;

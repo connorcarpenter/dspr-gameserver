@@ -16,6 +16,7 @@ namespace DsprGameServer {
         Gather,
         Pickup,
         ItemSwap,
-        ItemDrop
+        ItemDrop,
+        ItemGive
     };
 }

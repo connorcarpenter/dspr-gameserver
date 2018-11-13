@@ -125,6 +125,12 @@ namespace DsprGameServer
                         game->unitManager->receiveItemDropOrder(unitIdList.front(), slotIndex, x, y);
                     }
                         break;
+                    case ItemGive: {
+                        int slotIndex = stoi(orderStrings[1]);
+                        int targetUnitId = stoi(orderStrings[2]);
+                        game->unitManager->receiveItemGiveOrder(unitIdList.front(), slotIndex, targetUnitId);
+                    }
+                        break;
                 }
 
                 std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;

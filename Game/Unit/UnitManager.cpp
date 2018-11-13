@@ -372,6 +372,35 @@ namespace DsprGameServer
         ///
     }
 
+    void UnitManager::receiveItemGiveOrder(int unitId, int slotIndex, int targetUnitId)
+    {
+        if (unitMap.count(unitId) == 0) return;
+
+        Unit *unit = unitMap.at(unitId);
+        if (!unit->unitTemplate->hasInventory) return;
+        if (!unit->canMove())return;
+
+        Unit *targetUnit = unitMap.at(targetUnitId);
+        if (!targetUnit->unitTemplate->hasInventory) return;
+        if (unit->tribe != targetUnit->tribe) return;
+
+        ///
+        std::list<std::pair<int, int>> unitPositionsList;
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::ItemGive);
+        newOrderGroup->setTargetUnit(targetUnit);
+        unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
+        unit->setOrderGroup(newOrderGroup);
+
+        auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
+                                                     targetUnit->position->y, false);
+        if (path!= nullptr) {
+            newOrderGroup->setPath(path);
+            unit->startPath();
+            unit->inventory->itemToDrop = unit->inventory->getItem(slotIndex);
+        }
+        ///
+    }
+
     void UnitManager::updateUnits()
     {
         for(const auto& unitPair : unitMap)

@@ -139,5 +139,7 @@ namespace DsprGameServer
         void updateItemDrop();
 
         void dropItem();
+
+        void updateItemGive();
     };
 }
