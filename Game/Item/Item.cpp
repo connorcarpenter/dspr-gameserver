@@ -5,13 +5,14 @@
 #include "Item.h"
 #include "ItemManager.h"
 #include "../FogManager.h"
+#include "ItemTemplate.h"
 
 namespace DsprGameServer {
 
-    Item::Item(DsprGameServer::Game *game, int id, int x, int y, int index) {
+    Item::Item(DsprGameServer::Game *game, int id, int x, int y, ItemTemplate *itemTemplate) {
         this->game = game;
         this->position = new Point(x,y);
-        this->index = index;
+        this->itemTemplate = itemTemplate;
         this->id = id;
 
         this->game->itemManager->addItemToGrid(this);

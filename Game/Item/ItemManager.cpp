@@ -8,6 +8,7 @@
 #include "../TileManager.h"
 #include "../../GameServer.h"
 #include "../../PlayerData.h"
+#include "ItemTemplateCatalog.h"
 
 namespace DsprGameServer {
 
@@ -35,15 +36,15 @@ namespace DsprGameServer {
     }
 
     void ItemManager::initializeFirstItems() {
-        this->createItem((3) * 2, (10) * 2, 0);
-        this->createItem((4) * 2, (10) * 2, 2);
-        this->createItem((5) * 2, (10) * 2, 3);
-        this->createItem((6) * 2, (10) * 2, 4);
-        this->createItem((4) * 2, (11) * 2, 5);
+        this->createItem((3) * 2, (10) * 2, this->game->itemTemplateCatalog->sling);
+        this->createItem((4) * 2, (10) * 2, this->game->itemTemplateCatalog->club);
+        this->createItem((5) * 2, (10) * 2, this->game->itemTemplateCatalog->helmet);
+        this->createItem((6) * 2, (10) * 2, this->game->itemTemplateCatalog->armor);
+        this->createItem((4) * 2, (11) * 2, this->game->itemTemplateCatalog->shield);
     }
     
-    void ItemManager::createItem(int x, int y, int templateIndex) {
-        Item* newItem = new Item(this->game, (int) itemMap.size(), x, y, templateIndex);
+    void ItemManager::createItem(int x, int y, ItemTemplate *itemTemplate) {
+        Item* newItem = new Item(this->game, (int) itemMap.size(), x, y, itemTemplate);
         this->itemMap.insert(std::pair<int, Item*>(newItem->id, newItem));
     }
 
@@ -97,7 +98,7 @@ namespace DsprGameServer {
 
         std::stringstream msg;
         msg << "item/1.0/create|" << item->id << "," << item->position->x << "," << item->position->y << ","
-            << item->index << "\r\n";
+            << item->itemTemplate->index << "\r\n";
 
         GameServer::get().queueMessage(playerData, msg.str());
 

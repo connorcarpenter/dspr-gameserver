@@ -31,7 +31,7 @@ namespace DsprGameServer {
 
         void removeItem(Item *item);
 
-        void createItem(int x, int y, int templateIndex);
+        void createItem(int x, int y, ItemTemplate *itemTemplate);
 
         bool canPlaceItemAtPos(int x, int y);
 

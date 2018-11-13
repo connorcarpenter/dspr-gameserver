@@ -22,6 +22,7 @@ namespace DsprGameServer {
     class Tribe;
     class UnitTemplateCatalog;
     class ItemManager;
+    class ItemTemplateCatalog;
 
     class Game
     {
@@ -44,6 +45,7 @@ namespace DsprGameServer {
         FogManager* fogManager = nullptr;
         UnitTemplateCatalog* unitTemplateCatalog = nullptr;
         ItemManager* itemManager = nullptr;
+        ItemTemplateCatalog* itemTemplateCatalog = nullptr;
 
     private:
 

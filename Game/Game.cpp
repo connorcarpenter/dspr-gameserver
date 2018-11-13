@@ -15,6 +15,7 @@
 #include "Unit/UnitTemplateCatalog.h"
 #include "EconomyManager.h"
 #include "Item/ItemManager.h"
+#include "Item/ItemTemplateCatalog.h"
 
 namespace DsprGameServer
 {
@@ -30,6 +31,7 @@ namespace DsprGameServer
         this->unitManager->initializeFirstUnits();
         this->pathfinder = new AStarPathfinder(this);
         this->simplePathfinder = new SimplePathfinder(this);
+        this->itemTemplateCatalog = new ItemTemplateCatalog(this);
         this->itemManager = new ItemManager(this);
         this->itemManager->initializeFirstItems();
     }

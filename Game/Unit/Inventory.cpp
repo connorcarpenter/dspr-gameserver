@@ -73,7 +73,7 @@ namespace DsprGameServer
             }
             else
             {
-                newStr.append(std::to_string(this->items[i]->index));
+                newStr.append(std::to_string(this->items[i]->itemTemplate->index));
             }
 
             first = false;

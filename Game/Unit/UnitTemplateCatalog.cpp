@@ -16,8 +16,11 @@ namespace DsprGameServer
 
     UnitTemplateCatalog::~UnitTemplateCatalog()
     {
-        delete this->worker;
-        delete this->temple;
+        for(const auto& unitTemplatePair : this->templateMap)
+        {
+            UnitTemplate* unitTemplate = unitTemplatePair.second;
+            delete unitTemplate;
+        }
     }
 
     UnitTemplate* UnitTemplateCatalog::getTemplateFromIndex(int index) {
