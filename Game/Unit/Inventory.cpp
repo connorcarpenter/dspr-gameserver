@@ -31,8 +31,24 @@ namespace DsprGameServer
         }
     }
 
+    void Inventory::removeItem(Item *item) {
+        for(int i=0;i<6;i++)
+        {
+            if(this->items[i] == item)
+            {
+                this->items[i] = nullptr;
+                this->dirty = true;
+                return;
+            }
+        }
+    }
+
     Item* Inventory::getItem(ItemSlot slot){
         return this->items[slot];
+    }
+
+    Item* Inventory::getItem(int slotIndex){
+        return this->items[slotIndex];
     }
 
     bool Inventory::isDirty() {
@@ -73,5 +89,9 @@ namespace DsprGameServer
         this->items[afterIndex] = itemA;
 
         this->dirty = true;
+    }
+
+    void Inventory::removeItemAtSlot(int slotIndex) {
+        this->items[slotIndex] = nullptr;
     }
 }

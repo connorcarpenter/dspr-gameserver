@@ -115,7 +115,14 @@ namespace DsprGameServer
                     case ItemSwap: {
                         int beforeSlotIndex = stoi(orderStrings[1]);
                         int afterSlotIndex = stoi(orderStrings[2]);
-                        game->unitManager->receiveItemOrder(unitIdList.front(), beforeSlotIndex, afterSlotIndex);
+                        game->unitManager->receiveItemSwapOrder(unitIdList.front(), beforeSlotIndex, afterSlotIndex);
+                    }
+                        break;
+                    case ItemDrop: {
+                        int slotIndex = stoi(orderStrings[1]);
+                        int x = stoi(orderStrings[2]);
+                        int y = stoi(orderStrings[3]);
+                        game->unitManager->receiveItemDropOrder(unitIdList.front(), slotIndex, x, y);
                     }
                         break;
                 }

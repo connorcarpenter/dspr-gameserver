@@ -49,7 +49,9 @@ namespace DsprGameServer {
 
         void receivePickupOrder(std::list<int> unitIdList, int targetItemId);
 
-        void receiveItemOrder(int unitId, int beforeSlotIndex, int afterSlotIndex);
+        void receiveItemSwapOrder(int unitId, int beforeSlotIndex, int afterSlotIndex);
+
+        void receiveItemDropOrder(int unitId, int slotIndex, int x, int y);
 
     private:
         std::map<int, Unit*> unitMap;

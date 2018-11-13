@@ -35,15 +35,15 @@ namespace DsprGameServer {
     }
 
     void ItemManager::initializeFirstItems() {
-        this->createItem((3) * 2, (10) * 2, 0, 0);
-        this->createItem((4) * 2, (10) * 2, 2, 1);
-        this->createItem((5) * 2, (10) * 2, 3, 2);
-        this->createItem((6) * 2, (10) * 2, 4, 3);
-        this->createItem((4) * 2, (11) * 2, 5, 4);
+        this->createItem((3) * 2, (10) * 2, 0);
+        this->createItem((4) * 2, (10) * 2, 2);
+        this->createItem((5) * 2, (10) * 2, 3);
+        this->createItem((6) * 2, (10) * 2, 4);
+        this->createItem((4) * 2, (11) * 2, 5);
     }
     
-    void ItemManager::createItem(int x, int y, int templateIndex, int id) {
-        Item* newItem = new Item(this->game, id, x, y, templateIndex);
+    void ItemManager::createItem(int x, int y, int templateIndex) {
+        Item* newItem = new Item(this->game, (int) itemMap.size(), x, y, templateIndex);
         this->itemMap.insert(std::pair<int, Item*>(newItem->id, newItem));
     }
 
@@ -53,6 +53,20 @@ namespace DsprGameServer {
 
     void ItemManager::setItemInGrid(int x, int y, Item *item) {
         this->itemGrid->set(x,y, item);
+    }
+
+    void ItemManager::dropItemFromInventory(int x, int y, Item* item)
+    {
+        item->position->x = x;
+        item->position->y = y;
+        this->addItemToGrid(item);
+        this->itemMap.insert(std::pair<int, Item*>(item->id, item));
+
+        for( const auto& playerSetPair : this->playerToItemsAwareOfMap ) {
+            if (item->isVisibleToTribe(playerSetPair.first->getTribe())) {
+                this->makePlayerAwareOfItem(playerSetPair.first, item);
+            }
+        }
     }
 
     void ItemManager::sendItemUpdates(PlayerData *playerData)
@@ -148,5 +162,12 @@ namespace DsprGameServer {
             if (playerSetPair.second->count(item) > 0)
                 this->makePlayerUnawareOfItem(playerSetPair.first, item);
         }
+    }
+
+    bool ItemManager::canPlaceItemAtPos(int x, int y) {
+        if (this->itemGrid->get(x,y) != nullptr) return false;
+        auto tileThere = this->game->tileManager->getTileAt(x,y);
+        if (tileThere == nullptr || !tileThere->walkable) return false;
+        return true;
     }
 }

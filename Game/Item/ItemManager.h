@@ -31,6 +31,12 @@ namespace DsprGameServer {
 
         void removeItem(Item *item);
 
+        void createItem(int x, int y, int templateIndex);
+
+        bool canPlaceItemAtPos(int x, int y);
+
+        void dropItemFromInventory(int x, int y, Item *item);
+
     private:
         Game *game = nullptr;
 
@@ -40,8 +46,6 @@ namespace DsprGameServer {
 
         std::map<int, Item*> itemMap;
 
-        void createItem(int x, int y, int templateIndex, int id);
-
         void setItemInGrid(int x, int y, Item *item);
 
         void makePlayerAwareOfItem(PlayerData *playerData, Item *item);
@@ -49,5 +53,6 @@ namespace DsprGameServer {
         void makePlayerUnawareOfItem(PlayerData *playerData, Item *item);
 
         bool playerIsAwareOfItem(PlayerData *playerData, Item *item);
+
     };
 }

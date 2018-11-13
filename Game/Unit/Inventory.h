@@ -19,6 +19,7 @@ namespace DsprGameServer {
         ~Inventory();
         void addItem(Item *item);
         Item* getItem(ItemSlot slot);
+        void swapSlots(int beforeIndex, int afterIndex);
 
         bool isDirty();
         std::string getUpdate(bool overrideDirty);
@@ -28,6 +29,12 @@ namespace DsprGameServer {
         Item** items = nullptr;
         bool dirty = false;
 
-        void swapSlots(int beforeIndex, int afterIndex);
+        Item* itemToDrop = nullptr;
+
+        Item *getItem(int slotIndex);
+
+        void removeItemAtSlot(int slotIndex);
+
+        void removeItem(Item *item);
     };
 }

@@ -136,5 +136,8 @@ namespace DsprGameServer
         void pickupItem(DsprGameServer::Item *item);
 
 
+        void updateItemDrop();
+
+        void dropItem();
     };
 }

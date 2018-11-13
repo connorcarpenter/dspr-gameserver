@@ -117,6 +117,9 @@ namespace DsprGameServer
                     case Pickup:
                         this->updatePickup();
                         break;
+                    case ItemDrop:
+                        this->updateItemDrop();
+                        break;
                 }
             } else {
                 this->updateWalking();
@@ -396,6 +399,34 @@ namespace DsprGameServer
     void Unit::pickupItem(DsprGameServer::Item *item) {
         this->game->itemManager->removeItem(item);
         this->inventory->addItem(item);
+    }
+
+    void Unit::updateItemDrop()
+    {
+        if (this->withinRangeOfPoint(this->position->x, this->position->y, 2, this->moveTarget->obj()->x, this->moveTarget->obj()->y)){
+            this->dropItem();
+        }
+        else {
+            //try to get in range of target unit
+            if (this->animationState->obj()->GetState() != Walking) {
+                this->animationState->dirtyObj()->SetState(Walking);
+                this->orderGroup->unitUnarrived();
+            }
+
+            if(!this->followingPath) setPathUnarrived();
+            this->updateWalking();
+        }
+    }
+
+    void Unit::dropItem() {
+        if (this->game->itemManager->canPlaceItemAtPos(this->moveTarget->obj()->x, this->moveTarget->obj()->y))
+        {
+            this->game->itemManager->dropItemFromInventory(this->moveTarget->obj()->x, this->moveTarget->obj()->y, this->inventory->itemToDrop);
+            this->inventory->removeItem(this->inventory->itemToDrop);
+        }
+
+        this->inventory->itemToDrop = nullptr;
+        this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
     }
 
     void Unit::updateHolding()
