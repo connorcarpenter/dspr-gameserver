@@ -15,14 +15,24 @@ namespace DsprGameServer
         this->neutral = new Tribe(game, -1);
         this->tribeA = new Tribe(game, 0);
         this->tribeB = new Tribe(game, 1);
+        this->tribeCreep = new Tribe(game, 2);
 
         tribeSet.insert(this->tribeA);
         this->tribeA->setEnemy(this->tribeB);
+        this->tribeA->setEnemy(this->tribeCreep);
+        this->tribeA->playable = true;
         this->game->fogManager->addTribe(this->tribeA);
 
         tribeSet.insert(this->tribeB);
         this->tribeB->setEnemy(this->tribeA);
+        this->tribeB->setEnemy(this->tribeCreep);
+        this->tribeB->playable = true;
         this->game->fogManager->addTribe(this->tribeB);
+
+        tribeSet.insert(this->tribeCreep);
+        this->tribeCreep->setEnemy(this->tribeA);
+        this->tribeCreep->setEnemy(this->tribeB);
+        this->game->fogManager->addTribe(this->tribeCreep);
     }
 
     TribeManager::~TribeManager()
@@ -37,7 +47,7 @@ namespace DsprGameServer
 
     Tribe *TribeManager::getFreeTribe() {
         for (auto tribe: tribeSet){
-            if (tribe->playerData == nullptr){
+            if (tribe->playerData == nullptr && tribe->playable){
                 return tribe;
             }
         }

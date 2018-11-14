@@ -12,6 +12,7 @@ namespace DsprGameServer
         initWorker();
         initTemple();
         initManafount();
+        initAshwalker();
     }
 
     UnitTemplateCatalog::~UnitTemplateCatalog()
@@ -69,5 +70,15 @@ namespace DsprGameServer
         };
 
         this->templateMap.emplace(this->manafount->index, this->manafount);
+    }
+
+    void UnitTemplateCatalog::initAshwalker() {
+        this->ashwalker = new UnitTemplate(3);
+        this->ashwalker->sight = 8;
+        this->ashwalker->acquisition = 8;
+        this->ashwalker->setWalkSpeed(4,6);
+        this->ashwalker->maxHealth = 340;
+
+        this->templateMap.emplace(this->ashwalker->index, this->ashwalker);
     }
 }

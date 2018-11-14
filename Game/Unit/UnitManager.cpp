@@ -33,6 +33,7 @@ namespace DsprGameServer
 
     void UnitManager::initializeFirstUnits()
     {
+        //red tribe
         int i = 0;
         //for (int i = 0; i<3; i++)
             for (int j = 0; j<3;j++)
@@ -41,6 +42,13 @@ namespace DsprGameServer
         createUnit((3) * 2, (3) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->temple);
         createUnit((7) * 2, (7) * 2, this->game->tribeManager->neutral, this->game->unitTemplateCatalog->manafount);
 
+        //ashwalkers
+        for (int i = 0; i<2; i++)
+        for (int j = 0; j<2;j++) {
+            createUnit((15+i) * 2, (15+j) * 2, this->game->tribeManager->tribeCreep, this->game->unitTemplateCatalog->ashwalker);
+        }
+
+        //blue tribe
         //for (int i = 0; i<3; i++)
             for (int j = 0; j<3;j++)
                 createUnit((40 + i) * 2, (40 + j) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->worker);

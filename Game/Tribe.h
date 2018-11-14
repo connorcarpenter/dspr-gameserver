@@ -20,6 +20,7 @@ namespace DsprGameServer
         int index = -1;
         PlayerData* playerData = nullptr;
         bool isNeutral();
+        bool playable = false;
     private:
         std::set<Tribe*> enemies;
         Game *game = nullptr;
