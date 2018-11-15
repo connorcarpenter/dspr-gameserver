@@ -11,6 +11,7 @@
 #include "MapUtils.h"
 #include "Game/Unit/UnitOrder.h"
 #include "Game/Unit/UnitManager.h"
+#include "Game/ChatManager.h"
 
 namespace DsprGameServer
 {
@@ -133,6 +134,11 @@ namespace DsprGameServer
                         break;
                 }
 
+                std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;
+            }
+            else if (parts.at(0).compare("chat/1.0/send") == 0)
+            {
+                game->chatManager->receiveMessage(parts[2], playerData);
                 std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;
             }
         }

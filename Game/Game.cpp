@@ -16,6 +16,7 @@
 #include "EconomyManager.h"
 #include "Item/ItemManager.h"
 #include "Item/ItemTemplateCatalog.h"
+#include "ChatManager.h"
 
 namespace DsprGameServer
 {
@@ -34,6 +35,7 @@ namespace DsprGameServer
         this->itemTemplateCatalog = new ItemTemplateCatalog(this);
         this->itemManager = new ItemManager(this);
         this->itemManager->initializeFirstItems();
+        this->chatManager = new ChatManager(this);
     }
 
     Game::~Game()
@@ -44,6 +46,7 @@ namespace DsprGameServer
         delete this->tribeManager;
         delete this->fogManager;
         delete this->unitTemplateCatalog;
+        delete this->chatManager;
     }
 
     void Game::update()

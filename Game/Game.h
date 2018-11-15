@@ -23,6 +23,7 @@ namespace DsprGameServer {
     class UnitTemplateCatalog;
     class ItemManager;
     class ItemTemplateCatalog;
+    class ChatManager;
 
     class Game
     {
@@ -46,10 +47,10 @@ namespace DsprGameServer {
         UnitTemplateCatalog* unitTemplateCatalog = nullptr;
         ItemManager* itemManager = nullptr;
         ItemTemplateCatalog* itemTemplateCatalog = nullptr;
+        ChatManager* chatManager = nullptr;
+        std::set<PlayerData *> playerDataSet;
 
     private:
-
-        std::set<PlayerData *> playerDataSet;
 
         void sendPlayerTribeIndex(PlayerData *playerData, DsprGameServer::Tribe *tribe);
     };

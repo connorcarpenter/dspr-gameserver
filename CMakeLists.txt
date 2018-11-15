@@ -33,6 +33,7 @@ add_executable(dspr-gameserver
         Game/TribeManager.h Game/TribeManager.cpp
         Game/FogManager.h Game/FogManager.cpp
         Game/EconomyManager.h Game/EconomyManager.cpp
+        Game/ChatManager.h Game/ChatManager.cpp
 
         Game/Item/Item.h Game/Item/Item.cpp
         Game/Item/ItemManager.h Game/Item/ItemManager.cpp
