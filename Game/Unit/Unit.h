@@ -16,6 +16,7 @@
 #include "../Item/Inventory.h"
 #include "SpecificUnit/SpecificUnit.h"
 #include "../Item/Item.h"
+#include "../../Math/Bool.h"
 
 namespace DsprGameServer
 {
@@ -73,6 +74,7 @@ namespace DsprGameServer
         //attacking vars
         Synced<Int>* health = nullptr;
         Synced<Int>* syncedTargetUnitId = nullptr;
+        Synced<Bool>* bleed = false;
         int stamina = 100;
 
         const int minDamage = 10;

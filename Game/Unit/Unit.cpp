@@ -31,6 +31,10 @@ namespace DsprGameServer
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
         this->gatherYield = new Synced<Point>("gatherYield", new Point(0,0));
+        this->bleed = new Synced<Bool>("bleed", new Bool(false));
+        this->bleed->setCleanFunc([&](){
+            this->bleed->obj()->Set(false);
+        });
         this->nextTilePosition = new Point(x,y);
         this->tribe = tribe;
 
@@ -67,6 +71,7 @@ namespace DsprGameServer
         delete this->animationState;
         delete this->gatherYield;
         delete this->health;
+        delete this->bleed;
         delete this->syncedTargetUnitId;
         if (this->blockedEnemyList != nullptr) delete this->blockedEnemyList;
 
@@ -844,6 +849,7 @@ namespace DsprGameServer
     void Unit::damageOtherUnit(Unit *otherUnit, int dmgAmount) {
         if (otherUnit->unitTemplate->isInvincible)return;
         otherUnit->health->dirtyObj()->Subtract(dmgAmount);
+        otherUnit->bleed->dirtyObj()->Set(true);
         if (otherUnit->health->obj()->value <= 0){
             this->game->unitManager->queueUnitForDeletion(otherUnit);
         }
@@ -934,6 +940,12 @@ namespace DsprGameServer
             msg << this->health->serialize();
         }
 
+        if (overrideDirty || this->bleed->isDirty())
+        {
+            if (firstVar) { firstVar = false; } else { msg << "&"; }
+            msg << this->bleed->serialize();
+        }
+
         if (overrideDirty || this->syncedTargetUnitId->isDirty())
         {
             if (firstVar) { firstVar = false; } else { msg << "&"; }
@@ -990,6 +1002,7 @@ namespace DsprGameServer
         if (this->animationState->isDirty()) return true;
         if (this->health->isDirty()) return true;
         if (this->syncedTargetUnitId->isDirty()) return true;
+        if (this->bleed->isDirty()) return true;
         if (this->gatherYield->isDirty()) return true;
         if (sendingToControllerPlayer && this->constructionQueue!=nullptr && this->constructionQueue->isDirty()) return true;
         if (sendingToControllerPlayer && this->inventory!=nullptr && this->inventory->isDirty()) return true;
@@ -998,15 +1011,18 @@ namespace DsprGameServer
     }
 
     void Unit::cleanAllVars() {
-        this->nextPosition->clean();
-        this->moveTarget->clean();
-        this->animationState->clean();
-        this->health->clean();
-        this->syncedTargetUnitId->clean();
-        this->gatherYield->clean();
-        if (this->constructionQueue!=nullptr) this->constructionQueue->clean();
-        if (this->inventory!=nullptr) this->inventory->clean();
-        //more synced vars here
+        if (anyVarIsDirty(this->tribe->playerData)) {
+            this->nextPosition->clean();
+            this->moveTarget->clean();
+            this->animationState->clean();
+            this->health->clean();
+            this->bleed->clean();
+            this->syncedTargetUnitId->clean();
+            this->gatherYield->clean();
+            if (this->constructionQueue != nullptr) this->constructionQueue->clean();
+            if (this->inventory != nullptr) this->inventory->clean();
+            //more synced vars here
+        }
     }
 
     bool Unit::canMove() {

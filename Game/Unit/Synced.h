@@ -5,6 +5,7 @@
 //
 
 #include <string>
+#include <functional>
 
 namespace DsprGameServer
 {
@@ -39,6 +40,7 @@ namespace DsprGameServer
 
         void clean() {
             this->dataIsDirty = false;
+            if (this->cleanFunc != nullptr) this->cleanFunc();
         }
 
         bool isDirty() {
@@ -53,9 +55,14 @@ namespace DsprGameServer
             return newStr;
         }
 
+        void setCleanFunc(std::function<void()> cleanFunc) {
+            this->cleanFunc = cleanFunc;
+        }
+
     private:
         T* internal;
         bool dataIsDirty = false;
         std::string varName;
+        std::function<void()> cleanFunc = nullptr;
     };
 }

@@ -40,7 +40,6 @@ add_executable(dspr-gameserver
         Game/Item/ItemTemplateCatalog.h Game/Item/ItemTemplateCatalog.cpp
         Game/Item/Inventory.h Game/Item/Inventory.cpp
         Game/Item/BodyPart.h
-        Game/Item/ItemSlot.h
 
         Game/Unit/UnitManager.h Game/Unit/UnitManager.cpp
         Game/Unit/Unit.h Game/Unit/Unit.cpp
@@ -51,7 +50,6 @@ add_executable(dspr-gameserver
         Game/Unit/UnitTemplateCatalog.h Game/Unit/UnitTemplateCatalog.cpp
         Game/Unit/UnitTemplate.h Game/Unit/UnitTemplate.cpp
         Game/Unit/ConstructionQueue.h Game/Unit/ConstructionQueue.cpp
-
 
         Game/Unit/SpecificUnit/SpecificUnit.h Game/Unit/SpecificUnit/SpecificUnit.cpp
         Game/Unit/SpecificUnit/Manafount.h Game/Unit/SpecificUnit/Manafount.cpp
@@ -67,6 +65,7 @@ add_executable(dspr-gameserver
         Math/FloatPoint.h Math/FloatPoint.cpp
         Math/MathUtils.h
         Math/Int.h Math/Int.cpp
+        Math/Bool.h Math/Bool.cpp
 
         Pathfinding/AStarPathfinder.h Pathfinding/AStarPathfinder.cpp
         Pathfinding/SimplePathfinder.h Pathfinding/SimplePathfinder.cpp
