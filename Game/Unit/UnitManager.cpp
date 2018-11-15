@@ -90,8 +90,19 @@ namespace DsprGameServer
 
     Unit * UnitManager::createUnit(int x, int y, Tribe *tribe, UnitTemplate* unitTemplate)
     {
-        Unit* newUnit = new Unit(this->game, (int) unitMap.size(), tribe, x, y, unitTemplate);
+        Unit* newUnit = new Unit(this->game, getFreeUnitId(), tribe, x, y, unitTemplate);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
+    }
+
+    int UnitManager::getFreeUnitId() {
+        if (!unusedIds.empty())
+        {
+            auto freeId = unusedIds.front();
+            unusedIds.pop();
+            return freeId;
+        }
+
+        return (int) unitMap.size();
     }
 
     void UnitManager::receiveMoveOrder(const std::list<int> &idList, int tileX, int tileY)
@@ -507,6 +518,7 @@ namespace DsprGameServer
             //clean up
             this->removeUnitFromGrid(unit);
             this->unitMap.erase(unit->id);
+            this->unusedIds.push(unit->id);
 
             //setup sending the deletions
             int showDeath = (unit->health->obj()->Get() <= 0) ? 1 : 0;

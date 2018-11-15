@@ -44,8 +44,19 @@ namespace DsprGameServer {
     }
     
     void ItemManager::createItem(int x, int y, ItemTemplate *itemTemplate) {
-        Item* newItem = new Item(this->game, (int) itemMap.size(), x, y, itemTemplate);
+        Item* newItem = new Item(this->game, getFreeItemId(), x, y, itemTemplate);
         this->itemMap.insert(std::pair<int, Item*>(newItem->id, newItem));
+    }
+
+    int ItemManager::getFreeItemId() {
+        if (!unusedIds.empty())
+        {
+            auto freeId = unusedIds.front();
+            unusedIds.pop();
+            return freeId;
+        }
+
+        return (int) itemMap.size();
     }
 
     void ItemManager::addItemToGrid(Item *item) {
@@ -61,6 +72,7 @@ namespace DsprGameServer {
         item->position->x = x;
         item->position->y = y;
         this->addItemToGrid(item);
+        item->id = getFreeItemId();
         this->itemMap.insert(std::pair<int, Item*>(item->id, item));
 
         for( const auto& playerSetPair : this->playerToItemsAwareOfMap ) {
@@ -163,6 +175,9 @@ namespace DsprGameServer {
             if (playerSetPair.second->count(item) > 0)
                 this->makePlayerUnawareOfItem(playerSetPair.first, item);
         }
+
+        unusedIds.push(item->id);
+        item->id = -1;
     }
 
     bool ItemManager::canPlaceItemAtPos(int x, int y) {

@@ -75,5 +75,6 @@ namespace DsprGameServer {
 
         void makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit);
 
+        int getFreeUnitId();
     };
 }

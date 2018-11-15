@@ -6,6 +6,7 @@
 #include "../../PtrIsoGrid.h"
 #include "Item.h"
 #include <map>
+#include <queue>
 
 namespace DsprGameServer {
     class Game;
@@ -45,6 +46,7 @@ namespace DsprGameServer {
         std::map<PlayerData*, std::set<Item*>*> playerToItemsAwareOfMap;
 
         std::map<int, Item*> itemMap;
+        std::queue<int> unusedIds;
 
         void setItemInGrid(int x, int y, Item *item);
 
@@ -54,5 +56,6 @@ namespace DsprGameServer {
 
         bool playerIsAwareOfItem(PlayerData *playerData, Item *item);
 
+        int getFreeItemId();
     };
 }
