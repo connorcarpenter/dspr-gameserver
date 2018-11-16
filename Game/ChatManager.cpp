@@ -20,7 +20,7 @@ namespace DsprGameServer {
             if (playerData == sendPlayerData) continue;
 
             std::stringstream msg;
-            msg << "chat/1.0/send|" << playerData->getTribe()->index << "|" << msgReceived << "\r\n";
+            msg << "chat/1.0/send|" << sendPlayerData->getTribe()->index << "|" << msgReceived << "\r\n";
 
             GameServer::get().queueMessage(playerData, msg.str());
         }
