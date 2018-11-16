@@ -37,6 +37,7 @@ namespace DsprGameServer
         bool canGather = false;
         bool isGatherable = false;
         bool hasInventory = false;
+        bool hasRallyPoint = false;
 
         std::function<SpecificUnit*(Unit* unit)> createSpecificUnitFunction = nullptr;
     };

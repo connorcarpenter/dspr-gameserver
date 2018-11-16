@@ -132,6 +132,17 @@ namespace DsprGameServer
                         game->unitManager->receiveItemGiveOrder(unitIdList.front(), slotIndex, targetUnitId);
                     }
                         break;
+                    case RallyPoint: {
+                        int x = stoi(orderStrings[1]);
+                        int y = stoi(orderStrings[2]);
+                        game->unitManager->receiveRallyPointOrder(unitIdList, x, y);
+                    }
+                        break;
+                    case RallyUnit: {
+                        int targetUnitId = stoi(orderStrings[1]);
+                        game->unitManager->receiveRallyUnitOrder(unitIdList, targetUnitId);
+                    }
+                        break;
                 }
 
                 std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;

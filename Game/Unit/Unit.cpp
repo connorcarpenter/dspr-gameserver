@@ -26,7 +26,10 @@ namespace DsprGameServer
     {
         this->game = game;
         this->id = id;
+        this->tribe = tribe;
         this->position = new Point(x, y);
+        this->unitTemplate = unitTemplate;
+
         this->nextPosition = new Synced<Point>("nextPosition", new Point(x, y));
         this->moveTarget = new Synced<Point>("moveTarget", new Point(x, y));
         this->animationState = new Synced<AnimationState>("animationState", new AnimationState());
@@ -35,18 +38,19 @@ namespace DsprGameServer
         this->bleed->setCleanFunc([&](){
             this->bleed->obj()->Set(false);
         });
-        this->nextTilePosition = new Point(x,y);
-        this->tribe = tribe;
-
-        this->unitTemplate = unitTemplate;
-        this->health = new Synced<Int>("health", new Int(unitTemplate->maxHealth));
         this->syncedTargetUnitId = new Synced<Int>("targetUnitId", new Int(-1));
-        this->game->unitManager->addUnitToGrid(this);
-        this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
+        this->health = new Synced<Int>("health", new Int(unitTemplate->maxHealth));
+        this->nextTilePosition = new Point(x,y);
 
         if (this->unitTemplate->hasConstructionQueue)
         {
             this->constructionQueue = new ConstructionQueue(this);
+        }
+
+        if (this->unitTemplate->hasRallyPoint)
+        {
+            this->rallyPoint = new Synced<Point>("rallyPoint", new Point(x, y));
+            this->rallyUnitId = new Synced<Int>("rallyUnitId", new Int(-1));
         }
 
         if (this->unitTemplate->hasInventory)
@@ -58,6 +62,9 @@ namespace DsprGameServer
         {
             this->specificUnit = this->unitTemplate->createSpecificUnitFunction(this);
         }
+
+        this->game->unitManager->addUnitToGrid(this);
+        this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
     }
 
     Unit::~Unit()
@@ -78,6 +85,11 @@ namespace DsprGameServer
         if (this->unitTemplate->hasConstructionQueue)
         {
             delete this->constructionQueue;
+        }
+        if (this->unitTemplate->hasRallyPoint)
+        {
+            delete this->rallyPoint;
+            delete this->rallyUnitId;
         }
 
         if (this->specificUnit != nullptr)
@@ -973,6 +985,21 @@ namespace DsprGameServer
             }
         }
 
+        if (this->rallyPoint != nullptr)
+        {
+            if (playerData == this->tribe->playerData) {
+                if (overrideDirty || this->rallyPoint->isDirty()) {
+                    if (firstVar) { firstVar = false; } else { msg << "&"; }
+                    msg << this->rallyPoint->serialize();
+                }
+
+                if (overrideDirty || this->rallyUnitId->isDirty()) {
+                    if (firstVar) { firstVar = false; } else { msg << "&"; }
+                    msg << this->rallyUnitId->serialize();
+                }
+            }
+        }
+
         if (this->inventory != nullptr)
         {
             if (playerData == this->tribe->playerData) {
@@ -1004,8 +1031,13 @@ namespace DsprGameServer
         if (this->syncedTargetUnitId->isDirty()) return true;
         if (this->bleed->isDirty()) return true;
         if (this->gatherYield->isDirty()) return true;
-        if (sendingToControllerPlayer && this->constructionQueue!=nullptr && this->constructionQueue->isDirty()) return true;
-        if (sendingToControllerPlayer && this->inventory!=nullptr && this->inventory->isDirty()) return true;
+        if (sendingToControllerPlayer)
+        {
+            if (this->constructionQueue != nullptr && this->constructionQueue->isDirty()) return true;
+            if (this->rallyPoint != nullptr && this->rallyPoint->isDirty()) return true;
+            if (this->rallyUnitId != nullptr && this->rallyUnitId->isDirty()) return true;
+            if (this->inventory != nullptr && this->inventory->isDirty()) return true;
+        }
         //more synced vars here
         return false;
     }
@@ -1021,6 +1053,8 @@ namespace DsprGameServer
             this->gatherYield->clean();
             if (this->constructionQueue != nullptr) this->constructionQueue->clean();
             if (this->inventory != nullptr) this->inventory->clean();
+            if (this->rallyPoint != nullptr) this->rallyPoint->clean();
+            if (this->rallyUnitId != nullptr) this->rallyPoint->clean();
             //more synced vars here
         }
     }

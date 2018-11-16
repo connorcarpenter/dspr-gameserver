@@ -17,6 +17,8 @@ namespace DsprGameServer {
         Pickup,
         ItemSwap,
         ItemDrop,
-        ItemGive
+        ItemGive,
+        RallyPoint,
+        RallyUnit
     };
 }

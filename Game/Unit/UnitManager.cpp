@@ -138,6 +138,28 @@ namespace DsprGameServer
         }
     }
 
+    void UnitManager::receiveRallyPointOrder(const std::list<int> &idList, int tileX, int tileY)
+    {
+        for (const auto &i : idList) {
+            if (unitMap.count(i) != 0) {
+                Unit *unit = unitMap.at(i);
+                if (!unit->unitTemplate->hasRallyPoint)continue;
+                unit->rallyPoint->dirtyObj()->Set(tileX, tileY);
+            }
+        }
+    }
+
+    void UnitManager::receiveRallyUnitOrder(const std::list<int> &idList, int targetId)
+    {
+        for (const auto &i : idList) {
+            if (unitMap.count(i) != 0) {
+                Unit *unit = unitMap.at(i);
+                if (!unit->unitTemplate->hasRallyPoint)continue;
+                unit->rallyUnitId->dirtyObj()->Set(targetId);
+            }
+        }
+    }
+
     void UnitManager::receiveAttackMoveOrder(const std::list<int> &idList, int tileX, int tileY)
     {
         std::list<std::pair<int, int>> unitPositionsList;

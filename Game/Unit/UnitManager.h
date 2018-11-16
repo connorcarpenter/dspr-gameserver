@@ -46,14 +46,12 @@ namespace DsprGameServer {
         void finishSendUnitDeletes();
         void addPlayer(PlayerData *playerData);
         void removePlayer(PlayerData *playerData);
-
         void receivePickupOrder(std::list<int> unitIdList, int targetItemId);
-
         void receiveItemSwapOrder(int unitId, int beforeSlotIndex, int afterSlotIndex);
-
         void receiveItemDropOrder(int unitId, int slotIndex, int x, int y);
-
         void receiveItemGiveOrder(int unitId, int slotIndex, int targetUnitId);
+        void receiveRallyPointOrder(const std::list<int> &idList, int tileX, int tileY);
+        void receiveRallyUnitOrder(const std::list<int> &idList, int targetId);
 
     private:
         std::map<int, Unit*> unitMap;
@@ -68,13 +66,9 @@ namespace DsprGameServer {
         std::map<PlayerData*, std::set<Unit*>*> playerToUnitsAwareOfMap;
 
         void setUnitInGrid(int x, int y, Unit *unit, UnitTemplate *unitTemplate);
-
         void makePlayerAwareOfUnit(PlayerData *playerData, Unit *unit);
-
         bool playerIsAwareOfUnit(PlayerData *playerData, Unit *unit);
-
         void makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit);
-
         int getFreeUnitId();
     };
 }

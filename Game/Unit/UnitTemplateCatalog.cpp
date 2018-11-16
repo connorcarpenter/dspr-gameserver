@@ -54,6 +54,7 @@ namespace DsprGameServer
         this->temple->buildableUnits = new std::set<int>();
         this->temple->buildableUnits->insert(0);
         this->temple->buildTime = 1000;
+        this->temple->hasRallyPoint = true;
 
         this->templateMap.emplace(this->temple->index, this->temple);
     }

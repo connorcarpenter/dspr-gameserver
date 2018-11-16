@@ -70,6 +70,8 @@ namespace DsprGameServer
         Point* position = nullptr;
         Synced<Point>* nextPosition = nullptr;
         Synced<Point>* moveTarget = nullptr;
+        Synced<Point>* rallyPoint = nullptr;
+        Synced<Int>* rallyUnitId = nullptr;
 
         //attacking vars
         Synced<Int>* health = nullptr;
