@@ -25,9 +25,7 @@ namespace DsprGameServer
             {
                 if (hollow)
                 {
-                    //if (row != startRow && row != endRow-1 && column != startColumn && column != endColumn-1)
-                    //    continue;
-                    if (row != endRow-1 && column != startColumn)
+                    if (row != startRow && row != endRow-1 && column != startColumn && column != endColumn-1)
                         continue;
                 }
 

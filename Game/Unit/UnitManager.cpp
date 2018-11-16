@@ -92,6 +92,7 @@ namespace DsprGameServer
     {
         Unit* newUnit = new Unit(this->game, getFreeUnitId(), tribe, x, y, unitTemplate);
         unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
+        return newUnit;
     }
 
     int UnitManager::getFreeUnitId() {

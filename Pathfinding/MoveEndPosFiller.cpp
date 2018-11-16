@@ -34,8 +34,16 @@ namespace DsprGameServer {
             PathNode* currentNode = openHeap->top(); /*and then delete it*/ openHeap->pop();
             openMap->erase(currentNode->getId());
 
-            if (closedMap->size() + 1 < endTileNumber)
+            auto willAddNodeThisLoop = true;
+            if (this->game->unitManager->getEndPosAtCoord(currentNode->x, currentNode->y))
+                willAddNodeThisLoop = false;
+
+            auto expectedClosedMapSizeNextLoop = closedMap->size();
+            if (willAddNodeThisLoop)expectedClosedMapSizeNextLoop++;
+
+            if (expectedClosedMapSizeNextLoop < endTileNumber)
             {
+                //still don't have enough tiles, so flood outwards
                 std::list<PathNode*>* neighbors = getNeighbors(currentNode, path->targetX, path->targetY);
                 for(auto newNode : *neighbors)
                 {
@@ -61,13 +69,11 @@ namespace DsprGameServer {
                 //clean up neighbor list
                 delete neighbors;
             }
-            else
-            {
-                closedMap->emplace(currentNode->getId(), currentNode);
-                break;
-            }
 
-            closedMap->emplace(currentNode->getId(), currentNode);
+            if (willAddNodeThisLoop)
+                closedMap->emplace(currentNode->getId(), currentNode);
+
+            if (closedMap->size() >= endTileNumber)break;
         }
 
         //all our end tiles are in the closedMap, so iterate through that
@@ -106,7 +112,7 @@ namespace DsprGameServer {
         auto tile = this->game->tileManager->getTileAt(x, y);
         if (tile == nullptr) return;
         if (!tile->walkable) return;
-        if (this->game->unitManager->getEndPosAtCoord(x, y)) return;
+        //if (this->game->unitManager->getEndPosAtCoord(x, y)) return;
 
         auto newPathNode = new PathNode(x, y, parent, cost, targetX, targetY);
         neighborList->push_front(newPathNode);

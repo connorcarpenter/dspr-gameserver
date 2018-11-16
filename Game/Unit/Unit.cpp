@@ -1146,7 +1146,13 @@ namespace DsprGameServer
 
         if (foundSpawn)
         {
-            this->game->unitManager->createUnit(spawnX, spawnY, this->tribe, unitTemplate);
+            auto newUnit = this->game->unitManager->createUnit(spawnX, spawnY, this->tribe, unitTemplate);
+            if (this->unitTemplate->hasRallyPoint)
+            {
+                std::list<int> idList;
+                idList.push_back(newUnit->id);
+                this->game->unitManager->receiveMoveOrder(idList, this->rallyPoint->obj()->x, this->rallyPoint->obj()->y);
+            }
         }
     }
 }
