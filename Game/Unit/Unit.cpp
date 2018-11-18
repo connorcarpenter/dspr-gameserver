@@ -539,7 +539,8 @@ namespace DsprGameServer
     void Unit::setPathArrived()
     {
         this->followingPath = false;
-        this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
+        if (this->position->x != this->moveTarget->obj()->x || this->position->y != this->moveTarget->obj()->y)
+            this->moveTarget->dirtyObj()->Set(this->position->x, this->position->y);
         this->orderGroup->unitArrived();
     }
 
@@ -684,17 +685,41 @@ namespace DsprGameServer
 
     void Unit::pushOtherUnit(Unit *otherUnit)
     {
-        this->timesHaventPushed = 0;
+        if (this->timesHaventPushed > 2) {
+            if (this->orderGroup != nullptr && this->orderGroup->path != nullptr) {
 
-        if (otherUnit->pushCount == 0) {
-            otherUnit->pushDirection = getDir(otherUnit->position->x - this->position->x,
-                                              otherUnit->position->y - this->position->y);
-            otherUnit->pushDirection += MathUtils::getRandom(3) - 1;
-            if (otherUnit->pushDirection > 7) otherUnit->pushDirection -= 8;
-            if (otherUnit->pushDirection < 0) otherUnit->pushDirection += 8;
+                if (MathUtils::Distance(this->position->x, this->position->y, this->orderGroup->path->targetX,
+                                        this->orderGroup->path->targetY) < 2 + timesHaventPushed + pushCount) {
+                    setPathArrived();//this is the give up point
+                    this->pushCount = 0;
+                    this->timesHaventPushed = 0;
+                    return;
+                }
+            }
         }
 
-        otherUnit->pushCount += 1;
+        this->timesHaventPushed = 0;
+
+        auto shouldSwap = false;
+        if (!shouldSwap) {
+            if (otherUnit->pushCount == 0) {
+                otherUnit->pushDirection = getDir(otherUnit->position->x - this->position->x,
+                                                  otherUnit->position->y - this->position->y);
+                otherUnit->pushDirection += MathUtils::getRandom(3) - 1;
+                if (otherUnit->pushDirection > 7) otherUnit->pushDirection -= 8;
+                if (otherUnit->pushDirection < 0) otherUnit->pushDirection += 8;
+            }
+
+            otherUnit->pushCount += 1;
+        } else {
+            if (otherUnit->followingPath)otherUnit->setPathUnarrived();
+            otherUnit->nextTilePosition->x = this->position->x;
+            otherUnit->nextTilePosition->y = this->position->y;
+            this->nextTilePosition->x = otherUnit->position->x;
+            this->nextTilePosition->y = otherUnit->position->y;
+            this->game->unitManager->removeUnitFromGrid(this);
+            this->game->unitManager->removeUnitFromGrid(otherUnit);
+        }
     }
 
     Unit *Unit::getUnitAtPosition(int x, int y) {
@@ -725,6 +750,8 @@ namespace DsprGameServer
                 else
                 {
                     this->disToEnd += 10;
+                    this->timesHaventPushed += 2;
+                    //this doesn't make sense... but makes it easier to give up
                 }
             }
 
