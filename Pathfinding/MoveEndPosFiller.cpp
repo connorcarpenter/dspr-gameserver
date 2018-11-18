@@ -17,7 +17,7 @@ namespace DsprGameServer {
 
     void MoveEndPosFiller::fillEndTiles(std::shared_ptr<Path> path, int unitNumber)
     {
-        int endTileNumber = (unitNumber == 1) ? 1 : unitNumber+2;
+        int endTileNumber = unitNumber;//(unitNumber == 1 && !this->game->unitManager->getEndPosAtCoord(path->targetX, path->targetY)) ? 1 : unitNumber+2;
         auto closedMap = new std::unordered_map<int, PathNode*>();
         auto openHeap = new std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>();
         auto openMap = new std::unordered_map<int, PathNode*>();

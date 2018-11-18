@@ -48,7 +48,7 @@ namespace DsprGameServer {
         {
             if (obj != nullptr && get(x,y)!=nullptr)
             {
-                int i = 0;
+                int i = 1/0; //how did we get here?!
             }
 
             int gridIndex = getGridIndex(x, y);
