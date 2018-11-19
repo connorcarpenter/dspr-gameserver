@@ -35,15 +35,15 @@ namespace DsprGameServer
 
     void EconomyManager::addTribe(Tribe *tribe) {
         auto syncedVar = new Synced<Int>("pop", new Int(3));
-        syncedVar->dirty();
+        //syncedVar->dirty();
         this->playerToPopMap.emplace(tribe, syncedVar);
 
         syncedVar = new Synced<Int>("popMax", new Int(25));
-        syncedVar->dirty();
+        //syncedVar->dirty();
         this->playerToPopMaxMap.emplace(tribe, syncedVar);
 
         syncedVar = new Synced<Int>("mana", new Int(0));
-        syncedVar->dirty();
+        //syncedVar->dirty();
         this->playerToManaMap.emplace(tribe, syncedVar);
     }
 
@@ -106,11 +106,11 @@ namespace DsprGameServer
 
     void EconomyManager::clean() {
 
-        //for(const auto& mapPair : this->playerToPopMap) mapPair.second->clean();
+        for(const auto& mapPair : this->playerToPopMap) mapPair.second->clean();
 
-        //for(const auto& mapPair : this->playerToPopMaxMap) mapPair.second->clean();
+        for(const auto& mapPair : this->playerToPopMaxMap) mapPair.second->clean();
 
-        //for(const auto& mapPair : this->playerToManaMap) mapPair.second->clean();
+        for(const auto& mapPair : this->playerToManaMap) mapPair.second->clean();
         //more synced vars here
     }
 
