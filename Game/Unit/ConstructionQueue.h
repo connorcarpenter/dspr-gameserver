@@ -28,7 +28,7 @@ namespace DsprGameServer {
 
         void clean();
 
-        DsprMessage::ConstructionQueueMsgV1 serialize();
+        DsprMessage::ConstructionQueueMsgV1 * serialize();
 
     private:
         std::queue<UnitTemplate*> unitQueue;

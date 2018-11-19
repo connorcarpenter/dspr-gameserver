@@ -21,7 +21,8 @@ int main()
         PlayerData* playerData = new PlayerData(ws);
         ws->setUserData(playerData);
 
-        ws->send("auth/1.0/gametoken|\r\n", uWS::BINARY);//the \r\n makes it happen on EMSC! Don't remove!
+        std::string str = std::basic_string<char>("auth/1.0/gametoken|\r\n");
+        GameServer::get().queueMessage(playerData, str);
         std::cout << "dspr-gameserver: Received 'onConnection', Sent 'auth/1.0/gametoken|'" << std::endl;
     });
 

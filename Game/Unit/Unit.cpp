@@ -1004,9 +1004,10 @@ namespace DsprGameServer
         {
             if (playerData == this->tribe->playerData) {
                 if (overrideDirty || this->constructionQueue->isDirty()) {
-                    DsprMessage::ConstructionQueueMsgV1 cqMsgV1 = this->constructionQueue->serialize();
-                    DsprMessage::_cstr serializedCQ = cqMsgV1.Serialize();
+                    DsprMessage::ConstructionQueueMsgV1* cqMsgV1 = this->constructionQueue->serialize();
+                    DsprMessage::_cstr serializedCQ = cqMsgV1->Serialize();
                     unitUpdateMsgV1.constructionQueue.set(serializedCQ);
+                    delete cqMsgV1;
                 }
             }
         }
@@ -1049,14 +1050,19 @@ namespace DsprGameServer
 
         auto serializedUnitUpdateMsg = unitUpdateMsgV1.Serialize();
 
-        DsprMessage::ToClientMsg clientMsg;
-        clientMsg.msgType.set(DsprMessage::ToClientMsg::MessageType::UnitUpdate);
-        clientMsg.msgBytes.set(serializedUnitUpdateMsg);
-        auto serializedClientMsg = clientMsg.Serialize();
+        DsprMessage::ToClientMsg* clientMsg = new DsprMessage::ToClientMsg();
+        clientMsg->msgType.set(DsprMessage::ToClientMsg::MessageType::UnitUpdate);
+        clientMsg->msgBytes.set(serializedUnitUpdateMsg);
+        auto serializedClientMsg = clientMsg->Serialize();
         std::string msgStr = std::basic_string<char>(serializedClientMsg.innerCstr, serializedClientMsg.number);
 
         //and, quickly test it comin back out again
-        DsprMessage::ToClientMsg testMsg(serializedClientMsg);
+        DsprMessage::ToClientMsg* testMsg = new DsprMessage::ToClientMsg(serializedClientMsg);
+
+        if (!DsprMessage::ToClientMsg::Equals(clientMsg, testMsg))
+        {
+            int i = 12; //:(
+        }
 
         GameServer::get().queueMessageTrue(playerData, msgStr);
     }

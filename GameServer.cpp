@@ -35,10 +35,12 @@ namespace DsprGameServer
 
     void GameServer::queueMessage(PlayerData *playerData, std::string str)
     {
+        char* newCstr = new char[str.length()];
+        for(int i=0;i<str.length();i++)
+            newCstr[i] = str[i];
         auto clientMessage = DsprMessage::ToClientMsg();
         clientMessage.msgType.set(DsprMessage::ToClientMsg::StandardMessage);
-        char* cStrNormal = (char*) str.c_str();
-        DsprMessage::_cstr standardCstr(cStrNormal, str.length());
+        DsprMessage::_cstr standardCstr(newCstr, str.length(), false);
         clientMessage.msgBytes.set(standardCstr);
 
         auto serializedClientMsg = clientMessage.Serialize();
