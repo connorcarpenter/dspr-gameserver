@@ -12,11 +12,11 @@
 #include "Game/Unit/UnitOrder.h"
 #include "Game/Unit/UnitManager.h"
 #include "Game/ChatManager.h"
+#include "DsprMessage/ToServerMsg.h"
 
 namespace DsprGameServer
 {
     class MessageReceiver{
-
 
     public:
         MessageReceiver() = default;

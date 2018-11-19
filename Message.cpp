@@ -14,6 +14,6 @@ namespace DsprGameServer {
 
     void Message::send() {
         this->playerData->getWs()->send(str.c_str(), uWS::BINARY);
-        std::cout << "gameserver: sent: " << str << std::endl;
+        //std::cout << "gameserver: sent: " << str << std::endl;
     }
 }

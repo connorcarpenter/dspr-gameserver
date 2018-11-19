@@ -23,6 +23,7 @@ namespace DsprGameServer
 
         void step();
         void queueMessage(PlayerData *playerData, std::string str);
+        void queueMessageTrue(PlayerData *playerData, std::string str);
         void addPlayerToken(std::string playerToken);
         void removePlayerToken(std::string playerToken);
 

@@ -3,6 +3,7 @@
 //
 
 #include "GameServer.h"
+#include "DsprMessage/ToClientMsg.h"
 
 namespace DsprGameServer
 {
@@ -34,6 +35,20 @@ namespace DsprGameServer
 
     void GameServer::queueMessage(PlayerData *playerData, std::string str)
     {
+        auto clientMessage = DsprMessage::ToClientMsg();
+        clientMessage.msgType.set(DsprMessage::ToClientMsg::StandardMessage);
+        char* cStrNormal = (char*) str.c_str();
+        DsprMessage::_cstr standardCstr(cStrNormal, str.length());
+        clientMessage.msgBytes.set(standardCstr);
+
+        auto serializedClientMsg = clientMessage.Serialize();
+        std::string msgStr = std::basic_string<char>(serializedClientMsg.innerCstr, serializedClientMsg.number);
+
+        auto newMsg = new Message(playerData, std::move(msgStr));
+        messageQueue.push(newMsg);
+    }
+
+    void GameServer::queueMessageTrue(PlayerData *playerData, std::string str) {
         auto newMsg = new Message(playerData, std::move(str));
         messageQueue.push(newMsg);
     }
@@ -45,4 +60,6 @@ namespace DsprGameServer
     void GameServer::removePlayerToken(std::string playerToken) {
         playerCodeToGameMap.erase(playerToken);
     }
+
+
 }

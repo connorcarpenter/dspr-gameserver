@@ -88,4 +88,21 @@ namespace DsprGameServer
         this->dirtyTime = false;
         this->dirtyQueue = false;
     }
+
+    DsprMessage::ConstructionQueueMsgV1 ConstructionQueue::serialize() {
+        DsprMessage::ConstructionQueueMsgV1 msg;
+        msg.buildTime.set(this->currentBuildTime);
+        msg.queue.initBytes(this->unitQueue.size());
+
+        int i = 0;
+        auto copiedQueue = std::queue<UnitTemplate *>(this->unitQueue);
+        while (copiedQueue.size() > 0) {
+            auto front = copiedQueue.front();
+            if (front!=nullptr) {
+                msg.queue.setArray(i, front->index);
+            }
+            copiedQueue.pop();
+            i++;
+        }
+    }
 }

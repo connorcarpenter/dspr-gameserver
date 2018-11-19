@@ -7,6 +7,7 @@
 #include <uWS/WebSocket.h>
 #include <list>
 #include <set>
+#include "../MessageSender.h"
 
 
 namespace DsprGameServer {
@@ -49,6 +50,7 @@ namespace DsprGameServer {
         ItemTemplateCatalog* itemTemplateCatalog = nullptr;
         ChatManager* chatManager = nullptr;
         std::set<PlayerData *> playerDataSet;
+        MessageSender* messageSender = nullptr;
 
     private:
 

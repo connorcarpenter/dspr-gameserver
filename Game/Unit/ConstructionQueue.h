@@ -6,6 +6,7 @@
 
 #include <queue>
 #include "UnitTemplate.h"
+#include "../../DsprMessage/ToClientMsg.h"
 
 namespace DsprGameServer {
 
@@ -26,6 +27,8 @@ namespace DsprGameServer {
         std::string getUpdate(bool overrideDirty);
 
         void clean();
+
+        DsprMessage::ConstructionQueueMsgV1 serialize();
 
     private:
         std::queue<UnitTemplate*> unitQueue;

@@ -55,9 +55,11 @@ namespace DsprGameServer
         this->unitManager->updateUnits();
 
         // send updates to each player
-        for (const auto &playerData : this->playerDataSet) {
-            this->economyManager->sendUpdates(playerData, false);
-        }
+        //for (auto i = 0;i<1000;i++) {
+            for (const auto &playerData : this->playerDataSet) {
+                this->economyManager->sendUpdates(playerData, false);
+            }
+        //}
 
         for (const auto &playerData : this->playerDataSet) {
             this->unitManager->sendUnitUpdates(playerData);

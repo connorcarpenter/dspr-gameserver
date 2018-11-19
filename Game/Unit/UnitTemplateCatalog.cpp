@@ -35,7 +35,7 @@ namespace DsprGameServer
         this->worker->acquisition = 6;
         this->worker->setWalkSpeed(2,3);
         this->worker->maxHealth = 420;
-        this->worker->buildTime = 100;
+        this->worker->buildTime = 2;
         this->worker->canGather = true;
         this->worker->hasInventory = true;
 

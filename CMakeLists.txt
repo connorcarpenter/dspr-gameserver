@@ -24,7 +24,7 @@ add_executable(dspr-gameserver
         StringUtils.h
         MapUtils.h
         PtrIsoGrid.h PrimIsoGrid.h
-        MessageReceiver.h
+        MessageReceiver.h MessageSender.h
 
         Game/Game.h Game/Game.cpp
         Game/TileManager.h Game/TileManager.cpp
@@ -62,6 +62,10 @@ add_executable(dspr-gameserver
         Game/IsoBox/IsoBoxCache.h Game/IsoBox/IsoBoxCache.cpp
         Game/IsoBox/IsoBox.h Game/IsoBox/IsoBox.cpp
 
+        DsprMessage/ToServerMsg.h DsprMessage/ToServerMsg.cpp
+        DsprMessage/ToClientMsg.h DsprMessage/ToClientMsg.cpp
+        DsprMessage/DataTypes.h
+
         Math/Point.h Math/Point.cpp
         Math/FloatPoint.h Math/FloatPoint.cpp
         Math/MathUtils.h
@@ -73,7 +77,6 @@ add_executable(dspr-gameserver
         Pathfinding/Path.h Pathfinding/Path.cpp
         Pathfinding/PathNode.h Pathfinding/PathNode.cpp
         Pathfinding/PathTile.h Pathfinding/PathTile.cpp
-        Pathfinding/MoveEndPosFiller.h Pathfinding/MoveEndPosFiller.cpp
-        )
+        Pathfinding/MoveEndPosFiller.h Pathfinding/MoveEndPosFiller.cpp)
 
 target_link_libraries (dspr-gameserver LINK_PUBLIC libuWS libssl libz)

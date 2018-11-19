@@ -19,6 +19,7 @@
 #include "SpecificUnit/Manafount.h"
 #include "../Item/Inventory.h"
 #include "../Item/ItemManager.h"
+#include "../../DsprMessage/ToClientMsg.h"
 
 namespace DsprGameServer
 {
@@ -951,54 +952,51 @@ namespace DsprGameServer
     void Unit::sendUpdate(PlayerData *playerData, bool overrideDirty)
     {
         if (!overrideDirty && !this->anyVarIsDirty(playerData)) return;
-        std::stringstream msg;
-        msg << "unit/1.0/update|" << id << "|";
-        bool firstVar = true;
+
+        DsprMessage::UnitUpdateMsgV1 unitUpdateMsgV1;
+        unitUpdateMsgV1.id.set(id);
 
         if (overrideDirty || this->nextPosition->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->nextPosition->serialize();
+            unitUpdateMsgV1.nextPosition.setA(this->nextPosition->obj()->x);
+            unitUpdateMsgV1.nextPosition.setB(this->nextPosition->obj()->y);
         }
 
         if (overrideDirty || this->moveTarget->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->moveTarget->serialize();
+            unitUpdateMsgV1.moveTarget.setA(this->moveTarget->obj()->x);
+            unitUpdateMsgV1.moveTarget.setB(this->moveTarget->obj()->y);
         }
 
         if (overrideDirty || this->animationState->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->animationState->serialize();
+            unitUpdateMsgV1.animationState.setA(this->animationState->obj()->GetState());
+            unitUpdateMsgV1.animationState.setB(this->animationState->obj()->GetHeading());
         }
 
         if (overrideDirty || this->health->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->health->serialize();
+            unitUpdateMsgV1.health.set(this->health->obj()->Get());
         }
 
         if (overrideDirty || this->bleed->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->bleed->serialize();
+            unitUpdateMsgV1.bleed.set(this->bleed->obj()->Get());
         }
 
         if (overrideDirty || this->syncedTargetUnitId->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << this->syncedTargetUnitId->serialize();
+            unitUpdateMsgV1.targetUnitId.set(this->syncedTargetUnitId->obj()->Get());
         }
 
         if (overrideDirty || this->gatherYield->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
+            unitUpdateMsgV1.gatherYield.setA(this->gatherYield->obj()->x);
+
             if (playerData == this->tribe->playerData) {
-                msg << this->gatherYield->serialize();
+                unitUpdateMsgV1.gatherYield.setB(this->gatherYield->obj()->y);
             } else {
-                msg << "gatherYield:";
-                msg << std::to_string(this->gatherYield->obj()->x);
+                unitUpdateMsgV1.gatherYield.setB(0);
             }
         }
 
@@ -1006,8 +1004,9 @@ namespace DsprGameServer
         {
             if (playerData == this->tribe->playerData) {
                 if (overrideDirty || this->constructionQueue->isDirty()) {
-                    if (firstVar) { firstVar = false; } else { msg << "&"; }
-                    msg << this->constructionQueue->getUpdate(overrideDirty);
+                    DsprMessage::ConstructionQueueMsgV1 cqMsgV1 = this->constructionQueue->serialize();
+                    DsprMessage::_cstr serializedCQ = cqMsgV1.Serialize();
+                    unitUpdateMsgV1.constructionQueue.set(serializedCQ);
                 }
             }
         }
@@ -1016,13 +1015,12 @@ namespace DsprGameServer
         {
             if (playerData == this->tribe->playerData) {
                 if (overrideDirty || this->rallyPoint->isDirty()) {
-                    if (firstVar) { firstVar = false; } else { msg << "&"; }
-                    msg << this->rallyPoint->serialize();
+                    unitUpdateMsgV1.rallyPoint.setA(this->rallyPoint->obj()->x);
+                    unitUpdateMsgV1.rallyPoint.setB(this->rallyPoint->obj()->y);
                 }
 
                 if (overrideDirty || this->rallyUnitId->isDirty()) {
-                    if (firstVar) { firstVar = false; } else { msg << "&"; }
-                    msg << this->rallyUnitId->serialize();
+                    unitUpdateMsgV1.rallyUnitId.set(this->rallyUnitId->obj()->Get());
                 }
             }
         }
@@ -1031,8 +1029,14 @@ namespace DsprGameServer
         {
             if (playerData == this->tribe->playerData) {
                 if (overrideDirty || this->inventory->isDirty()) {
-                    if (firstVar) { firstVar = false; } else { msg << "&"; }
-                    msg << this->inventory->getUpdate(overrideDirty);
+                    unitUpdateMsgV1.inventory.initBytes(6);
+                    for(int i=0;i<6;i++) {
+                        auto item = this->inventory->getItem(i);
+                        int index = 0;
+                        if (item != nullptr)
+                            index = item->itemTemplate->index+1;
+                        unitUpdateMsgV1.inventory.setArray(i, index);
+                    }
                 }
             }
         }
@@ -1043,9 +1047,118 @@ namespace DsprGameServer
 //            msg << "&" << this->nextPosition->serialize();
 //        }
 
-        msg << "\r\n";
-        GameServer::get().queueMessage(playerData, msg.str());
+        auto serializedUnitUpdateMsg = unitUpdateMsgV1.Serialize();
+
+        DsprMessage::ToClientMsg clientMsg;
+        clientMsg.msgType.set(DsprMessage::ToClientMsg::MessageType::UnitUpdate);
+        clientMsg.msgBytes.set(serializedUnitUpdateMsg);
+        auto serializedClientMsg = clientMsg.Serialize();
+        std::string msgStr = std::basic_string<char>(serializedClientMsg.innerCstr, serializedClientMsg.number);
+
+        //and, quickly test it comin back out again
+        DsprMessage::ToClientMsg testMsg(serializedClientMsg);
+
+        GameServer::get().queueMessageTrue(playerData, msgStr);
     }
+
+//    void Unit::sendUpdate(PlayerData *playerData, bool overrideDirty)
+//    {
+//        if (!overrideDirty && !this->anyVarIsDirty(playerData)) return;
+//        std::stringstream msg;
+//        msg << "unit/1.0/update|" << id << "|";
+//        bool firstVar = true;
+//
+//        if (overrideDirty || this->nextPosition->isDirty())
+//        {
+//            if (firstVar) { firstVar = false; } else { msg << "&"; }
+//            msg << this->nextPosition->serialize();
+//        }
+//
+//        if (overrideDirty || this->moveTarget->isDirty())
+//        {
+//            if (firstVar) { firstVar = false; } else { msg << "&"; }
+//            msg << this->moveTarget->serialize();
+//        }
+//
+//        if (overrideDirty || this->animationState->isDirty())
+//        {
+//            if (firstVar) { firstVar = false; } else { msg << "&"; }
+//            msg << this->animationState->serialize();
+//        }
+//
+//        if (overrideDirty || this->health->isDirty())
+//        {
+//            if (firstVar) { firstVar = false; } else { msg << "&"; }
+//            msg << this->health->serialize();
+//        }
+//
+//        if (overrideDirty || this->bleed->isDirty())
+//        {
+//            if (firstVar) { firstVar = false; } else { msg << "&"; }
+//            msg << this->bleed->serialize();
+//        }
+//
+//        if (overrideDirty || this->syncedTargetUnitId->isDirty())
+//        {
+//            if (firstVar) { firstVar = false; } else { msg << "&"; }
+//            msg << this->syncedTargetUnitId->serialize();
+//        }
+//
+//        if (overrideDirty || this->gatherYield->isDirty())
+//        {
+//            if (firstVar) { firstVar = false; } else { msg << "&"; }
+//            if (playerData == this->tribe->playerData) {
+//                msg << this->gatherYield->serialize();
+//            } else {
+//                msg << "gatherYield:";
+//                msg << std::to_string(this->gatherYield->obj()->x);
+//            }
+//        }
+//
+//        if (this->constructionQueue != nullptr)
+//        {
+//            if (playerData == this->tribe->playerData) {
+//                if (overrideDirty || this->constructionQueue->isDirty()) {
+//                    if (firstVar) { firstVar = false; } else { msg << "&"; }
+//                    msg << this->constructionQueue->getUpdate(overrideDirty);
+//                }
+//            }
+//        }
+//
+//        if (this->rallyPoint != nullptr)
+//        {
+//            if (playerData == this->tribe->playerData) {
+//                if (overrideDirty || this->rallyPoint->isDirty()) {
+//                    if (firstVar) { firstVar = false; } else { msg << "&"; }
+//                    msg << this->rallyPoint->serialize();
+//                }
+//
+//                if (overrideDirty || this->rallyUnitId->isDirty()) {
+//                    if (firstVar) { firstVar = false; } else { msg << "&"; }
+//                    msg << this->rallyUnitId->serialize();
+//                }
+//            }
+//        }
+//
+//        if (this->inventory != nullptr)
+//        {
+//            if (playerData == this->tribe->playerData) {
+//                if (overrideDirty || this->inventory->isDirty()) {
+//                    if (firstVar) { firstVar = false; } else { msg << "&"; }
+//                    msg << this->inventory->getUpdate(overrideDirty);
+//                }
+//            }
+//        }
+//
+//        //next synced variable should follow this format
+////        if (this->nextPosition->isDirty())
+////        {
+////            msg << "&" << this->nextPosition->serialize();
+////        }
+//
+//        msg << "\r\n";
+//        GameServer::get().queueMessage(playerData, msg.str());
+//    }
 
     bool Unit::anyVarIsDirty(PlayerData *playerData)
     {
