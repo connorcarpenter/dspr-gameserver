@@ -7,13 +7,15 @@
 #include "PlayerData.h"
 
 namespace DsprGameServer {
-    Message::Message(PlayerData *playerData, std::string str) {
+    Message::Message(PlayerData *playerData, DsprMessage::_cstr str) : str(str) {
         this->playerData = playerData;
-        this->str = str;
     }
 
     void Message::send() {
-        this->playerData->getWs()->send(str.c_str(), uWS::BINARY);
-        //std::cout << "gameserver: sent: " << str << std::endl;
+        this->playerData->getWs()->send((char*) str.innerCstr, str.number, uWS::BINARY);
+
+        //TODO:: REMOVE FOR PRODUCTION!
+        std::string strr = std::basic_string<char>((char*) str.innerCstr, str.number);
+        std::cout << "gameserver: sent: " << strr << std::endl;
     }
 }

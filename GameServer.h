@@ -8,6 +8,7 @@
 #include <map>
 #include "Message.h"
 #include "Game/Game.h"
+#include "DsprMessage/DataTypes.h"
 
 namespace DsprGameServer
 {
@@ -23,7 +24,7 @@ namespace DsprGameServer
 
         void step();
         void queueMessage(PlayerData *playerData, std::string str);
-        void queueMessageTrue(PlayerData *playerData, std::string str);
+        void queueMessageTrue(PlayerData *playerData, DsprMessage::_cstr str);
         void addPlayerToken(std::string playerToken);
         void removePlayerToken(std::string playerToken);
 

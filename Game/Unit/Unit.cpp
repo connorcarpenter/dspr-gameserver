@@ -1048,23 +1048,7 @@ namespace DsprGameServer
 //            msg << "&" << this->nextPosition->serialize();
 //        }
 
-        auto serializedUnitUpdateMsg = unitUpdateMsgV1.Serialize();
-
-        DsprMessage::ToClientMsg* clientMsg = new DsprMessage::ToClientMsg();
-        clientMsg->msgType.set(DsprMessage::ToClientMsg::MessageType::UnitUpdate);
-        clientMsg->msgBytes.set(serializedUnitUpdateMsg);
-        auto serializedClientMsg = clientMsg->Serialize();
-        std::string msgStr = std::basic_string<char>(serializedClientMsg.innerCstr, serializedClientMsg.number);
-
-        //and, quickly test it comin back out again
-        DsprMessage::ToClientMsg* testMsg = new DsprMessage::ToClientMsg(serializedClientMsg);
-
-        if (!DsprMessage::ToClientMsg::Equals(clientMsg, testMsg))
-        {
-            int i = 12; //:(
-        }
-
-        GameServer::get().queueMessageTrue(playerData, msgStr);
+        GameServer::get().queueMessageTrue(playerData, unitUpdateMsgV1.SerializeFinal());
     }
 
 //    void Unit::sendUpdate(PlayerData *playerData, bool overrideDirty)
