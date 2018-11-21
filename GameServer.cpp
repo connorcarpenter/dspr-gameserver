@@ -39,9 +39,12 @@ namespace DsprGameServer
         for(int i=0;i<str.length();i++)
             newCstr[i] = str[i];
         auto clientMessage = DsprMessage::ToClientMsg();
-        clientMessage.msgType.set(DsprMessage::ToClientMsg::StandardMessage);
+
+        assert(DsprMessage::ToClientMsg::MessageType::MessageTypeMaxValue < 255);
+        clientMessage.msgType.set((unsigned char) DsprMessage::ToClientMsg::MessageType::StandardMessage);
+
         DsprMessage::_cstr standardCstr(newCstr, str.length(), false);
-        clientMessage.msgBytes.set(standardCstr);
+        clientMessage.msgBytes.setCstr(standardCstr);
 
         auto serializedClientMsg = clientMessage.Serialize();
 

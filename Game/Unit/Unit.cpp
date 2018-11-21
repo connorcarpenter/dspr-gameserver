@@ -39,7 +39,7 @@ namespace DsprGameServer
         this->bleed->setCleanFunc([&](){
             this->bleed->obj()->Set(false);
         });
-        this->syncedTargetUnitId = new Synced<Int>("targetUnitId", new Int(-1));
+        this->syncedTargetUnitId = new Synced<Int>("targetUnitId", new Int(0));
         this->health = new Synced<Int>("health", new Int(unitTemplate->maxHealth));
         this->nextTilePosition = new Point(x,y);
 
@@ -51,7 +51,7 @@ namespace DsprGameServer
         if (this->unitTemplate->hasRallyPoint)
         {
             this->rallyPoint = new Synced<Point>("rallyPoint", new Point(x, y));
-            this->rallyUnitId = new Synced<Int>("rallyUnitId", new Int(-1));
+            this->rallyUnitId = new Synced<Int>("rallyUnitId", new Int(0));
         }
 
         if (this->unitTemplate->hasInventory)
@@ -958,20 +958,21 @@ namespace DsprGameServer
 
         if (overrideDirty || this->nextPosition->isDirty())
         {
-            unitUpdateMsgV1.nextPosition.setA(this->nextPosition->obj()->x);
-            unitUpdateMsgV1.nextPosition.setB(this->nextPosition->obj()->y);
+            unitUpdateMsgV1.nextPosition.add(this->nextPosition->obj()->x);
+            unitUpdateMsgV1.nextPosition.add(this->nextPosition->obj()->y);
         }
 
         if (overrideDirty || this->moveTarget->isDirty())
         {
-            unitUpdateMsgV1.moveTarget.setA(this->moveTarget->obj()->x);
-            unitUpdateMsgV1.moveTarget.setB(this->moveTarget->obj()->y);
+            unitUpdateMsgV1.moveTarget.add(this->moveTarget->obj()->x);
+            unitUpdateMsgV1.moveTarget.add(this->moveTarget->obj()->y);
         }
 
         if (overrideDirty || this->animationState->isDirty())
         {
-            unitUpdateMsgV1.animationState.setA(this->animationState->obj()->GetState());
-            unitUpdateMsgV1.animationState.setB(this->animationState->obj()->GetHeading());
+            assert(AnimationStates::AnimationStatesMaxValue < 255);
+            unitUpdateMsgV1.animationState.add((unsigned char) this->animationState->obj()->GetState());
+            unitUpdateMsgV1.animationState.add(this->animationState->obj()->GetHeading());
         }
 
         if (overrideDirty || this->health->isDirty())
@@ -991,12 +992,12 @@ namespace DsprGameServer
 
         if (overrideDirty || this->gatherYield->isDirty())
         {
-            unitUpdateMsgV1.gatherYield.setA(this->gatherYield->obj()->x);
+            unitUpdateMsgV1.gatherYield.add(this->gatherYield->obj()->x);
 
             if (playerData == this->tribe->playerData) {
-                unitUpdateMsgV1.gatherYield.setB(this->gatherYield->obj()->y);
+                unitUpdateMsgV1.gatherYield.add(this->gatherYield->obj()->y);
             } else {
-                unitUpdateMsgV1.gatherYield.setB(0);
+                unitUpdateMsgV1.gatherYield.add(0);
             }
         }
 
@@ -1006,7 +1007,7 @@ namespace DsprGameServer
                 if (overrideDirty || this->constructionQueue->isDirty()) {
                     DsprMessage::ConstructionQueueMsgV1* cqMsgV1 = this->constructionQueue->serialize();
                     DsprMessage::_cstr serializedCQ = cqMsgV1->Serialize();
-                    unitUpdateMsgV1.constructionQueue.set(serializedCQ);
+                    unitUpdateMsgV1.constructionQueue.setCstr(serializedCQ);
                     delete cqMsgV1;
                 }
             }
@@ -1016,8 +1017,8 @@ namespace DsprGameServer
         {
             if (playerData == this->tribe->playerData) {
                 if (overrideDirty || this->rallyPoint->isDirty()) {
-                    unitUpdateMsgV1.rallyPoint.setA(this->rallyPoint->obj()->x);
-                    unitUpdateMsgV1.rallyPoint.setB(this->rallyPoint->obj()->y);
+                    unitUpdateMsgV1.rallyPoint.add(this->rallyPoint->obj()->x);
+                    unitUpdateMsgV1.rallyPoint.add(this->rallyPoint->obj()->y);
                 }
 
                 if (overrideDirty || this->rallyUnitId->isDirty()) {
@@ -1030,13 +1031,12 @@ namespace DsprGameServer
         {
             if (playerData == this->tribe->playerData) {
                 if (overrideDirty || this->inventory->isDirty()) {
-                    unitUpdateMsgV1.inventory.initBytes(6);
                     for(int i=0;i<6;i++) {
                         auto item = this->inventory->getItem(i);
                         int index = 0;
                         if (item != nullptr)
                             index = item->itemTemplate->index+1;
-                        unitUpdateMsgV1.inventory.setArray(i, index);
+                        unitUpdateMsgV1.inventory.add(index);
                     }
                 }
             }
@@ -1051,104 +1051,6 @@ namespace DsprGameServer
         GameServer::get().queueMessageTrue(playerData, unitUpdateMsgV1.SerializeFinal());
     }
 
-//    void Unit::sendUpdate(PlayerData *playerData, bool overrideDirty)
-//    {
-//        if (!overrideDirty && !this->anyVarIsDirty(playerData)) return;
-//        std::stringstream msg;
-//        msg << "unit/1.0/update|" << id << "|";
-//        bool firstVar = true;
-//
-//        if (overrideDirty || this->nextPosition->isDirty())
-//        {
-//            if (firstVar) { firstVar = false; } else { msg << "&"; }
-//            msg << this->nextPosition->serialize();
-//        }
-//
-//        if (overrideDirty || this->moveTarget->isDirty())
-//        {
-//            if (firstVar) { firstVar = false; } else { msg << "&"; }
-//            msg << this->moveTarget->serialize();
-//        }
-//
-//        if (overrideDirty || this->animationState->isDirty())
-//        {
-//            if (firstVar) { firstVar = false; } else { msg << "&"; }
-//            msg << this->animationState->serialize();
-//        }
-//
-//        if (overrideDirty || this->health->isDirty())
-//        {
-//            if (firstVar) { firstVar = false; } else { msg << "&"; }
-//            msg << this->health->serialize();
-//        }
-//
-//        if (overrideDirty || this->bleed->isDirty())
-//        {
-//            if (firstVar) { firstVar = false; } else { msg << "&"; }
-//            msg << this->bleed->serialize();
-//        }
-//
-//        if (overrideDirty || this->syncedTargetUnitId->isDirty())
-//        {
-//            if (firstVar) { firstVar = false; } else { msg << "&"; }
-//            msg << this->syncedTargetUnitId->serialize();
-//        }
-//
-//        if (overrideDirty || this->gatherYield->isDirty())
-//        {
-//            if (firstVar) { firstVar = false; } else { msg << "&"; }
-//            if (playerData == this->tribe->playerData) {
-//                msg << this->gatherYield->serialize();
-//            } else {
-//                msg << "gatherYield:";
-//                msg << std::to_string(this->gatherYield->obj()->x);
-//            }
-//        }
-//
-//        if (this->constructionQueue != nullptr)
-//        {
-//            if (playerData == this->tribe->playerData) {
-//                if (overrideDirty || this->constructionQueue->isDirty()) {
-//                    if (firstVar) { firstVar = false; } else { msg << "&"; }
-//                    msg << this->constructionQueue->getUpdate(overrideDirty);
-//                }
-//            }
-//        }
-//
-//        if (this->rallyPoint != nullptr)
-//        {
-//            if (playerData == this->tribe->playerData) {
-//                if (overrideDirty || this->rallyPoint->isDirty()) {
-//                    if (firstVar) { firstVar = false; } else { msg << "&"; }
-//                    msg << this->rallyPoint->serialize();
-//                }
-//
-//                if (overrideDirty || this->rallyUnitId->isDirty()) {
-//                    if (firstVar) { firstVar = false; } else { msg << "&"; }
-//                    msg << this->rallyUnitId->serialize();
-//                }
-//            }
-//        }
-//
-//        if (this->inventory != nullptr)
-//        {
-//            if (playerData == this->tribe->playerData) {
-//                if (overrideDirty || this->inventory->isDirty()) {
-//                    if (firstVar) { firstVar = false; } else { msg << "&"; }
-//                    msg << this->inventory->getUpdate(overrideDirty);
-//                }
-//            }
-//        }
-//
-//        //next synced variable should follow this format
-////        if (this->nextPosition->isDirty())
-////        {
-////            msg << "&" << this->nextPosition->serialize();
-////        }
-//
-//        msg << "\r\n";
-//        GameServer::get().queueMessage(playerData, msg.str());
-//    }
 
     bool Unit::anyVarIsDirty(PlayerData *playerData)
     {

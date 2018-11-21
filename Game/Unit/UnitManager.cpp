@@ -103,7 +103,7 @@ namespace DsprGameServer
             return freeId;
         }
 
-        return (int) unitMap.size();
+        return (int) unitMap.size()+1;
     }
 
     void UnitManager::receiveMoveOrder(const std::list<int> &idList, int tileX, int tileY)

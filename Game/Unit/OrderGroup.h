@@ -29,7 +29,7 @@ namespace DsprGameServer {
         void unitUnarrived();
         bool isAttacking();
 
-        int targetUnitId = -1;
+        int targetUnitId = 0;
         UnitOrder orderIndex;
         std::shared_ptr<DsprGameServer::Path> path = nullptr;
 
