@@ -970,7 +970,7 @@ namespace DsprGameServer
 
         if (overrideDirty || this->animationState->isDirty())
         {
-            assert(AnimationStates::AnimationStatesMaxValue < 255);
+            assert(AnimationStates::AnimationStatesMaxValue < DsprMessage::MaxByteValue);
             unitUpdateMsgV1.animationState.add((unsigned char) this->animationState->obj()->GetState());
             unitUpdateMsgV1.animationState.add(this->animationState->obj()->GetHeading());
         }

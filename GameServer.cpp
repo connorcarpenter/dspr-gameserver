@@ -40,7 +40,7 @@ namespace DsprGameServer
             newCstr[i] = str[i];
         auto clientMessage = DsprMessage::ToClientMsg();
 
-        assert(DsprMessage::ToClientMsg::MessageType::MessageTypeMaxValue < 255);
+        assert(DsprMessage::ToClientMsg::MessageType::MessageTypeMaxValue < DsprMessage::MaxByteValue);
         clientMessage.msgType.set((unsigned char) DsprMessage::ToClientMsg::MessageType::StandardMessage);
 
         DsprMessage::_cstr standardCstr(newCstr, str.length(), false);

@@ -31,7 +31,7 @@ namespace DsprGameServer
                 if (parts.at(1).compare(bffToken) == 0)
                 {
                     GameServer::get().addPlayerToken(parts.at(2));
-                    std::cout << "dspr-gameserver: Received new player" << std::endl;
+                    std::cout << "dspr-gameserver: Received new player w/ token: " << parts.at(2) << std::endl;
                 }
                 return;
             }
