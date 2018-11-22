@@ -6,6 +6,7 @@
 #include "../GameServer.h"
 #include <sstream>
 #include "TribeManager.h"
+#include "../DsprMessage/ToClientMsg.h"
 
 namespace DsprGameServer
 {
@@ -67,29 +68,25 @@ namespace DsprGameServer
         Tribe* tribe = this->game->tribeManager->getTribeFromPlayer(player);
 
         if (!overrideDirty && !this->anyVarIsDirty(tribe)) return;
-        std::stringstream msg;
-        msg << "economy/1.0/update|";
-        bool firstVar = true;
+
+        DsprMessage::EconomyUpdateMsgV1 economyUpdateMsgV1;
 
         auto popVar = this->playerToPopMap.at(tribe);
         if (overrideDirty || popVar->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << popVar->serialize();
+            economyUpdateMsgV1.pop.set(popVar->obj()->Get());
         }
 
         auto popMaxVar = this->playerToPopMaxMap.at(tribe);
         if (overrideDirty || popMaxVar->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << popMaxVar->serialize();
+            economyUpdateMsgV1.pop.set(popVar->obj()->Get());
         }
 
         auto manaVar = this->playerToManaMap.at(tribe);
         if (overrideDirty || manaVar->isDirty())
         {
-            if (firstVar) { firstVar = false; } else { msg << "&"; }
-            msg << manaVar->serialize();
+            economyUpdateMsgV1.popMax.set(popVar->obj()->Get());
         }
 
         //next synced variable should follow this format
@@ -100,8 +97,9 @@ namespace DsprGameServer
 //            msg << manaVar->serialize();
 //        }
 
-        msg << "\r\n";
-        GameServer::get().queueMessage(player, msg.str());
+        auto clientMsg = economyUpdateMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(player, packedMsg);
     }
 
     void EconomyManager::clean() {
