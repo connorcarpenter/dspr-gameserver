@@ -572,7 +572,7 @@ namespace DsprGameServer
             unitDeleteMsgV1.dead.set(unitId.second);
             auto clientMsg = unitDeleteMsgV1.getToClientMessage();
             auto packedMsg = clientMsg->Pack();
-            GameServer::get().queueMessageTrue(playerData, packedMsg);
+            GameServer::get().queueMessage(playerData, packedMsg);
         }
     }
 
@@ -599,7 +599,7 @@ namespace DsprGameServer
         unitCreateMsgV1.templateIndex.set(unit->unitTemplate->index);
         auto clientMsg = unitCreateMsgV1.getToClientMessage();
         auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessageTrue(playerData, packedMsg);
+        GameServer::get().queueMessage(playerData, packedMsg);
 
         unit->sendUpdate(playerData, true);
 
@@ -614,7 +614,7 @@ namespace DsprGameServer
         unitDeleteMsgV1.dead.set(0);
         auto clientMsg = unitDeleteMsgV1.getToClientMessage();
         auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessageTrue(playerData, packedMsg);
+        GameServer::get().queueMessage(playerData, packedMsg);
 
         std::set<Unit*>* unitSet = this->playerToUnitsAwareOfMap.at(playerData);
         unitSet->erase(unit);

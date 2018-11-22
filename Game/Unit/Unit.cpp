@@ -1052,7 +1052,7 @@ namespace DsprGameServer
 
         auto clientMsg = unitUpdateMsgV1.getToClientMessage();
         auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessageTrue(playerData, packedMsg);
+        GameServer::get().queueMessage(playerData, packedMsg);
     }
 
 

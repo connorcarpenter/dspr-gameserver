@@ -25,7 +25,7 @@ namespace DsprGameServer {
             chatSendClientMsgV1.chatMsg.loadFromString(msgReceived);
             auto clientMsg = chatSendClientMsgV1.getToClientMessage();
             auto packedMsg = clientMsg->Pack();
-            GameServer::get().queueMessageTrue(playerData, packedMsg);
+            GameServer::get().queueMessage(playerData, packedMsg);
         }
     }
 }

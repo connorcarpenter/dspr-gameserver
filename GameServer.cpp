@@ -34,21 +34,7 @@ namespace DsprGameServer
         }
     }
 
-    void GameServer::queueMessage(PlayerData *playerData, std::string str)
-    {
-        auto clientMessage = DsprMessage::ToClientMsg();
-
-        assert(DsprMessage::ToClientMsg::MessageType::MessageTypeMaxValue < DsprMessage::MaxByteValue);
-        clientMessage.msgType.set((unsigned char) DsprMessage::ToClientMsg::MessageType::StandardMessage);
-        clientMessage.msgBytes.loadFromString(str);
-
-        auto packedMessage = clientMessage.Pack();
-        DsprMessage::CStr* test = packedMessage.get();
-        auto newMsg = new Message(playerData, packedMessage);
-        messageQueue.push(newMsg);
-    }
-
-    void GameServer::queueMessageTrue(PlayerData *playerData, std::shared_ptr<DsprMessage::CStr> str) {
+    void GameServer::queueMessage(PlayerData *playerData, std::shared_ptr<DsprMessage::CStr> str) {
         auto newMsg = new Message(playerData, str);
         messageQueue.push(newMsg);
     }

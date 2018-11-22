@@ -39,7 +39,7 @@ namespace DsprGameServer
         gridCreateMsgV1.height.set(this->height);
         auto clientMsg = gridCreateMsgV1.getToClientMessage();
         auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessageTrue(playerData, packedMsg);
+        GameServer::get().queueMessage(playerData, packedMsg);
 
         this->sendAllDiscoveredTilesToPlayer(playerData);
     }
@@ -111,7 +111,7 @@ namespace DsprGameServer
         tileCreateMsgV1.frame.set(frameToSend);
         auto clientMsg = tileCreateMsgV1.getToClientMessage();
         auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessageTrue(playerData, packedMsg);
+        GameServer::get().queueMessage(playerData, packedMsg);
 
     }
 
@@ -130,7 +130,7 @@ namespace DsprGameServer
                 tileCreateMsgV1.frame.set(frameToSend);
                 auto clientMsg = tileCreateMsgV1.getToClientMessage();
                 auto packedMsg = clientMsg->Pack();
-                GameServer::get().queueMessageTrue(playerData, packedMsg);
+                GameServer::get().queueMessage(playerData, packedMsg);
             });
     }
 }

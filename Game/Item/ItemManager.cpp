@@ -116,7 +116,7 @@ namespace DsprGameServer {
         itemCreateMsgV1.templateIndex.set(item->itemTemplate->index);
         auto clientMsg = itemCreateMsgV1.getToClientMessage();
         auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessageTrue(playerData, packedMsg);
+        GameServer::get().queueMessage(playerData, packedMsg);
 
         std::set<Item*>* itemSet = this->playerToItemsAwareOfMap.at(playerData);
         itemSet->emplace(item);
@@ -128,7 +128,7 @@ namespace DsprGameServer {
         itemDeleteMsgV1.id.set(item->id);
         auto clientMsg = itemDeleteMsgV1.getToClientMessage();
         auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessageTrue(playerData, packedMsg);
+        GameServer::get().queueMessage(playerData, packedMsg);
 
         std::set<Item*>* itemSet = this->playerToItemsAwareOfMap.at(playerData);
         itemSet->erase(item);

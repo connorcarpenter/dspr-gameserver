@@ -99,7 +99,7 @@ namespace DsprGameServer
 
         auto clientMsg = economyUpdateMsgV1.getToClientMessage();
         auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessageTrue(player, packedMsg);
+        GameServer::get().queueMessage(player, packedMsg);
     }
 
     void EconomyManager::clean() {

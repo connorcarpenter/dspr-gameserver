@@ -21,8 +21,10 @@ int main()
         PlayerData* playerData = new PlayerData(ws);
         ws->setUserData(playerData);
 
-        std::string str = std::basic_string<char>("auth/1.0/gametoken|");
-        GameServer::get().queueMessage(playerData, str);
+        DsprMessage::ToClientMsg authGameTokenMsgV1;
+        authGameTokenMsgV1.msgType.set((unsigned char) DsprMessage::ToClientMsg::MessageType::AuthGameToken);
+        auto packedMsg = authGameTokenMsgV1.Pack();
+        GameServer::get().queueMessage(playerData, packedMsg);
         std::cout << "dspr-gameserver: Received 'onConnection', Sent 'auth/1.0/gametoken|'" << std::endl;
     });
 
