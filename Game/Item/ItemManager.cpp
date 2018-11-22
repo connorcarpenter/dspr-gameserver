@@ -9,6 +9,7 @@
 #include "../../GameServer.h"
 #include "../../PlayerData.h"
 #include "ItemTemplateCatalog.h"
+#include "../../DsprMessage/ToClientMsg.h"
 
 namespace DsprGameServer {
 
@@ -106,20 +107,23 @@ namespace DsprGameServer {
         }
     }
     
-    void ItemManager::makePlayerAwareOfItem(PlayerData *playerData, Item *item) {
-
-        std::stringstream msg;
-        msg << "item/1.0/create|" << item->id << "," << item->position->x << "," << item->position->y << ","
-            << item->itemTemplate->index << "\r\n";
-
-        GameServer::get().queueMessage(playerData, msg.str());
+    void ItemManager::makePlayerAwareOfItem(PlayerData *playerData, Item *item)
+    {
+        DsprMessage::ItemCreateMsgV1 itemCreateMsgV1;
+        itemCreateMsgV1.id.set(item->id);
+        itemCreateMsgV1.x.set(item->position->x);
+        itemCreateMsgV1.y.set(item->position->y);
+        itemCreateMsgV1.templateIndex.set(item->itemTemplate->index);
+        auto clientMsg = itemCreateMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(playerData, packedMsg);
 
         std::set<Item*>* itemSet = this->playerToItemsAwareOfMap.at(playerData);
         itemSet->emplace(item);
     }
 
-    void ItemManager::makePlayerUnawareOfItem(PlayerData *playerData, Item *item) {
-
+    void ItemManager::makePlayerUnawareOfItem(PlayerData *playerData, Item *item)
+    {
         std::stringstream msg;
         msg << "item/1.0/delete|" << item->id << "|0" << "\r\n";
         GameServer::get().queueMessage(playerData, msg.str());
