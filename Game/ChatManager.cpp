@@ -7,6 +7,7 @@
 #include "../GameServer.h"
 #include "../PlayerData.h"
 #include "Tribe.h"
+#include "../DsprMessage/ToClientMsg.h"
 
 namespace DsprGameServer {
 
@@ -19,10 +20,12 @@ namespace DsprGameServer {
         {
             if (playerData == sendPlayerData) continue;
 
-            std::stringstream msg;
-            msg << "chat/1.0/send|" << sendPlayerData->getTribe()->index << "|" << msgReceived << "\r\n";
-
-            GameServer::get().queueMessage(playerData, msg.str());
+            DsprMessage::ChatSendClientMsgV1 chatSendClientMsgV1;
+            chatSendClientMsgV1.tribeIndex.set(sendPlayerData->getTribe()->index);
+            chatSendClientMsgV1.chatMsg.loadFromString(msgReceived);
+            auto clientMsg = chatSendClientMsgV1.getToClientMessage();
+            auto packedMsg = clientMsg->Pack();
+            GameServer::get().queueMessageTrue(playerData, packedMsg);
         }
     }
 }
