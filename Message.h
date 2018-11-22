@@ -6,7 +6,7 @@
 
 #include <uWS/WebSocketProtocol.h>
 #include <uWS/WebSocket.h>
-#include "DsprMessage/DataTypes.h"
+#include "DsprMessage/Number.h"
 
 namespace DsprGameServer {
 
@@ -14,12 +14,12 @@ namespace DsprGameServer {
 
     class Message {
     public:
-        Message(PlayerData *playerData, DsprMessage::_cstr str);
+        Message(PlayerData *playerData, std::shared_ptr<DsprMessage::CStr> str);
 
         void send();
 
     private:
         PlayerData* playerData = nullptr;
-        DsprMessage::_cstr str;
+        std::shared_ptr<DsprMessage::CStr> str = nullptr;
     };
 }

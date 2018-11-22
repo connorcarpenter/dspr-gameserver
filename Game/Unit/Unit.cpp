@@ -20,6 +20,7 @@
 #include "../Item/Inventory.h"
 #include "../Item/ItemManager.h"
 #include "../../DsprMessage/ToClientMsg.h"
+#include "../../DsprMessage/Main.h"
 
 namespace DsprGameServer
 {
@@ -977,7 +978,8 @@ namespace DsprGameServer
 
         if (overrideDirty || this->health->isDirty())
         {
-            unitUpdateMsgV1.health.set(this->health->obj()->Get());
+            if (this->health->obj()->Get() >= 0)
+                unitUpdateMsgV1.health.set(this->health->obj()->Get());
         }
 
         if (overrideDirty || this->bleed->isDirty())
@@ -1006,8 +1008,8 @@ namespace DsprGameServer
             if (playerData == this->tribe->playerData) {
                 if (overrideDirty || this->constructionQueue->isDirty()) {
                     DsprMessage::ConstructionQueueMsgV1* cqMsgV1 = this->constructionQueue->serialize();
-                    DsprMessage::_cstr serializedCQ = cqMsgV1->Serialize();
-                    unitUpdateMsgV1.constructionQueue.setCstr(serializedCQ);
+                    std::shared_ptr<DsprMessage::CStr> serializedCQ = cqMsgV1->Serialize();
+                    unitUpdateMsgV1.constructionQueue.loadFromCstr(serializedCQ);
                     delete cqMsgV1;
                 }
             }
@@ -1048,7 +1050,9 @@ namespace DsprGameServer
 //            msg << "&" << this->nextPosition->serialize();
 //        }
 
-        GameServer::get().queueMessageTrue(playerData, unitUpdateMsgV1.SerializeFinal());
+        auto clientMsg = unitUpdateMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(playerData, packedMsg);
     }
 
 

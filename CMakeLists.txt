@@ -62,9 +62,13 @@ add_executable(dspr-gameserver
         Game/IsoBox/IsoBoxCache.h Game/IsoBox/IsoBoxCache.cpp
         Game/IsoBox/IsoBox.h Game/IsoBox/IsoBox.cpp
 
+        DsprMessage/Main.h
         DsprMessage/ToServerMsg.h DsprMessage/ToServerMsg.cpp
         DsprMessage/ToClientMsg.h DsprMessage/ToClientMsg.cpp
-        DsprMessage/DataTypes.h DsprMessage/DataTypes.cpp
+        DsprMessage/Number.h DsprMessage/Number.cpp
+        DsprMessage/Array.h DsprMessage/Array.cpp
+        DsprMessage/CStr.h DsprMessage/CStr.cpp
+        DsprMessage/CharVector.h DsprMessage/CharVector.cpp
 
         Math/Point.h Math/Point.cpp
         Math/FloatPoint.h Math/FloatPoint.cpp
