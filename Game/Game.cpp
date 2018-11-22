@@ -112,8 +112,10 @@ namespace DsprGameServer
     }
 
     void Game::sendPlayerTribeIndex(PlayerData *playerData, Tribe *tribe) {
-        std::stringstream msg;
-        msg << "tribe/1.0/set|" << tribe->index << "\r\n";
-        GameServer::get().queueMessage(playerData, msg.str());
+        DsprMessage::TribeSetMsgV1 tribeSetMsgV1;
+        tribeSetMsgV1.tribeIndex.set(tribe->index);
+        auto clientMsg = tribeSetMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(playerData, packedMsg);
     }
 }
