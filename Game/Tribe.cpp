@@ -5,6 +5,7 @@
 #include "Tribe.h"
 #include "Game.h"
 #include "EconomyManager.h"
+#include "TribeManager.h"
 
 namespace DsprGameServer
 {
@@ -24,6 +25,6 @@ namespace DsprGameServer
     }
 
     bool Tribe::isNeutral() {
-        return index == -1;
+        return game->tribeManager->neutralTribe->index == index;
     }
 }

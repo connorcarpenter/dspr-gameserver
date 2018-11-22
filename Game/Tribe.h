@@ -17,7 +17,7 @@ namespace DsprGameServer
         Tribe(Game *game, int color);
         ~Tribe();
         void setEnemy(Tribe* otherTribe);
-        int index = -1;
+        int index = 0;
         PlayerData* playerData = nullptr;
         bool isNeutral();
         bool playable = false;

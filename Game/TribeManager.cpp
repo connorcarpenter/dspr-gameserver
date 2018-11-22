@@ -12,10 +12,10 @@ namespace DsprGameServer
     {
         this->game = game;
 
-        this->neutral = new Tribe(game, -1);
-        this->tribeA = new Tribe(game, 0);
-        this->tribeB = new Tribe(game, 1);
-        this->tribeCreep = new Tribe(game, 2);
+        this->neutralTribe = new Tribe(game, 0);
+        this->tribeA = new Tribe(game, 1);
+        this->tribeB = new Tribe(game, 2);
+        this->tribeCreep = new Tribe(game, 3);
 
         tribeSet.insert(this->tribeA);
         this->tribeA->setEnemy(this->tribeB);
@@ -42,7 +42,7 @@ namespace DsprGameServer
             delete tribe;
         }
 
-        delete this->neutral;
+        delete this->neutralTribe;
     }
 
     Tribe *TribeManager::getFreeTribe() {

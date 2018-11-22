@@ -40,7 +40,7 @@ namespace DsprGameServer
                 createUnit((2 + j) * 2, (8 + i) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
 
         createUnit((3) * 2, (3) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->temple);
-        createUnit((7) * 2, (7) * 2, this->game->tribeManager->neutral, this->game->unitTemplateCatalog->manafount);
+        createUnit((7) * 2, (7) * 2, this->game->tribeManager->neutralTribe, this->game->unitTemplateCatalog->manafount);
 
         //ashwalkers
         for (int i = 0; i<2; i++)
@@ -586,13 +586,18 @@ namespace DsprGameServer
         this->unitDeletionsToSend.clear();
     }
 
-    void UnitManager::makePlayerAwareOfUnit(PlayerData *playerData, Unit *unit) {
+    void UnitManager::makePlayerAwareOfUnit(PlayerData *playerData, Unit *unit)
+    {
+        DsprMessage::UnitCreateMsgV1 unitCreateMsgV1;
+        unitCreateMsgV1.id.set(unit->id);
+        unitCreateMsgV1.x.set(unit->position->x);
+        unitCreateMsgV1.y.set(unit->position->y);
+        unitCreateMsgV1.tribeIndex.set(unit->tribe->index);
+        unitCreateMsgV1.templateIndex.set(unit->unitTemplate->index);
+        auto clientMsg = unitCreateMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(playerData, packedMsg);
 
-        std::stringstream msg;
-        msg << "unit/1.0/create|" << unit->id << "," << unit->position->x << "," << unit->position->y << ","
-            << unit->tribe->index << "," << unit->unitTemplate->index << "\r\n";
-
-        GameServer::get().queueMessage(playerData, msg.str());
         unit->sendUpdate(playerData, true);
 
         std::set<Unit*>* unitSet = this->playerToUnitsAwareOfMap.at(playerData);
