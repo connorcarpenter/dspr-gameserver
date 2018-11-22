@@ -103,18 +103,16 @@ namespace DsprGameServer
         if (playerData == nullptr) return;
 
         auto tile = this->tileGrid->get(x,y);
-        if (tile->walkable)
-        {
-            std::stringstream msg;
-            msg << "tile/1.0/create|" << (x) << "," << (y) << "," << tile->frame << "\r\n";
-            GameServer::get().queueMessage(playerData, msg.str());
-        }
-        else
-        {
-            std::stringstream msg;
-            msg << "tile/1.0/create|" << (x) << "," << (y) << ",-1" << "\r\n";
-            GameServer::get().queueMessage(playerData, msg.str());
-        }
+        int frameToSend = (tile->walkable) ? (tile->frame+1) : 0;
+
+        DsprMessage::TileCreateMsgV1 tileCreateMsgV1;
+        tileCreateMsgV1.x.set(x);
+        tileCreateMsgV1.y.set(y);
+        tileCreateMsgV1.frame.set(frameToSend);
+        auto clientMsg = tileCreateMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(playerData, packedMsg);
+
     }
 
     void TileManager::sendAllDiscoveredTilesToPlayer(PlayerData *playerData) {
@@ -124,18 +122,15 @@ namespace DsprGameServer
                 if (fogAmount == 0) return;
 
                 auto tile = this->tileGrid->get(x,y);
-                if (tile->walkable)
-                {
-                    std::stringstream msg;
-                    msg << "tile/1.0/create|" << (x) << "," << (y) << "," << tile->frame << "\r\n";
-                    GameServer::get().queueMessage(playerData, msg.str());
-                }
-                else
-                {
-                    std::stringstream msg;
-                    msg << "tile/1.0/create|" << (x) << "," << (y) << ",-1" << "\r\n";
-                    GameServer::get().queueMessage(playerData, msg.str());
-                }
+                int frameToSend = (tile->walkable) ? (tile->frame+1) : 0;
+
+                DsprMessage::TileCreateMsgV1 tileCreateMsgV1;
+                tileCreateMsgV1.x.set(x);
+                tileCreateMsgV1.y.set(y);
+                tileCreateMsgV1.frame.set(frameToSend);
+                auto clientMsg = tileCreateMsgV1.getToClientMessage();
+                auto packedMsg = clientMsg->Pack();
+                GameServer::get().queueMessageTrue(playerData, packedMsg);
             });
     }
 }
