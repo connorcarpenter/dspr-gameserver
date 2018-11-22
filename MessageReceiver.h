@@ -37,6 +37,10 @@ namespace DsprGameServer
             if (isFromBff)
             {
                 std::string msgString = std::basic_string<char>(data, length);
+                if (StringUtils::endsWith(msgString,"\r"))
+                    msgString = msgString.substr(0, msgString.length()-1);
+                if (StringUtils::endsWith(msgString,"\n"))
+                    msgString = msgString.substr(0, msgString.length()-1);
                 std::vector<std::string> parts = StringUtils::split(msgString, '|');
 
                 // Add new player
@@ -53,8 +57,17 @@ namespace DsprGameServer
             DsprMessage::ToServerMsg toServerMsg = DsprMessage::ToServerMsg(dataCStr);
             if (toServerMsg.msgType.get() == DsprMessage::ToServerMsg::MessageType::StandardMessage)
             {
-                char* typicalCharString = new char[toServerMsg.msgBytes.size()];
+                char* typicalCharString = new char[toServerMsg.msgBytes.size()+1];
+                for (int i=0;i<toServerMsg.msgBytes.size();i++)
+                {
+                    typicalCharString[i] = toServerMsg.msgBytes.get(i);
+                }
+                typicalCharString[toServerMsg.msgBytes.size()] = '\0';
                 std::string msgString = std::basic_string<char>(typicalCharString, toServerMsg.msgBytes.size());
+                if (StringUtils::endsWith(msgString,"\r"))
+                    msgString = msgString.substr(0, msgString.length()-1);
+                if (StringUtils::endsWith(msgString,"\n"))
+                    msgString = msgString.substr(0, msgString.length()-1);
                 std::vector<std::string> parts = StringUtils::split(msgString, '|');
 
                 std::string playerToken = parts.at(1);
