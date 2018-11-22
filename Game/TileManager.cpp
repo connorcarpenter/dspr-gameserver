@@ -9,6 +9,7 @@
 #include "../Math/MathUtils.h"
 #include "FogManager.h"
 #include "../PlayerData.h"
+#include "../DsprMessage/ToClientMsg.h"
 
 namespace DsprGameServer
 {
@@ -33,9 +34,12 @@ namespace DsprGameServer
 
     void TileManager::sendGrid(PlayerData *playerData)
     {
-        std::stringstream msg0;
-        msg0 << "grid/1.0/create|" << this->width << "," << this->height << "\r\n";
-        GameServer::get().queueMessage(playerData, msg0.str());
+        DsprMessage::GridCreateMsgV1 gridCreateMsgV1;
+        gridCreateMsgV1.width.set(this->width);
+        gridCreateMsgV1.height.set(this->height);
+        auto clientMsg = gridCreateMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(playerData, packedMsg);
 
         this->sendAllDiscoveredTilesToPlayer(playerData);
     }
