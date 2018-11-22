@@ -124,9 +124,11 @@ namespace DsprGameServer {
 
     void ItemManager::makePlayerUnawareOfItem(PlayerData *playerData, Item *item)
     {
-        std::stringstream msg;
-        msg << "item/1.0/delete|" << item->id << "|0" << "\r\n";
-        GameServer::get().queueMessage(playerData, msg.str());
+        DsprMessage::ItemDeleteMsgV1 itemDeleteMsgV1;
+        itemDeleteMsgV1.id.set(item->id);
+        auto clientMsg = itemDeleteMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(playerData, packedMsg);
 
         std::set<Item*>* itemSet = this->playerToItemsAwareOfMap.at(playerData);
         itemSet->erase(item);
