@@ -12,7 +12,6 @@ namespace DsprGameServer
     {
         this->onlyGame = new Game();
         gameList.push_back(onlyGame);
-
     }
 
     void GameServer::step()

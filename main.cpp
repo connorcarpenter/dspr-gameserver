@@ -44,14 +44,14 @@ int main()
     {
         PlayerData* playerData = (PlayerData*) ws->getUserData();
 
-        std::string msgString = std::string(data, length);
+//        std::string msgString = std::string(data, length);
+//
+//        if (StringUtils::endsWith(msgString,"\r"))
+//            msgString = msgString.substr(0, msgString.length()-1);
+//        if (StringUtils::endsWith(msgString,"\n"))
+//            msgString = msgString.substr(0, msgString.length()-1);
 
-        if (StringUtils::endsWith(msgString,"\r"))
-            msgString = msgString.substr(0, msgString.length()-1);
-        if (StringUtils::endsWith(msgString,"\n"))
-            msgString = msgString.substr(0, msgString.length()-1);
-
-        mr.receive(playerData, bffToken, msgString);
+        mr.receive(playerData, bffToken, data, length);
     });
 
     auto timer = new Timer(h.getLoop());
