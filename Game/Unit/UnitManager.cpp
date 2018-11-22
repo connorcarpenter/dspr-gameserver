@@ -567,9 +567,12 @@ namespace DsprGameServer
     {
         for(auto unitId : this->unitDeletionsToSend)
         {
-            std::stringstream msg;
-            msg << "unit/1.0/delete|" << unitId.first << "|" << unitId.second << "\r\n";
-            GameServer::get().queueMessage(playerData, msg.str());
+            DsprMessage::UnitDeleteMsgV1 unitDeleteMsgV1;
+            unitDeleteMsgV1.id.set(unitId.first);
+            unitDeleteMsgV1.dead.set(unitId.second);
+            auto clientMsg = unitDeleteMsgV1.getToClientMessage();
+            auto packedMsg = clientMsg->Pack();
+            GameServer::get().queueMessageTrue(playerData, packedMsg);
         }
     }
 
@@ -604,11 +607,14 @@ namespace DsprGameServer
         unitSet->emplace(unit);
     }
 
-    void UnitManager::makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit) {
-
-        std::stringstream msg;
-        msg << "unit/1.0/delete|" << unit->id << "|0" << "\r\n";
-        GameServer::get().queueMessage(playerData, msg.str());
+    void UnitManager::makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit)
+    {
+        DsprMessage::UnitDeleteMsgV1 unitDeleteMsgV1;
+        unitDeleteMsgV1.id.set(unit->id);
+        unitDeleteMsgV1.dead.set(0);
+        auto clientMsg = unitDeleteMsgV1.getToClientMessage();
+        auto packedMsg = clientMsg->Pack();
+        GameServer::get().queueMessageTrue(playerData, packedMsg);
 
         std::set<Unit*>* unitSet = this->playerToUnitsAwareOfMap.at(playerData);
         unitSet->erase(unit);
