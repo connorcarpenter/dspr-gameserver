@@ -61,17 +61,18 @@ namespace DsprGameServer
             if (toServerMsg.msgType.get() != DsprMessage::ToServerMsg::MessageType::StandardMessage)
             {
                 playerTokenPtr = toServerMsg.authToken.toStdString();
+                std::string playerTokenStr = *playerTokenPtr.get();
 
                 // Validate the playertoken
-                if (!MapUtils::mapContains(GameServer::get().playerCodeToGameMap, *playerTokenPtr.get())) {
+                if (!MapUtils::mapContains(GameServer::get().playerCodeToGameMap, playerTokenStr)) {
                     std::cout << "dspr-gameserver: Received invalid playertoken: " << playerTokenPtr << std::endl;
                     return;
                 }
 
                 // Get the game associated with the token
-                if (GameServer::get().playerCodeToGameMap.count(*playerTokenPtr.get()) <=0)
+                if (GameServer::get().playerCodeToGameMap.count(playerTokenStr) <=0)
                     return;
-                game = GameServer::get().playerCodeToGameMap.at(*playerTokenPtr.get());
+                game = GameServer::get().playerCodeToGameMap.at(playerTokenStr);
             }
 
             switch(toServerMsg.msgType.get())
@@ -82,8 +83,21 @@ namespace DsprGameServer
                     game->addPlayer(*playerTokenPtr.get(), playerData);
                 }
                     break;
+                case DsprMessage::ToServerMsg::MessageType::ChatSend:
+                {
+                    DsprMessage::ChatSendServerMsgV1 chatSendServerMsgV1(toServerMsg.msgBytes);
+                    auto chatStr = chatSendServerMsgV1.chatMsg.toStdString();
+                    game->chatManager->receiveMessage(*chatStr, playerData);
+                    std::cout << "dspr-gameserver: Received Chat Msg:'" << (*chatStr) << "'" << std::endl;
+                }
+                    break;
                 case DsprMessage::ToServerMsg::MessageType::UnitOrder:
                 {
+//                    ///TESTING
+//                    std::shared_ptr<DsprMessage::CStr> testCstr = DsprMessage::CStr::make_cstr(toServerMsg.msgBytes);
+//                    DsprMessage::CStr* testCstrR = testCstr.get();
+//                    //TESTING
+
                     DsprMessage::UnitOrderMsgV1 unitOrderMsgV1(toServerMsg.msgBytes);
 
                     std::list<int> unitIdList;
@@ -292,9 +306,6 @@ namespace DsprGameServer
                                 break;
                         }
 
-                        std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;
-                    } else if (parts.at(0).compare("chat/1.0/send") == 0) {
-                        game->chatManager->receiveMessage(parts[2], playerData);
                         std::cout << "dspr-gameserver: Received '" << msgString << "'" << std::endl;
                     }
                 }
