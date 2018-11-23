@@ -52,38 +52,6 @@ namespace DsprGameServer
         return this->dirtyQueue || this->dirtyTime;
     }
 
-    std::string ConstructionQueue::getUpdate(bool overrideDirty) {
-        bool first = true;
-        std::string newStr;
-        newStr.append("cq:");
-        if (this->dirtyTime || overrideDirty){
-            newStr.append("bt-");
-            newStr.append(std::to_string(this->currentBuildTime));
-            first = false;
-        }
-        if (this->dirtyQueue || overrideDirty) {
-            if (!first) newStr.append("+");
-            newStr.append("q-");
-
-            first = true;
-            auto copiedQueue = std::queue<UnitTemplate *>(this->unitQueue);
-            while (copiedQueue.size() > 0) {
-                auto front = copiedQueue.front();
-                if (front!=nullptr) {
-
-                    if (first) {first = false;}
-                    else {
-                        newStr.append(",");
-                    }
-                    newStr.append(std::to_string(front->index));
-                }
-                copiedQueue.pop();
-            }
-        }
-
-        return newStr;
-    }
-
     void ConstructionQueue::clean() {
         this->dirtyTime = false;
         this->dirtyQueue = false;
@@ -91,15 +59,20 @@ namespace DsprGameServer
 
     DsprMessage::ConstructionQueueMsgV1 * ConstructionQueue::serialize() {
         DsprMessage::ConstructionQueueMsgV1* msg = new DsprMessage::ConstructionQueueMsgV1();
-        msg->buildTime.set(this->currentBuildTime);
+        if (this->dirtyTime)
+            msg->buildTime.set(this->currentBuildTime);
 
-        auto copiedQueue = std::queue<UnitTemplate *>(this->unitQueue);
-        while (copiedQueue.size() > 0) {
-            auto front = copiedQueue.front();
-            if (front!=nullptr) {
-                msg->queue.add(front->index);
+        if (this->dirtyQueue) {
+            auto copiedQueue = std::queue<UnitTemplate *>(this->unitQueue);
+            while (copiedQueue.size() > 0) {
+                auto front = copiedQueue.front();
+                if (front != nullptr) {
+                    msg->queue.add(front->index);
+                }
+                copiedQueue.pop();
             }
-            copiedQueue.pop();
+
+            msg->queue.setWasSet(true);
         }
 
         return msg;

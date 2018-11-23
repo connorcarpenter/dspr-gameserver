@@ -24,8 +24,6 @@ namespace DsprGameServer {
 
         bool isDirty();
 
-        std::string getUpdate(bool overrideDirty);
-
         void clean();
 
         DsprMessage::ConstructionQueueMsgV1 * serialize();

@@ -15,7 +15,7 @@ namespace DsprGameServer {
         this->playerData->getWs()->send((char*) str->getCharPtr(), str->size(), uWS::BINARY);
 
         //TODO:: REMOVE FOR PRODUCTION!
-        std::string strr = std::basic_string<char>((char*) str->getCharPtr(), str->size());
-        std::cout << "gameserver: sent: " << strr << std::endl;
+        //std::string strr = std::basic_string<char>((char*) str->getCharPtr(), str->size());
+        //std::cout << ">" << std::endl;
     }
 }
