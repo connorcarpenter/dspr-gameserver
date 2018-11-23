@@ -212,10 +212,6 @@ namespace DsprGameServer
                     game = GameServer::get().playerCodeToGameMap.at(playerToken);
 
                     // Process message
-                    if (parts.at(0).compare("auth/1.0/gametoken") == 0) {
-                        std::cout << "dspr-gameserver: Received 'auth/1.0/gametoken', added player to game" << std::endl;
-                        game->addPlayer(playerToken, playerData);
-                    } else
                     if (parts.at(0).compare("unit/1.0/order") == 0) {
                         auto unitIdListStrings = StringUtils::split(parts[2], ',');
                         auto orderStrings = StringUtils::split(parts[3], ',');
