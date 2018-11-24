@@ -154,5 +154,7 @@ namespace DsprGameServer
         void updateWieldedWeapon();
 
         Item *wieldedWeapon = nullptr;
+
+        int getAcquisitionRange();
     };
 }

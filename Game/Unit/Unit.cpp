@@ -271,7 +271,8 @@ namespace DsprGameServer
             return;
         }
 
-        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->getRange(), targetUnit)){
+        if (targetUnit->isVisibleToTribe(this->tribe) && this->withinRangeOfUnit(this->position->x, this->position->y, this->getRange(), targetUnit))
+        {
             //start to attack!
             this->handleAttackAnimation(targetUnit);
         }
@@ -309,8 +310,12 @@ namespace DsprGameServer
             this->attackFrameIndex += this->attackAnimationSpeed;
             if (this->attackFrameIndex == this->attackFrameToApplyDamage)
             {
-                if (this->getRange() <= 2) {this->damageOtherUnit(targetUnit, this->getDamage());}
-                else {
+                if (this->getRange() <= 2)
+                {
+                    this->damageOtherUnit(targetUnit, this->getDamage());
+                }
+                else
+                {
                     this->game->unitManager->createProjectile(this->position->x, this->position->y,
                                                               targetUnit->position->x, targetUnit->position->y, 0,
                                                               this);
@@ -817,6 +822,7 @@ namespace DsprGameServer
 
         for(auto circleCoord : acquiCircle->coordList)
         {
+            if(!this->game->fogManager->tileIsClear(this->tribe, this->position->x + circleCoord->x, this->position->y + circleCoord->y)) continue;
             auto unitAtPosition = this->getUnitAtPosition(this->position->x + circleCoord->x, this->position->y + circleCoord->y);
             if (unitAtPosition == nullptr)continue;
             if (unitAtPosition->tribe->isNeutral())continue;
@@ -864,7 +870,7 @@ namespace DsprGameServer
     void Unit::lookForEnemyUnitsAndEngage() {
         if (this->unitTemplate->acquisition <= 0) return;
 
-        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->unitTemplate->acquisition);
+        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getAcquisitionRange());
         if (enemyUnitInAcquisitionRange != nullptr){
             //ideally, we would store the current order in a stack, and just push it down.. for now, no such thing
             std::list<std::pair<int, int>> unitPositionsList;
@@ -1249,5 +1255,9 @@ namespace DsprGameServer
         }
 
         return MathUtils::getRandom(minDamage, maxDamage);
+    }
+
+    int Unit::getAcquisitionRange() {
+        return MathUtils::Max(this->getRange(), this->unitTemplate->acquisition);
     }
 }
