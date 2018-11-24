@@ -97,6 +97,7 @@ namespace DsprGameServer
         void cancelTrainUnit(int queueIndex);
 
         int getRange();
+        void receiveDamage(int dmgAmount);
 
     private:
 

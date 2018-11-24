@@ -309,7 +309,10 @@ namespace DsprGameServer
             this->attackFrameIndex += this->attackAnimationSpeed;
             if (this->attackFrameIndex == this->attackFrameToApplyDamage)
             {
-                this->damageOtherUnit(targetUnit, this->getDamage());
+                if (this->getRange() <= 2) {this->damageOtherUnit(targetUnit, this->getDamage());}
+                else {
+                    this->game->unitManager->createProjectile(this->position->x, this->position->y, targetUnit->position->x, targetUnit->position->y, 0);
+                }
             }
             if (this->attackFrameIndex >= this->attackFramesNumber)
             {
@@ -888,11 +891,15 @@ namespace DsprGameServer
     }
 
     void Unit::damageOtherUnit(Unit *otherUnit, int dmgAmount) {
-        if (otherUnit->unitTemplate->isInvincible)return;
-        otherUnit->health->dirtyObj()->Subtract(dmgAmount);
-        otherUnit->bleed->dirtyObj()->Set(true);
-        if (otherUnit->health->obj()->value <= 0){
-            this->game->unitManager->queueUnitForDeletion(otherUnit);
+        otherUnit->receiveDamage(dmgAmount);
+    }
+
+    void Unit::receiveDamage(int dmgAmount) {
+        if (this->unitTemplate->isInvincible)return;
+        this->health->dirtyObj()->Subtract(dmgAmount);
+        this->bleed->dirtyObj()->Set(true);
+        if (this->health->obj()->value <= 0){
+            this->game->unitManager->queueUnitForDeletion(this);
         }
     }
 

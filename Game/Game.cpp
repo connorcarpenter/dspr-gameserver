@@ -52,6 +52,7 @@ namespace DsprGameServer
     void Game::update()
     {
         // update units
+        this->unitManager->updateProjectiles();
         this->unitManager->updateUnits();
 
         // send updates to each player
@@ -67,9 +68,14 @@ namespace DsprGameServer
             this->itemManager->sendItemUpdates(playerData);
         }
 
+        for (const auto &playerData : this->playerDataSet) {
+            this->unitManager->sendProjectiles(playerData);
+        }
+
         // clean units vars
         this->economyManager->clean();
         this->unitManager->cleanAllUnits();
+        this->unitManager->cleanProjectiles();
 
         // delete queued units
         this->unitManager->deleteUnits();

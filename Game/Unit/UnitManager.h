@@ -11,6 +11,7 @@
 #include "../TileManager.h"
 #include "../../Pathfinding/AStarPathfinder.h"
 #include "../../PrimIsoGrid.h"
+#include "Projectile.h"
 
 namespace DsprGameServer {
 
@@ -55,8 +56,20 @@ namespace DsprGameServer {
 
         void receiveCancelTrainOrder(std::list<int> idList, int queueIndex);
 
+        void updateProjectiles();
+
+        void createProjectile(int fromX, int fromY, int toX, int toY, int index);
+
+        void damageUnitAtPoint(int x, int y, int damage);
+
+        void sendProjectiles(PlayerData *const &playerData);
+
+        void cleanProjectiles();
+
     private:
         std::map<int, Unit*> unitMap;
+        std::set<Projectile*> projectileSet;
+        std::set<Projectile*> projectileCreationSet;
         std::queue<int> unusedIds;
         Game* game = nullptr;
 

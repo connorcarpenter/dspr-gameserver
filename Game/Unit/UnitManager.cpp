@@ -14,6 +14,7 @@
 #include "UnitTemplateCatalog.h"
 #include "../IsoBox/IsoBoxCache.h"
 #include "../Item/ItemManager.h"
+#include "../FogManager.h"
 
 namespace DsprGameServer
 {
@@ -643,5 +644,70 @@ namespace DsprGameServer
     bool UnitManager::playerIsAwareOfUnit(PlayerData *playerData, Unit *unit) {
         auto playerUnitAwareSet = this->playerToUnitsAwareOfMap.at(playerData);
         return playerUnitAwareSet->count(unit) != 0;
+    }
+
+    void UnitManager::createProjectile(int fromX, int fromY, int toX, int toY, int index) {
+        auto newPrjctl = new Projectile(this->game, fromX, fromY, toX, toY, index);
+        this->projectileCreationSet.insert(newPrjctl);
+    }
+
+    void UnitManager::updateProjectiles() {
+        std::set<Projectile*>* prjctlsToDelete = nullptr;
+        for(auto prjctl : this->projectileSet)
+        {
+            prjctl->update();
+            if (prjctl->done)
+            {
+                if (prjctlsToDelete == nullptr)
+                {
+                    prjctlsToDelete = new std::set<Projectile*>();
+                }
+
+                prjctlsToDelete->insert(prjctl);
+            }
+        }
+
+        if (prjctlsToDelete != nullptr)
+        {
+            for (auto prjctl : *prjctlsToDelete)
+            {
+                delete prjctl;
+            }
+            delete prjctlsToDelete;
+        }
+    }
+
+    void UnitManager::damageUnitAtPoint(int x, int y, int damage) {
+        auto unitToDamage = this->getUnitFromGrid(x,y);
+        if (unitToDamage == nullptr) return;
+        unitToDamage->receiveDamage(damage);
+    }
+
+    void UnitManager::sendProjectiles(PlayerData *const &playerData) {
+        for (auto prjctl : this->projectileCreationSet)
+        {
+            if (this->game->fogManager->tileIsClear(playerData->getTribe(), prjctl->fromCoord->x, prjctl->fromCoord->y) ||
+                    this->game->fogManager->tileIsClear(playerData->getTribe(), prjctl->toCoord->x, prjctl->toCoord->y))
+            {
+                DsprMessage::ProjectileCreateMsgV1 projectileCreateMsgV1;
+                projectileCreateMsgV1.fromX.set(prjctl->fromCoord->x);
+                projectileCreateMsgV1.fromY.set(prjctl->fromCoord->y);
+                projectileCreateMsgV1.toX.set(prjctl->toCoord->x);
+                projectileCreateMsgV1.toY.set(prjctl->toCoord->y);
+                projectileCreateMsgV1.index.set(prjctl->index);
+                auto clientMsg = projectileCreateMsgV1.getToClientMessage();
+                auto packedMsg = clientMsg->Pack();
+                GameServer::get().queueMessage(playerData, packedMsg);
+            }
+        }
+    }
+
+    void UnitManager::cleanProjectiles() {
+        for (auto prjctl : this->projectileCreationSet)
+        {
+            this->projectileSet.insert(prjctl);
+        }
+
+        this->projectileCreationSet.clear();
     }
 }

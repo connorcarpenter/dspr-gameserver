@@ -51,6 +51,7 @@ add_executable(dspr-gameserver
         Game/Unit/UnitTemplateCatalog.h Game/Unit/UnitTemplateCatalog.cpp
         Game/Unit/UnitTemplate.h Game/Unit/UnitTemplate.cpp
         Game/Unit/ConstructionQueue.h Game/Unit/ConstructionQueue.cpp
+        Game/Unit/Projectile.h Game/Unit/Projectile.cpp
 
         Game/Unit/SpecificUnit/SpecificUnit.h Game/Unit/SpecificUnit/SpecificUnit.cpp
         Game/Unit/SpecificUnit/Manafount.h Game/Unit/SpecificUnit/Manafount.cpp
