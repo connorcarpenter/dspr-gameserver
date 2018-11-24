@@ -311,7 +311,9 @@ namespace DsprGameServer
             {
                 if (this->getRange() <= 2) {this->damageOtherUnit(targetUnit, this->getDamage());}
                 else {
-                    this->game->unitManager->createProjectile(this->position->x, this->position->y, targetUnit->position->x, targetUnit->position->y, 0);
+                    this->game->unitManager->createProjectile(this->position->x, this->position->y,
+                                                              targetUnit->position->x, targetUnit->position->y, 0,
+                                                              this);
                 }
             }
             if (this->attackFrameIndex >= this->attackFramesNumber)

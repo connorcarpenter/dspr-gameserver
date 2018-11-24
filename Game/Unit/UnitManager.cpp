@@ -646,8 +646,8 @@ namespace DsprGameServer
         return playerUnitAwareSet->count(unit) != 0;
     }
 
-    void UnitManager::createProjectile(int fromX, int fromY, int toX, int toY, int index) {
-        auto newPrjctl = new Projectile(this->game, fromX, fromY, toX, toY, index);
+    void UnitManager::createProjectile(int fromX, int fromY, int toX, int toY, int index, Unit *unit) {
+        auto newPrjctl = new Projectile(this->game, fromX, fromY, toX, toY, index, unit);
         this->projectileCreationSet.insert(newPrjctl);
     }
 
@@ -671,6 +671,7 @@ namespace DsprGameServer
         {
             for (auto prjctl : *prjctlsToDelete)
             {
+                this->projectileSet.erase(prjctl);
                 delete prjctl;
             }
             delete prjctlsToDelete;
@@ -686,14 +687,16 @@ namespace DsprGameServer
     void UnitManager::sendProjectiles(PlayerData *const &playerData) {
         for (auto prjctl : this->projectileCreationSet)
         {
+            if (playerIsAwareOfUnit(playerData, prjctl->unit)) continue;
+
             if (this->game->fogManager->tileIsClear(playerData->getTribe(), prjctl->fromCoord->x, prjctl->fromCoord->y) ||
                     this->game->fogManager->tileIsClear(playerData->getTribe(), prjctl->toCoord->x, prjctl->toCoord->y))
             {
                 DsprMessage::ProjectileCreateMsgV1 projectileCreateMsgV1;
-                projectileCreateMsgV1.fromX.set(prjctl->fromCoord->x);
-                projectileCreateMsgV1.fromY.set(prjctl->fromCoord->y);
-                projectileCreateMsgV1.toX.set(prjctl->toCoord->x);
-                projectileCreateMsgV1.toY.set(prjctl->toCoord->y);
+                projectileCreateMsgV1.from.add(prjctl->fromCoord->x);
+                projectileCreateMsgV1.from.add(prjctl->fromCoord->y);
+                projectileCreateMsgV1.to.add(prjctl->toCoord->x);
+                projectileCreateMsgV1.to.add(prjctl->toCoord->y);
                 projectileCreateMsgV1.index.set(prjctl->index);
                 auto clientMsg = projectileCreateMsgV1.getToClientMessage();
                 auto packedMsg = clientMsg->Pack();

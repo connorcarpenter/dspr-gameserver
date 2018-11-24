@@ -6,11 +6,12 @@
 
 #include "../../Math/Point.h"
 #include "../Game.h"
+#include "Unit.h"
 
 namespace DsprGameServer {
     class Projectile {
     public:
-        Projectile(Game *game, int fromX, int fromY, int toX, int toY, int index);
+        Projectile(Game *game, int fromX, int fromY, int toX, int toY, int index, Unit *unit);
         ~Projectile();
 
         Point* fromCoord = nullptr;
@@ -24,5 +25,6 @@ namespace DsprGameServer {
         int speed = 1;
         Game *game = nullptr;
         int damage = 0;
+        Unit *unit;
     };
 }

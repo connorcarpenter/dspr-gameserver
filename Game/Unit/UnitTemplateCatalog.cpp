@@ -80,6 +80,9 @@ namespace DsprGameServer
         this->ashwalker = new UnitTemplate(3);
         this->ashwalker->sight = 8;
         this->ashwalker->acquisition = 8;
+        this->ashwalker->range = 2;
+        this->ashwalker->minDamage = 10;
+        this->ashwalker->maxDamage = 15;
         this->ashwalker->setWalkSpeed(4,6);
         this->ashwalker->maxHealth = 340;
 

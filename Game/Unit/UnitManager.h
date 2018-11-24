@@ -58,7 +58,7 @@ namespace DsprGameServer {
 
         void updateProjectiles();
 
-        void createProjectile(int fromX, int fromY, int toX, int toY, int index);
+        void createProjectile(int fromX, int fromY, int toX, int toY, int index, Unit *tribe);
 
         void damageUnitAtPoint(int x, int y, int damage);
 
