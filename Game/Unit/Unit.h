@@ -79,9 +79,6 @@ namespace DsprGameServer
         Synced<Bool>* bleed = false;
         int stamina = 100;
 
-        const int minDamage = 10;
-        const int maxDamage = 15;
-        int range = 2;//make sure this is multiples of 2... to accomodate for diagonal tiles
         float attackFrameIndex = 0;
         float attackWaitIndex = 0;
         float attackAnimationSpeed = 1;
@@ -98,6 +95,8 @@ namespace DsprGameServer
         Inventory* inventory = nullptr;
 
         void cancelTrainUnit(int queueIndex);
+
+        int getRange();
 
     private:
 
@@ -148,5 +147,11 @@ namespace DsprGameServer
         void dropItem();
 
         void updateItemGive();
+
+        int getDamage();
+
+        void updateWieldedWeapon();
+
+        Item *wieldedWeapon = nullptr;
     };
 }

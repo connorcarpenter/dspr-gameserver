@@ -60,16 +60,28 @@ namespace DsprGameServer {
             bool pathFindSuccess = (tileInPath != nullptr && tileInPath->disToEnd < unit->disToEnd);
             PathTile* endTileInPath = nullptr;
             if (!pathFindSuccess) {
-                if (unit->orderGroup->orderIndex == AttackTarget || unit->orderGroup->orderIndex == Gather) {
-                    if (unit->withinRangeOfUnit(currentNode->x, currentNode->y, unit->range,
-                                                unit->orderGroup->getTargetUnit()))
-                        pathFindSuccess = true;
-                } else {
-                    endTileInPath = path->getEndTile(currentNode->x, currentNode->y);
-                    if (endTileInPath != nullptr) pathFindSuccess = true;
+                switch (unit->orderGroup->orderIndex)
+                {
+                    case AttackTarget: {
+                        if (unit->withinRangeOfUnit(currentNode->x, currentNode->y, unit->getRange(),
+                                                    unit->orderGroup->getTargetUnit()))
+                            pathFindSuccess = true;
+                    }
+                        break;
+                    case Gather: {
+                        if (unit->withinRangeOfUnit(currentNode->x, currentNode->y, unit->unitTemplate->range,
+                                                    unit->orderGroup->getTargetUnit()))
+                            pathFindSuccess = true;
+                    }
+                        break;
+                    default:
+                    {
+                        endTileInPath = path->getEndTile(currentNode->x, currentNode->y);
+                        if (endTileInPath != nullptr) pathFindSuccess = true;
+                    }
+                        break;
                 }
             }
-
 
             if (pathFindSuccess)
             {

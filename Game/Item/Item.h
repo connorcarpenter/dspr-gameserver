@@ -17,7 +17,7 @@ namespace DsprGameServer {
 
         Game *game = nullptr;
         Point* position = nullptr;
-        ItemTemplate *itemTemplate;
+        ItemTemplate *itemTemplate = nullptr;
         int id = -1;
 
         bool isVisibleToTribe(Tribe *tribe);

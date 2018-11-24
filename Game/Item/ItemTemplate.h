@@ -13,6 +13,11 @@ namespace DsprGameServer {
         ItemTemplate(int index);
         BodyPart wornOn = BodyPart::None;
 
+        bool isWeapon = false;
+
         int index = -1;
+        int range;
+        int minDamage;
+        int maxDamage;
     };
 }

@@ -33,6 +33,9 @@ namespace DsprGameServer
         this->worker = new UnitTemplate(0);
         this->worker->sight = 6;
         this->worker->acquisition = 6;
+        this->worker->range = 2;//make sure this is multiples of 2... to accomodate for diagonal tiles
+        this->worker->minDamage = 10;
+        this->worker->maxDamage = 15;
         this->worker->setWalkSpeed(2,3);
         this->worker->maxHealth = 420;
         this->worker->buildTime = 300;

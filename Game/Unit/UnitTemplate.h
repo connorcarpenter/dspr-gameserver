@@ -25,6 +25,9 @@ namespace DsprGameServer
         int index;
         int sight;
         int acquisition;
+        int range;//make sure this is multiples of 2... to accomodate for diagonal tiles
+        int minDamage;
+        int maxDamage;
         int walkMax = 0;
         int walkSpeedStraight = 0;
         int walkSpeedDiagonal = 0;

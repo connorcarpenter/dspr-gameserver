@@ -189,7 +189,7 @@ namespace DsprGameServer
                 if (this->orderGroup != nullptr) {
                     if (this->orderGroup->orderIndex == AttackTarget)
                     {
-                        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->range,
+                        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->getRange(),
                                                     orderGroup->getTargetUnit())) {
                             setPathArrived();
                         }
@@ -271,7 +271,7 @@ namespace DsprGameServer
             return;
         }
 
-        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->range, targetUnit)){
+        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->getRange(), targetUnit)){
             //start to attack!
             this->handleAttackAnimation(targetUnit);
         }
@@ -309,7 +309,7 @@ namespace DsprGameServer
             this->attackFrameIndex += this->attackAnimationSpeed;
             if (this->attackFrameIndex == this->attackFrameToApplyDamage)
             {
-                this->damageOtherUnit(targetUnit, MathUtils::getRandom(this->minDamage, this->maxDamage));
+                this->damageOtherUnit(targetUnit, this->getDamage());
             }
             if (this->attackFrameIndex >= this->attackFramesNumber)
             {
@@ -332,7 +332,7 @@ namespace DsprGameServer
             return;
         }
 
-        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->range, targetUnit)){
+        if (this->withinRangeOfUnit(this->position->x, this->position->y, this->unitTemplate->range, targetUnit)){
             //start to gather!
             this->handleGatherAnimation(targetUnit);
         }
@@ -468,7 +468,7 @@ namespace DsprGameServer
         if (this->orderGroup->getTargetUnit() == nullptr)
         {
             if (this->unitTemplate->acquisition <= 0) return;
-            Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->range);
+            Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getRange());
             if (enemyUnitInAcquisitionRange != nullptr)
             {
                 this->orderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
@@ -477,7 +477,7 @@ namespace DsprGameServer
         auto targetUnit = this->orderGroup->getTargetUnit();
         if (targetUnit != nullptr)
         {
-            if (this->withinRangeOfUnit(this->position->x, this->position->y, this->range, targetUnit))
+            if (this->withinRangeOfUnit(this->position->x, this->position->y, this->getRange(), targetUnit))
             {
                 //start to attack!
                 this->handleAttackAnimation(targetUnit);
@@ -1088,7 +1088,13 @@ namespace DsprGameServer
             this->syncedTargetUnitId->clean();
             this->gatherYield->clean();
             if (this->constructionQueue != nullptr) this->constructionQueue->clean();
-            if (this->inventory != nullptr) this->inventory->clean();
+            if (this->inventory != nullptr)
+            {
+                if (this->inventory->dirty) {
+                    this->updateWieldedWeapon();
+                    this->inventory->clean();
+                }
+            }
             if (this->rallyPoint != nullptr) this->rallyPoint->clean();
             if (this->rallyUnitId != nullptr) this->rallyUnitId->clean();
             //more synced vars here
@@ -1194,5 +1200,45 @@ namespace DsprGameServer
                 this->game->unitManager->receiveMoveOrder(idList, this->rallyPoint->obj()->x, this->rallyPoint->obj()->y);
             }
         }
+    }
+
+    void Unit::updateWieldedWeapon() {
+        this->wieldedWeapon = nullptr;
+
+        if (this->unitTemplate->hasInventory)
+        {
+            for(int i=0;i<2;i++) {
+                auto sampleWeapon = this->inventory->getItem(i + 1);
+                if (sampleWeapon != nullptr && sampleWeapon->itemTemplate->isWeapon) {
+                    this->wieldedWeapon = sampleWeapon;
+                    return;
+                }
+            }
+        }
+    }
+
+    int Unit::getRange() {
+        if (this->wieldedWeapon != nullptr)
+        {
+            return this->wieldedWeapon->itemTemplate->range;
+        }
+
+        return this->unitTemplate->range;
+    }
+
+    int Unit::getDamage() {
+        int minDamage, maxDamage;
+        if (this->wieldedWeapon != nullptr)
+        {
+            minDamage = this->wieldedWeapon->itemTemplate->minDamage;
+            maxDamage = this->wieldedWeapon->itemTemplate->maxDamage;
+        }
+        else
+        {
+            minDamage = this->unitTemplate->minDamage;
+            maxDamage = this->unitTemplate->maxDamage;
+        }
+
+        return MathUtils::getRandom(minDamage, maxDamage);
     }
 }

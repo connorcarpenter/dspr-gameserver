@@ -12,10 +12,18 @@ namespace DsprGameServer {
 
         this->sling = new ItemTemplate(0);
         this->sling->wornOn = BodyPart::Hand;
+        this->sling->isWeapon = true;
+        this->sling->range = 6;
+        this->sling->minDamage = 15;
+        this->sling->maxDamage = 20;
         this->templateMap.emplace(this->sling->index, this->sling);
 
         this->club = new ItemTemplate(2);
         this->club->wornOn = BodyPart::Hand;
+        this->club->isWeapon = true;
+        this->club->range = 2;
+        this->club->minDamage = 20;
+        this->club->maxDamage = 30;
         this->templateMap.emplace(this->club->index, this->club);
 
         this->helmet = new ItemTemplate(3);
