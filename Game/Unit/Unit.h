@@ -96,6 +96,9 @@ namespace DsprGameServer
         SpecificUnit* specificUnit = nullptr;
 
         Inventory* inventory = nullptr;
+
+        void cancelTrainUnit(int queueIndex);
+
     private:
 
         Game* game = nullptr;

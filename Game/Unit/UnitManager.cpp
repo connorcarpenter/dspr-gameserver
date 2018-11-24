@@ -304,6 +304,15 @@ namespace DsprGameServer
             }
     }
 
+    void UnitManager::receiveCancelTrainOrder(std::list<int> idList, int queueIndex) {
+        for (const auto &i : idList)
+            if (unitMap.count(i) != 0) {
+                auto unit = unitMap.at(i);
+                if (!unit->unitTemplate->hasConstructionQueue) continue;
+                unit->cancelTrainUnit(queueIndex);
+            }
+    }
+
     void UnitManager::receiveGatherOrder(const std::list<int> &idList, int targetUnitId)
     {
         if (unitMap.count(targetUnitId) == 0) return;

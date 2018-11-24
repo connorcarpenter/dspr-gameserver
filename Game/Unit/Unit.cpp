@@ -1090,7 +1090,7 @@ namespace DsprGameServer
             if (this->constructionQueue != nullptr) this->constructionQueue->clean();
             if (this->inventory != nullptr) this->inventory->clean();
             if (this->rallyPoint != nullptr) this->rallyPoint->clean();
-            if (this->rallyUnitId != nullptr) this->rallyPoint->clean();
+            if (this->rallyUnitId != nullptr) this->rallyUnitId->clean();
             //more synced vars here
         }
     }
@@ -1136,6 +1136,10 @@ namespace DsprGameServer
         if (!this->constructionQueue->atMaxQueue()){
             this->constructionQueue->enqueue(unitTemplate);
         }
+    }
+
+    void Unit::cancelTrainUnit(int queueIndex) {
+        this->constructionQueue->cancelAtIndex(queueIndex);
     }
 
     std::list<Point*> shuffle(std::list<Point*>& lst ) // shuffle contents of a list

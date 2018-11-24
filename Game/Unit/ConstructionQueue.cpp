@@ -2,6 +2,7 @@
 // Created by connor on 10/26/18.
 //
 
+#include <stack>
 #include "ConstructionQueue.h"
 #include "Unit.h"
 
@@ -20,6 +21,34 @@ namespace DsprGameServer
     {
         this->unitQueue.push(unitTemplate);
         this->dirtyQueue = true;
+    }
+
+    void ConstructionQueue::cancelAtIndex(int index) {
+        auto newStack = std::stack<UnitTemplate*>();
+
+        int i = 0;
+        while (unitQueue.size() > 0) {
+            auto front = unitQueue.front();
+            if (front != nullptr && index != i) {
+                newStack.push(front);
+            }
+            unitQueue.pop();
+
+            i++;
+        }
+
+        while (newStack.size() > 0) {
+            unitQueue.push(newStack.top());
+            newStack.pop();
+        }
+
+        this->dirtyQueue = true;
+
+        if (index == 0)
+        {
+            this->currentBuildTime = 0;
+            this->dirtyTime = true;
+        }
     }
 
     void ConstructionQueue::update()

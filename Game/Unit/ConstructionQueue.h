@@ -28,6 +28,8 @@ namespace DsprGameServer {
 
         DsprMessage::ConstructionQueueMsgV1 * serialize();
 
+        void cancelAtIndex(int index);
+
     private:
         std::queue<UnitTemplate*> unitQueue;
         const int maxQueue = 7;

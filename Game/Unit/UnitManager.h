@@ -53,6 +53,8 @@ namespace DsprGameServer {
         void receiveRallyPointOrder(const std::list<int> &idList, int tileX, int tileY);
         void receiveRallyUnitOrder(const std::list<int> &idList, int targetId);
 
+        void receiveCancelTrainOrder(std::list<int> idList, int queueIndex);
+
     private:
         std::map<int, Unit*> unitMap;
         std::queue<int> unusedIds;

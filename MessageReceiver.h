@@ -143,6 +143,11 @@ namespace DsprGameServer
                             game->unitManager->receiveTrainOrder(unitIdList, unitTemplateIndex);
                         }
                             break;
+                        case CancelTrain: {
+                            int queueIndex = unitOrderMsgV1.otherNumbers.get(0);
+                            game->unitManager->receiveCancelTrainOrder(unitIdList, queueIndex);
+                        }
+                            break;
                         case Gather: {
                             int targetUnitId = unitOrderMsgV1.otherNumbers.get(0);
                             game->unitManager->receiveGatherOrder(unitIdList, targetUnitId);

@@ -19,6 +19,7 @@ namespace DsprGameServer {
         ItemDrop,
         ItemGive,
         RallyPoint,
-        RallyUnit
+        RallyUnit,
+        CancelTrain
     };
 }
