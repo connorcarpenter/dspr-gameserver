@@ -239,7 +239,7 @@ namespace DsprGameServer
 
         std::list<std::pair<int, int>> unitPositionsList;
 
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackTarget);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackTargetStrong);
         auto targetUnit = unitMap.at(targetUnitId);
         newOrderGroup->setTargetUnit(targetUnit);
 

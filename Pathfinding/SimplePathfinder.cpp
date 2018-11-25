@@ -62,7 +62,8 @@ namespace DsprGameServer {
             if (!pathFindSuccess) {
                 switch (unit->orderGroup->orderIndex)
                 {
-                    case AttackTarget: {
+                    case AttackTargetStrong:
+                    case AttackTargetWeak:{
                         if (unit->withinRangeOfUnit(currentNode->x, currentNode->y, unit->getRange(),
                                                     unit->orderGroup->getTargetUnit()))
                             pathFindSuccess = true;

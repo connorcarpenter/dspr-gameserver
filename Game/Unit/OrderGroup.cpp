@@ -70,7 +70,7 @@ namespace DsprGameServer {
 
                 auto targetUnit = this->getTargetUnit();
                 auto path = this->game->pathfinder->findPath(unitPositionsList, targetUnit->position->x,
-                                                             targetUnit->position->y, orderIndex == AttackTarget);
+                                                             targetUnit->position->y, this->isAttackingTarget());
                 if (path != nullptr)
                 {
                     this->setPath(path);
@@ -144,8 +144,8 @@ namespace DsprGameServer {
         return this->unitsArrived;
     }
 
-    bool OrderGroup::isAttacking() {
-        return orderIndex == AttackTarget || orderIndex == AttackMove;
+    bool OrderGroup::isAttackingTarget() {
+        return orderIndex == AttackTargetStrong || orderIndex == AttackTargetWeak;
     }
 
     Unit *OrderGroup::getTargetUnit() {

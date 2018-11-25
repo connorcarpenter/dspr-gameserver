@@ -124,7 +124,8 @@ namespace DsprGameServer
                     case Follow:
                         this->updateFollowing();
                         break;
-                    case AttackTarget:
+                    case AttackTargetStrong:
+                    case AttackTargetWeak:
                         this->updateAttacking();
                         break;
                     case Hold:
@@ -205,7 +206,7 @@ namespace DsprGameServer
         if (this->followingPath && this->pushCount<5) {
             if (this->position->Equals(this->nextTilePosition) && this->nextPosition->obj()->Equals(this->nextTilePosition)) {
                 if (this->orderGroup != nullptr) {
-                    if (this->orderGroup->orderIndex == AttackTarget)
+                    if (this->orderGroup->isAttackingTarget())
                     {
                         if (this->withinRangeOfUnit(this->position->x, this->position->y, this->getRange(),
                                                     orderGroup->getTargetUnit())) {
@@ -302,7 +303,31 @@ namespace DsprGameServer
             }
 
             if(!this->followingPath) setPathUnarrived();
-            this->updateFollowing();
+
+            switch(this->orderGroup->orderIndex)
+            {
+                case UnitOrderType::AttackTargetStrong:
+                    this->orderGroup->recalculatePathIfTargetMoved();
+                    break;
+
+                case UnitOrderType::AttackTargetWeak:
+                {
+                    if (this->orderGroup->targetHasMoved() && this->orderGroup->targetOffPath())
+                    {
+                        this->lookForEnemyUnitsAndEngage();
+                    }
+                    else
+                    {
+                        this->orderGroup->recalculatePathIfTargetMoved();
+                    }
+                }
+                    break;
+                default:
+                    int i = 1/0; //whats going on here?
+                    break;
+            }
+
+            this->updateWalking();
         }
     }
 
@@ -761,7 +786,7 @@ namespace DsprGameServer
         if (nextPoint == nullptr){
             this->lostWithoutShortPath += 1;
             if (lostWithoutShortPath > 5){
-                if(this->orderGroup->orderIndex == AttackTarget)
+                if(this->orderGroup->isAttackingTarget())
                 {
                     if (lostWithoutShortPath > 50)
                     {
@@ -902,7 +927,7 @@ namespace DsprGameServer
                     this->queuedOrders.push_front(attackOrder);
                 }
 
-                auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackTarget);
+                auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackTargetWeak);
                 newOrderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
                 newOrderGroup->setPath(path);
                 this->setOrderGroup(newOrderGroup);

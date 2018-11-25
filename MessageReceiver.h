@@ -119,7 +119,7 @@ namespace DsprGameServer
                             game->unitManager->receiveFollowOrder(unitIdList, targetUnitId);
                         }
                             break;
-                        case AttackTarget: {
+                        case AttackTargetStrong: {
                             int targetUnitId = unitOrderMsgV1.otherNumbers.get(0);
                             game->unitManager->receiveAttackTargetOrder(unitIdList, targetUnitId);
                         }
@@ -240,7 +240,7 @@ namespace DsprGameServer
                                 game->unitManager->receiveFollowOrder(unitIdList, targetUnitId);
                             }
                                 break;
-                            case AttackTarget: {
+                            case AttackTargetStrong: {
                                 int targetUnitId = stoi(orderStrings[1]);
                                 game->unitManager->receiveAttackTargetOrder(unitIdList, targetUnitId);
                             }

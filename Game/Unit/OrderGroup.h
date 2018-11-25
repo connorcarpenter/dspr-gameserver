@@ -29,7 +29,7 @@ namespace DsprGameServer
         int getUnitsArrived();
         void unitArrived();
         void unitUnarrived();
-        bool isAttacking();
+        bool isAttackingTarget();
         bool targetHasMoved();
         Unit *getTargetUnit();
         void setTargetItem(DsprGameServer::Item *targetItem);
@@ -39,9 +39,10 @@ namespace DsprGameServer
         UnitOrderType orderIndex;
         std::shared_ptr<DsprGameServer::Path> path = nullptr;
 
+        bool targetOffPath();
+
     private:
 
-        bool targetOffPath();
         void targetUpdatePosition();
 
         std::list<int> unitIds;
