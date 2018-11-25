@@ -290,6 +290,28 @@ namespace DsprGameServer
             return;
         }
 
+        //give a chance to auto-acquire as higher-priority target
+        if (this->orderGroup->orderIndex == UnitOrderType::AttackTargetWeak) {
+            if (!targetUnit->canAttack()) {
+                Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getAcquisitionRange());
+                if (enemyUnitInAcquisitionRange != nullptr && enemyUnitInAcquisitionRange->canAttack())
+                {
+                    auto path = this->game->pathfinder->findPath(this->position->x, this->position->y, enemyUnitInAcquisitionRange->position->x,
+                                                                 enemyUnitInAcquisitionRange->position->y, false);
+                    if (path != nullptr)
+                    {
+                        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackTargetWeak);
+                        newOrderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
+                        newOrderGroup->setPath(path);
+                        this->setOrderGroup(newOrderGroup);
+                        this->startPath();
+                        targetUnit = enemyUnitInAcquisitionRange;
+                    }
+                }
+            }
+        }
+
+        // if the target is visible and we're within attack range.. attack already!
         if (targetUnit->isVisibleToTribe(this->tribe) && this->withinRangeOfUnit(this->position->x, this->position->y, this->getRange(), targetUnit))
         {
             //start to attack!
@@ -861,6 +883,9 @@ namespace DsprGameServer
     }
 
     Unit * Unit::getEnemyUnitInRange(int range) {
+
+        Unit* lowPriorityTarget = nullptr;
+
         auto acquiCircle = CircleCache::get().getCircle(range);
 
         for(auto circleCoord : acquiCircle->coordList)
@@ -873,9 +898,18 @@ namespace DsprGameServer
             if (this->blockedEnemyList != nullptr)
                 if (this->blockedEnemyList->count(unitAtPosition) > 0)
                     continue;
-            return unitAtPosition;
+            if (unitAtPosition->canAttack()) {
+                return unitAtPosition;
+            } else {
+                if (lowPriorityTarget == nullptr) {
+                    lowPriorityTarget = unitAtPosition;
+                } else {
+                    continue;
+                }
+            }
         }
 
+        if (lowPriorityTarget != nullptr) return lowPriorityTarget;
         return nullptr;
     }
 
