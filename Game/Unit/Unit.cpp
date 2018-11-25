@@ -180,7 +180,25 @@ namespace DsprGameServer
     }
 
     void Unit::updateStanding() {
-        this->lookForEnemyUnitsAndEngage();
+        //if there's a queued command, do that
+        if (this->queuedOrders.size() > 0)
+        {
+            auto queuedOrder = this->queuedOrders.front();
+            this->queuedOrders.pop_front();
+
+            if (queuedOrder.orderType == UnitOrderType::AttackMove)
+            {
+                auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackMove);
+                auto path = this->game->pathfinder->findPath(this->nextPosition->obj()->x, this->nextPosition->obj()->y, queuedOrder.toX, queuedOrder.toY, false);
+                if (path!= nullptr) {
+                    newOrderGroup->setPath(path);
+                    this->setOrderGroup(newOrderGroup);
+                    this->startPath();
+                }
+            }
+        }
+        else
+            this->lookForEnemyUnitsAndEngage();
     }
 
     void Unit::updateWalking() {
@@ -267,7 +285,7 @@ namespace DsprGameServer
         auto targetUnit = this->orderGroup->getTargetUnit();
 
         if (targetUnit == nullptr){
-            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrderType::Move));
             return;
         }
 
@@ -338,7 +356,7 @@ namespace DsprGameServer
         auto targetUnit = this->orderGroup->getTargetUnit();
 
         if (targetUnit == nullptr){
-            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrderType::Move));
             return;
         }
 
@@ -394,7 +412,7 @@ namespace DsprGameServer
         auto targetItem = this->orderGroup->getTargetItem();
 
         if (targetItem == nullptr){
-            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrderType::Move));
             return;
         }
 
@@ -443,7 +461,7 @@ namespace DsprGameServer
         }
 
         this->inventory->itemToDrop = nullptr;
-        this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
+        this->stop(std::make_shared<OrderGroup>(this->game, UnitOrderType::Move));
     }
 
     void Unit::updateItemGive()
@@ -451,7 +469,7 @@ namespace DsprGameServer
         auto targetUnit = this->orderGroup->getTargetUnit();
 
         if (targetUnit == nullptr){
-            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrderType::Move));
             return;
         }
 
@@ -459,7 +477,7 @@ namespace DsprGameServer
             targetUnit->inventory->addItem(this->inventory->itemToDrop);
             this->inventory->removeItem(this->inventory->itemToDrop);
             this->inventory->itemToDrop = nullptr;
-            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrder::Move));
+            this->stop(std::make_shared<OrderGroup>(this->game, UnitOrderType::Move));
         }
         else {
             //try to get in range of target unit
@@ -519,7 +537,7 @@ namespace DsprGameServer
 
     void Unit::hold()
     {
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Hold);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::Hold);
         this->setOrderGroup(newOrderGroup);
         this->followingPath = false;
         if (!this->moveTarget->obj()->Equals(this->nextPosition->obj()))
@@ -871,21 +889,23 @@ namespace DsprGameServer
         if (this->unitTemplate->acquisition <= 0) return;
 
         Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getAcquisitionRange());
-        if (enemyUnitInAcquisitionRange != nullptr){
-            //ideally, we would store the current order in a stack, and just push it down.. for now, no such thing
-            std::list<std::pair<int, int>> unitPositionsList;
-
-            auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackTarget);
-            newOrderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
-
-            unitPositionsList.emplace_back(std::pair<int,int>(this->position->x, this->position->y));
-            this->setOrderGroup(newOrderGroup);
-
-            auto path = this->game->pathfinder->findPath(unitPositionsList, enemyUnitInAcquisitionRange->position->x,
+        if (enemyUnitInAcquisitionRange != nullptr)
+        {
+            auto path = this->game->pathfinder->findPath(this->position->x, this->position->y, enemyUnitInAcquisitionRange->position->x,
                                                          enemyUnitInAcquisitionRange->position->y, false);
             if (path != nullptr)
             {
+                //if we're attack moving, put the last order into our queue
+                if (this->orderGroup != nullptr && this->orderGroup->orderIndex == UnitOrderType::AttackMove)
+                {
+                    auto attackOrder = UnitOrder(UnitOrderType::AttackMove, this->orderGroup->path->targetX, this->orderGroup->path->targetY);
+                    this->queuedOrders.push_front(attackOrder);
+                }
+
+                auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackTarget);
+                newOrderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
                 newOrderGroup->setPath(path);
+                this->setOrderGroup(newOrderGroup);
                 this->startPath();
             }
         }

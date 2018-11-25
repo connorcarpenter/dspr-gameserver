@@ -47,7 +47,7 @@ add_executable(dspr-gameserver
         Game/Unit/OrderGroup.h Game/Unit/OrderGroup.cpp
         Game/Unit/Synced.h
         Game/Unit/AnimationState.h Game/Unit/AnimationState.cpp
-        Game/Unit/UnitOrder.h
+        Game/Unit/UnitOrder.h Game/Unit/UnitOrder.cpp
         Game/Unit/UnitTemplateCatalog.h Game/Unit/UnitTemplateCatalog.cpp
         Game/Unit/UnitTemplate.h Game/Unit/UnitTemplate.cpp
         Game/Unit/ConstructionQueue.h Game/Unit/ConstructionQueue.cpp

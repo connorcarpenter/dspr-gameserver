@@ -24,6 +24,23 @@ namespace DsprGameServer
     }
 
     std::shared_ptr<Path>
+    AStarPathfinder::findPath(int unitX, int unitY, int targetX, int targetY,
+                              bool attackTarget)
+    {
+        auto targetTile = this->game->tileManager->getTileAt(targetX, targetY);
+        if (targetTile == nullptr || !targetTile->walkable) return nullptr;
+
+        auto path = std::make_shared<Path>(this->game, targetX, targetY);
+
+        addToPath(path, unitX, unitY, targetX, targetY);
+
+        if (!attackTarget)
+            this->moveEndPosFiller->fillEndTiles(path, 1);
+
+        return path;
+    }
+
+    std::shared_ptr<Path>
     AStarPathfinder::findPath(const std::list<std::pair<int, int>> &unitPositions, int targetX, int targetY,
                                   bool attackTarget)
     {

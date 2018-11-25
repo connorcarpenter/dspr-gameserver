@@ -8,14 +8,16 @@
 #include "UnitOrder.h"
 #include "../Item/Item.h"
 
-namespace DsprGameServer {
+namespace DsprGameServer
+{
     class Unit;
     class Game;
 
-    class OrderGroup {
+    class OrderGroup
+    {
     public:
 
-        OrderGroup(Game* game, UnitOrder order);
+        OrderGroup(Game* game, UnitOrderType order);
 
         void addUnit(Unit* unit);
         void removeUnit(Unit *unit);
@@ -28,31 +30,24 @@ namespace DsprGameServer {
         void unitArrived();
         void unitUnarrived();
         bool isAttacking();
-
-        int targetUnitId = 0;
-        UnitOrder orderIndex;
-        std::shared_ptr<DsprGameServer::Path> path = nullptr;
-
         bool targetHasMoved();
-
         Unit *getTargetUnit();
-
         void setTargetItem(DsprGameServer::Item *targetItem);
-
         Item *getTargetItem();
 
+        int targetUnitId = 0;
+        UnitOrderType orderIndex;
+        std::shared_ptr<DsprGameServer::Path> path = nullptr;
+
     private:
+
+        bool targetOffPath();
+        void targetUpdatePosition();
 
         std::list<int> unitIds;
         int unitsArrived = 0;
         Point lastTargetPosition = DsprGameServer::Point(0, 0);
         Game* game = nullptr;
-
-        bool targetOffPath();
-
-        void targetUpdatePosition();
-
         int targetItemId;
-
     };
 }

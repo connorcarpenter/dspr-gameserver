@@ -17,6 +17,7 @@
 #include "SpecificUnit/SpecificUnit.h"
 #include "../Item/Item.h"
 #include "../../Math/Bool.h"
+#include "UnitOrder.h"
 
 namespace DsprGameServer
 {
@@ -49,6 +50,9 @@ namespace DsprGameServer
         bool canAttack();
         void trainUnit(UnitTemplate *unitTemplate);
         void finishTraining(UnitTemplate *unitTemplate);
+        void cancelTrainUnit(int queueIndex);
+        int getRange();
+        void receiveDamage(int dmgAmount);
 
         int id = -1;
         Synced<AnimationState>* animationState = nullptr;
@@ -94,11 +98,6 @@ namespace DsprGameServer
 
         Inventory* inventory = nullptr;
 
-        void cancelTrainUnit(int queueIndex);
-
-        int getRange();
-        void receiveDamage(int dmgAmount);
-
     private:
 
         Game* game = nullptr;
@@ -106,6 +105,8 @@ namespace DsprGameServer
         int pushCount = 0;
         std::set<Unit*>* blockedEnemyList = nullptr;
         ConstructionQueue* constructionQueue = nullptr;
+        Item *wieldedWeapon = nullptr;
+        std::deque<UnitOrder> queuedOrders;
 
         void pushOtherUnit(Unit *otherUnit);
         void getNextTile();
@@ -128,33 +129,19 @@ namespace DsprGameServer
         void updateAttacking();
         void updateHolding();
         void updateGather();
+        void updateItemGive();
+        void updateItemDrop();
+        void updatePickup();
 
         void handleAttackAnimation(Unit *targetUnit);
         void handleGatherAnimation(Unit *targetUnit);
-
         void setAnimationStateHeading(Unit *targetUnit);
-
         int getAdjustedDir(float x, float y);
-
-        void updatePickup();
-
         bool withinRangeOfPoint(int x, int y, int range, int tx, int ty);
-
         void pickupItem(DsprGameServer::Item *item);
-
-
-        void updateItemDrop();
-
         void dropItem();
-
-        void updateItemGive();
-
         int getDamage();
-
         void updateWieldedWeapon();
-
-        Item *wieldedWeapon = nullptr;
-
         int getAcquisitionRange();
     };
 }

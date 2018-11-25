@@ -111,7 +111,7 @@ namespace DsprGameServer
     {
         std::list<std::pair<int, int>> unitPositionsList;
 
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::Move);
 
         for (const auto& i : idList)
         {
@@ -166,7 +166,7 @@ namespace DsprGameServer
     {
         std::list<std::pair<int, int>> unitPositionsList;
 
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackMove);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackMove);
 
         for (const auto& i : idList)
         {
@@ -201,7 +201,7 @@ namespace DsprGameServer
 
         std::list<std::pair<int, int>> unitPositionsList;
 
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Follow);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::Follow);
 
         auto targetUnit = unitMap.at(targetUnitId);
         newOrderGroup->setTargetUnit(targetUnit);
@@ -239,7 +239,7 @@ namespace DsprGameServer
 
         std::list<std::pair<int, int>> unitPositionsList;
 
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::AttackTarget);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackTarget);
         auto targetUnit = unitMap.at(targetUnitId);
         newOrderGroup->setTargetUnit(targetUnit);
 
@@ -272,7 +272,7 @@ namespace DsprGameServer
 
     void UnitManager::receiveStopOrder(const std::list<int> &idList)
     {
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Move);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::Move);
 
         for (const auto &i : idList)
             if (unitMap.count(i) != 0) {
@@ -323,7 +323,7 @@ namespace DsprGameServer
         auto targetUnit = unitMap.at(targetUnitId);
         if (!targetUnit->unitTemplate->isGatherable)return;
 
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Gather);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::Gather);
         newOrderGroup->setTargetUnit(targetUnit);
 
         for (const auto& i : idList)
@@ -360,7 +360,7 @@ namespace DsprGameServer
 
         auto targetItem = this->game->itemManager->getItem(targetItemId);
 
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::Pickup);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::Pickup);
         newOrderGroup->setTargetItem(targetItem);
 
         for (const auto& i : unitIdList)
@@ -411,7 +411,7 @@ namespace DsprGameServer
 
         ///
         std::list<std::pair<int, int>> unitPositionsList;
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::ItemDrop);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::ItemDrop);
         unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
         unit->setOrderGroup(newOrderGroup);
 
@@ -438,7 +438,7 @@ namespace DsprGameServer
 
         ///
         std::list<std::pair<int, int>> unitPositionsList;
-        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrder::ItemGive);
+        auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::ItemGive);
         newOrderGroup->setTargetUnit(targetUnit);
         unitPositionsList.emplace_back(std::pair<int,int>(unit->nextPosition->obj()->x, unit->nextPosition->obj()->y));
         unit->setOrderGroup(newOrderGroup);

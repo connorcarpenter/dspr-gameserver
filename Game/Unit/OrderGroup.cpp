@@ -12,7 +12,7 @@
 
 namespace DsprGameServer {
 
-    OrderGroup::OrderGroup(Game *game, UnitOrder order) {
+    OrderGroup::OrderGroup(Game *game, UnitOrderType order) {
         this->game = game;
         this->orderIndex = order;
     }

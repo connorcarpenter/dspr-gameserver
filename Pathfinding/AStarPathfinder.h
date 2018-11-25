@@ -31,6 +31,9 @@ namespace DsprGameServer
         static void setMapWidth(int width);
         static int getMapWidth();
         static int mapWidth;
+
+        std::shared_ptr<Path> findPath(int unitX, int unitY, int targetX, int targetY, bool attackTarget);
+
     private:
         std::list<PathNode *> *getNeighbors(PathNode *parent, int targetX, int targetY);
 
@@ -48,5 +51,6 @@ namespace DsprGameServer
 
         Game* game = nullptr;
         MoveEndPosFiller *moveEndPosFiller = nullptr;
+
     };
 }

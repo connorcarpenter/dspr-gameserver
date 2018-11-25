@@ -105,7 +105,7 @@ namespace DsprGameServer
                         unitIdList.push_front(unitOrderMsgV1.unitIds.get(i));
                     }
 
-                    UnitOrder orderIndex = static_cast<UnitOrder>(unitOrderMsgV1.orderIndex.get());
+                    UnitOrderType orderIndex = static_cast<UnitOrderType>(unitOrderMsgV1.orderIndex.get());
 
                     switch (orderIndex) {
                         case Move: {
@@ -226,7 +226,7 @@ namespace DsprGameServer
                             unitIdList.push_front(stoi(str));
                         }
 
-                        UnitOrder orderIndex = static_cast<UnitOrder>(stoi(orderStrings[0]));
+                        UnitOrderType orderIndex = static_cast<UnitOrderType>(stoi(orderStrings[0]));
 
                         switch (orderIndex) {
                             case Move: {
