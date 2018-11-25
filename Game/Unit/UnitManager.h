@@ -60,7 +60,7 @@ namespace DsprGameServer {
 
         void createProjectile(int fromX, int fromY, int toX, int toY, int index, Unit *tribe);
 
-        void damageUnitAtPoint(int x, int y, int damage);
+        void damageUnitAtPoint(int fromX, int fromY, int x, int y, int damage);
 
         void sendProjectiles(PlayerData *const &playerData);
 

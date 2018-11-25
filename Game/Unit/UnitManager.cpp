@@ -678,10 +678,10 @@ namespace DsprGameServer
         }
     }
 
-    void UnitManager::damageUnitAtPoint(int x, int y, int damage) {
+    void UnitManager::damageUnitAtPoint(int fromX, int fromY, int x, int y, int damage) {
         auto unitToDamage = this->getUnitFromGrid(x,y);
         if (unitToDamage == nullptr) return;
-        unitToDamage->receiveDamage(damage);
+        unitToDamage->receiveDamage(fromX, fromY, damage);
     }
 
     void UnitManager::sendProjectiles(PlayerData *const &playerData) {

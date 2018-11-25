@@ -10,6 +10,7 @@ namespace DsprGameServer
     {
         Move,
         AttackMove,
+        AttackMoveStrong,
         Follow,
         AttackTargetStrong,
         AttackTargetWeak,

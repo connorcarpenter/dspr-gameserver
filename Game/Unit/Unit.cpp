@@ -119,6 +119,7 @@ namespace DsprGameServer
                         this->updateWalking();
                         break;
                     case AttackMove:
+                    case AttackMoveStrong:
                         this->updateAttackMoving();
                         break;
                     case Follow:
@@ -293,7 +294,7 @@ namespace DsprGameServer
         //give a chance to auto-acquire as higher-priority target
         if (this->orderGroup->orderIndex == UnitOrderType::AttackTargetWeak) {
             if (!targetUnit->canAttack()) {
-                Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getAcquisitionRange());
+                Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getAcquisitionRange(), false);
                 if (enemyUnitInAcquisitionRange != nullptr && enemyUnitInAcquisitionRange->canAttack())
                 {
                     auto path = this->game->pathfinder->findPath(this->position->x, this->position->y, enemyUnitInAcquisitionRange->position->x,
@@ -543,7 +544,7 @@ namespace DsprGameServer
         if (this->orderGroup->getTargetUnit() == nullptr)
         {
             if (this->unitTemplate->acquisition <= 0) return;
-            Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getRange());
+            Unit *enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getRange(), false);
             if (enemyUnitInAcquisitionRange != nullptr)
             {
                 this->orderGroup->setTargetUnit(enemyUnitInAcquisitionRange);
@@ -882,7 +883,7 @@ namespace DsprGameServer
         this->game->fogManager->revealFog(this->tribe, this->nextPosition->obj()->x, this->nextPosition->obj()->y, this->unitTemplate->sight);
     }
 
-    Unit * Unit::getEnemyUnitInRange(int range) {
+    Unit * Unit::getEnemyUnitInRange(int range, bool onlyAcceptAttackers) {
 
         Unit* lowPriorityTarget = nullptr;
 
@@ -909,7 +910,7 @@ namespace DsprGameServer
             }
         }
 
-        if (lowPriorityTarget != nullptr) return lowPriorityTarget;
+        if (lowPriorityTarget != nullptr && !onlyAcceptAttackers) return lowPriorityTarget;
         return nullptr;
     }
 
@@ -947,7 +948,8 @@ namespace DsprGameServer
     void Unit::lookForEnemyUnitsAndEngage() {
         if (this->unitTemplate->acquisition <= 0) return;
 
-        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getAcquisitionRange());
+        Unit* enemyUnitInAcquisitionRange = this->getEnemyUnitInRange(this->getAcquisitionRange(),
+                                                                      this->orderGroup != nullptr && this->orderGroup->orderIndex == AttackMoveStrong);
         if (enemyUnitInAcquisitionRange != nullptr)
         {
             auto path = this->game->pathfinder->findPath(this->position->x, this->position->y, enemyUnitInAcquisitionRange->position->x,
@@ -978,15 +980,39 @@ namespace DsprGameServer
     }
 
     void Unit::damageOtherUnit(Unit *otherUnit, int dmgAmount) {
-        otherUnit->receiveDamage(dmgAmount);
+        otherUnit->receiveDamage(this->position->x, this->position->y, dmgAmount);
     }
 
-    void Unit::receiveDamage(int dmgAmount) {
+    void Unit::receiveDamage(int fromX, int fromY, int dmgAmount) {
         if (this->unitTemplate->isInvincible)return;
         this->health->dirtyObj()->Subtract(dmgAmount);
         this->bleed->dirtyObj()->Set(true);
         if (this->health->obj()->value <= 0){
             this->game->unitManager->queueUnitForDeletion(this);
+        }
+
+        if (this->orderGroup == nullptr || (
+                (this->orderGroup->orderIndex == UnitOrderType::Move && this->followingPath==false) ||
+                (this->orderGroup->orderIndex == UnitOrderType::AttackTargetWeak && !this->orderGroup->getTargetUnit()->canAttack()) ||
+                (this->orderGroup->orderIndex == UnitOrderType::AttackMove)
+                                           ))
+        {
+            auto path = this->game->pathfinder->findPath(this->position->x, this->position->y, fromX, fromY, false);
+
+            if (path != nullptr)
+            {
+                //if we're attack moving, put the last order into our queue
+                if (this->orderGroup != nullptr && this->orderGroup->orderIndex == UnitOrderType::AttackMove)
+                {
+                    auto attackOrder = UnitOrder(UnitOrderType::AttackMove, this->orderGroup->path->targetX, this->orderGroup->path->targetY);
+                    this->queuedOrders.push_front(attackOrder);
+                }
+
+                auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackMoveStrong);
+                newOrderGroup->setPath(path);
+                this->setOrderGroup(newOrderGroup);
+                this->startPath();
+            }
         }
     }
 

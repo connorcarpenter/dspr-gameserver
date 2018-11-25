@@ -52,7 +52,7 @@ namespace DsprGameServer
         void finishTraining(UnitTemplate *unitTemplate);
         void cancelTrainUnit(int queueIndex);
         int getRange();
-        void receiveDamage(int dmgAmount);
+        void receiveDamage(int fromX, int fromY, int dmgAmount);
 
         int id = -1;
         Synced<AnimationState>* animationState = nullptr;
@@ -117,7 +117,7 @@ namespace DsprGameServer
         void getNextTileSimplePathfind();
         void setPathUnarrived();
         void updateNextPosition(Point *newNextPosition);
-        Unit *getEnemyUnitInRange(int range);
+        Unit *getEnemyUnitInRange(int range, bool onlyAcceptAttackers);
         void updateAttackMoving();
         void lookForEnemyUnitsAndEngage();
         void addToBlockedEnemyList(Unit *blockedEnemy);

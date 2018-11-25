@@ -36,7 +36,7 @@ namespace DsprGameServer {
         {
             this->done = true;
 
-            this->game->unitManager->damageUnitAtPoint(toCoord->x, toCoord->y, this->damage);
+            this->game->unitManager->damageUnitAtPoint(fromCoord->x, fromCoord->y, toCoord->x, toCoord->y, this->damage);
         }
     }
 }
