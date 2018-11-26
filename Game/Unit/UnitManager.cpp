@@ -162,13 +162,17 @@ namespace DsprGameServer
         }
     }
 
-    void UnitManager::receiveSpecialActionOrder(const std::list<int> &idList, int actionIndex)
+    void UnitManager::receiveSpecialActionOrder(const std::list<int> &idList, DsprMessage::Array& otherNumbers)
     {
         for (const auto &i : idList) {
             if (unitMap.count(i) != 0) {
                 Unit *unit = unitMap.at(i);
                 if (unit->specificUnit != nullptr) {
-                    unit->specificUnit->specialAction(actionIndex);
+                    if (otherNumbers.size() == 1) {
+                        unit->specificUnit->specialAction(otherNumbers.get(0));
+                    } else if (otherNumbers.size() == 3) {
+                        unit->specificUnit->specialAction(otherNumbers.get(0), otherNumbers.get(1), otherNumbers.get(2));
+                    }
                 }
             }
         }

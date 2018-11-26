@@ -10,8 +10,15 @@ namespace DsprGameServer
         this->masterUnit = unit;
     }
 
-    void TempleFlying::specialAction(int actionIndex) {
-
+    void TempleFlying::specialAction(int actionIndex, int x, int y) {
+        switch(actionIndex)
+        {
+            case 0:
+            {
+                int i = 12;
+            }
+                break;
+        }
     }
 }
 

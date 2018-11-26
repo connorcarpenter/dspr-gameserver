@@ -190,8 +190,7 @@ namespace DsprGameServer
                         }
                             break;
                         case SpecialAction: {
-                            int actionIndex = unitOrderMsgV1.otherNumbers.get(0);
-                            game->unitManager->receiveSpecialActionOrder(unitIdList, actionIndex);
+                            game->unitManager->receiveSpecialActionOrder(unitIdList, unitOrderMsgV1.otherNumbers);
                         }
                             break;
                         default:

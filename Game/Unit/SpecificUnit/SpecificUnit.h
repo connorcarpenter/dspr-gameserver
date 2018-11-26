@@ -8,5 +8,6 @@ namespace DsprGameServer {
     class SpecificUnit {
     public:
         virtual void specialAction(int actionIndex) {};
+        virtual void specialAction(int actionIndex, int x, int y) {};
     };
 }
