@@ -55,6 +55,8 @@ add_executable(dspr-gameserver
 
         Game/Unit/SpecificUnit/SpecificUnit.h Game/Unit/SpecificUnit/SpecificUnit.cpp
         Game/Unit/SpecificUnit/Manafount.h Game/Unit/SpecificUnit/Manafount.cpp
+        Game/Unit/SpecificUnit/TempleBuilding.h Game/Unit/SpecificUnit/TempleBuilding.cpp
+        Game/Unit/SpecificUnit/TempleFlying.h Game/Unit/SpecificUnit/TempleFlying.cpp
 
         Game/Circle/CircleCache.h Game/Circle/CircleCache.cpp
         Game/Circle/Circle.h Game/Circle/Circle.cpp

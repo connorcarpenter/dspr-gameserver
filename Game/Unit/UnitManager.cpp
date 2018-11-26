@@ -40,7 +40,7 @@ namespace DsprGameServer
             for (int j = 0; j<3;j++)
                 createUnit((2 + j) * 2, (8 + i) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
 
-        createUnit((3) * 2, (3) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->temple);
+        createUnit((3) * 2, (3) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->templeBuilding);
         createUnit((7) * 2, (7) * 2, this->game->tribeManager->neutralTribe, this->game->unitTemplateCatalog->manafount);
 
         //ashwalkers
@@ -54,7 +54,7 @@ namespace DsprGameServer
             for (int j = 0; j<3;j++)
                 createUnit((40 + i) * 2, (40 + j) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->worker);
 
-        createUnit((52) * 2, (45) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->temple);
+        createUnit((52) * 2, (45) * 2, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->templeBuilding);
     }
 
     UnitManager::~UnitManager()
@@ -158,6 +158,18 @@ namespace DsprGameServer
                 Unit *unit = unitMap.at(i);
                 if (!unit->unitTemplate->hasRallyPoint)continue;
                 unit->rallyUnitId->dirtyObj()->Set(targetId);
+            }
+        }
+    }
+
+    void UnitManager::receiveSpecialActionOrder(const std::list<int> &idList, int actionIndex)
+    {
+        for (const auto &i : idList) {
+            if (unitMap.count(i) != 0) {
+                Unit *unit = unitMap.at(i);
+                if (unit->specificUnit != nullptr) {
+                    unit->specificUnit->specialAction(actionIndex);
+                }
             }
         }
     }

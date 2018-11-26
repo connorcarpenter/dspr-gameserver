@@ -4,13 +4,16 @@
 
 #include "UnitTemplateCatalog.h"
 #include "SpecificUnit/Manafount.h"
+#include "SpecificUnit/TempleBuilding.h"
+#include "SpecificUnit/TempleFlying.h"
 
 namespace DsprGameServer
 {
     UnitTemplateCatalog::UnitTemplateCatalog()
     {
         initWorker();
-        initTemple();
+        initTempleBuilding();
+        initTempleFlying();
         initManafount();
         initAshwalker();
     }
@@ -45,22 +48,7 @@ namespace DsprGameServer
         this->templateMap.emplace(this->worker->index, this->worker);
     }
 
-    void UnitTemplateCatalog::initTemple() {
-        this->temple = new UnitTemplate(1);
-        this->temple->sight = 12;
-        this->temple->acquisition = 0;
-        this->temple->setWalkSpeed(0,0);
-        this->temple->tileWidth = 5;
-        this->temple->tileHeight = 5;
-        this->temple->maxHealth = 1500;
-        this->temple->hasConstructionQueue = true;
-        this->temple->buildableUnits = new std::set<int>();
-        this->temple->buildableUnits->insert(0);
-        this->temple->buildTime = 1000;
-        this->temple->hasRallyPoint = true;
 
-        this->templateMap.emplace(this->temple->index, this->temple);
-    }
 
     void UnitTemplateCatalog::initManafount() {
         this->manafount = new UnitTemplate(2);
@@ -87,5 +75,41 @@ namespace DsprGameServer
         this->ashwalker->maxHealth = 340;
 
         this->templateMap.emplace(this->ashwalker->index, this->ashwalker);
+    }
+
+    void UnitTemplateCatalog::initTempleBuilding() {
+        this->templeBuilding = new UnitTemplate(1);
+        this->templeBuilding->sight = 12;
+        this->templeBuilding->acquisition = 0;
+        this->templeBuilding->setWalkSpeed(0,0);
+        this->templeBuilding->tileWidth = 5;
+        this->templeBuilding->tileHeight = 5;
+        this->templeBuilding->maxHealth = 1500;
+        this->templeBuilding->hasConstructionQueue = true;
+        this->templeBuilding->buildableUnits = new std::set<int>();
+        this->templeBuilding->buildableUnits->insert(0);
+        this->templeBuilding->buildTime = 1000;
+        this->templeBuilding->hasRallyPoint = true;
+        this->templeBuilding->createSpecificUnitFunction = [&](Unit* unit) {
+            return new TempleBuilding(unit);
+        };
+
+        this->templateMap.emplace(this->templeBuilding->index, this->templeBuilding);
+    }
+
+    void UnitTemplateCatalog::initTempleFlying() {
+        this->templeFlying = new UnitTemplate(4);
+        this->templeFlying->sight = 12;
+        this->templeFlying->acquisition = 0;
+        this->templeFlying->setWalkSpeed(20,30);
+        this->templeFlying->tileWidth = 1;
+        this->templeFlying->tileHeight = 1;
+        this->templeFlying->maxHealth = 1500;
+        this->templeFlying->buildTime = 1000;
+        this->templeFlying->createSpecificUnitFunction = [&](Unit* unit) {
+            return new TempleFlying(unit);
+        };
+
+        this->templateMap.emplace(this->templeFlying->index, this->templeFlying);
     }
 }

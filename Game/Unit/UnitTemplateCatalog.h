@@ -14,14 +14,16 @@ namespace DsprGameServer {
         ~UnitTemplateCatalog();
         UnitTemplate* getTemplateFromIndex(int index);
         UnitTemplate* worker = nullptr;
-        UnitTemplate* temple = nullptr;
+        UnitTemplate* templeBuilding = nullptr;
+        UnitTemplate* templeFlying = nullptr;
         UnitTemplate* manafount = nullptr;
         UnitTemplate *ashwalker = nullptr;
     private:
         std::map<int, UnitTemplate*> templateMap;
 
         void initWorker();
-        void initTemple();
+        void initTempleBuilding();
+        void initTempleFlying();
         void initManafount();
         void initAshwalker();
     };

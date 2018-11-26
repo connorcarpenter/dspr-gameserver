@@ -24,7 +24,8 @@ namespace DsprGameServer
         ItemGive,
         RallyPoint,
         RallyUnit,
-        CancelTrain
+        CancelTrain,
+        SpecialAction
     };
 
     class UnitOrder

@@ -189,6 +189,11 @@ namespace DsprGameServer
                             game->unitManager->receiveRallyUnitOrder(unitIdList, targetUnitId);
                         }
                             break;
+                        case SpecialAction: {
+                            int actionIndex = unitOrderMsgV1.otherNumbers.get(0);
+                            game->unitManager->receiveSpecialActionOrder(unitIdList, actionIndex);
+                        }
+                            break;
                         default:
                         {
                             int i = 12; //:(

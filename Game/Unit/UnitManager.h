@@ -55,6 +55,7 @@ namespace DsprGameServer {
         void receiveRallyUnitOrder(const std::list<int> &idList, int targetId);
 
         void receiveCancelTrainOrder(std::list<int> idList, int queueIndex);
+        void receiveSpecialActionOrder(const std::list<int> &idList, int actionIndex);
 
         void updateProjectiles();
 
@@ -85,5 +86,7 @@ namespace DsprGameServer {
         bool playerIsAwareOfUnit(PlayerData *playerData, Unit *unit);
         void makePlayerUnawareOfUnit(PlayerData *playerData, Unit *unit);
         int getFreeUnitId();
+
+
     };
 }
