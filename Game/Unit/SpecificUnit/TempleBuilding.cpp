@@ -3,6 +3,8 @@
 //
 
 #include "TempleBuilding.h"
+#include "../UnitTemplateCatalog.h"
+#include "../UnitManager.h"
 
 namespace DsprGameServer
 {
@@ -11,7 +13,20 @@ namespace DsprGameServer
     }
 
     void TempleBuilding::specialAction(int actionIndex) {
-        int i = 1;
+        switch(actionIndex)
+        {
+            case 0:
+            {
+                //Lift off
+                this->masterUnit->game->unitManager->changeUnitsTemplate(this->masterUnit, this->masterUnit->game->unitTemplateCatalog->templeFlying);
+            }
+                break;
+            default:
+            {
+                int i = 1/0; // ?
+            }
+                break;
+        }
     }
 }
 

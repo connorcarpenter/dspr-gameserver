@@ -98,9 +98,11 @@ namespace DsprGameServer
 
         Inventory* inventory = nullptr;
 
+        Game* game = nullptr;
+        std::function<void()> onDeletionFunc = nullptr;
+
     private:
 
-        Game* game = nullptr;
         int timesHaventPushed = 0;
         int pushCount = 0;
         std::set<Unit*>* blockedEnemyList = nullptr;

@@ -576,6 +576,9 @@ namespace DsprGameServer
                     playerUnitPair.second->erase(unit);
             }
 
+            if (unit->onDeletionFunc != nullptr)
+                unit->onDeletionFunc();
+
             //actually delete
             delete unit;
 
@@ -724,5 +727,20 @@ namespace DsprGameServer
         }
 
         this->projectileCreationSet.clear();
+    }
+
+    void UnitManager::changeUnitsTemplate(Unit *unit, UnitTemplate *newTemplate) {
+        if (unit == nullptr || newTemplate == nullptr)return;
+
+        unit->onDeletionFunc = [&, unit, newTemplate]()
+        {
+            Unit* newUnit = new Unit(unit->game, unit->id, unit->tribe, unit->position->x, unit->position->y, newTemplate);
+
+            newUnit->health->obj()->Set(unit->health->obj()->Get());//currently only syncing health, let's see how far that gets us
+
+            this->unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
+        };
+
+        this->game->unitManager->queueUnitForDeletion(unit);
     }
 }

@@ -29,6 +29,14 @@ namespace DsprGameServer {
         void receiveHoldOrder(const std::list<int> &idList);
         void receiveTrainOrder(const std::list<int> &idList, int unitTemplateIndex);
         void receiveGatherOrder(const std::list<int> &idList, int targetUnitId);
+        void receivePickupOrder(std::list<int> unitIdList, int targetItemId);
+        void receiveItemSwapOrder(int unitId, int beforeSlotIndex, int afterSlotIndex);
+        void receiveItemDropOrder(int unitId, int slotIndex, int x, int y);
+        void receiveItemGiveOrder(int unitId, int slotIndex, int targetUnitId);
+        void receiveRallyPointOrder(const std::list<int> &idList, int tileX, int tileY);
+        void receiveRallyUnitOrder(const std::list<int> &idList, int targetId);
+        void receiveCancelTrainOrder(std::list<int> idList, int queueIndex);
+        void receiveSpecialActionOrder(const std::list<int> &idList, int actionIndex);
 
         void updateUnits();
         void deleteUnits();
@@ -47,25 +55,12 @@ namespace DsprGameServer {
         void finishSendUnitDeletes();
         void addPlayer(PlayerData *playerData);
         void removePlayer(PlayerData *playerData);
-        void receivePickupOrder(std::list<int> unitIdList, int targetItemId);
-        void receiveItemSwapOrder(int unitId, int beforeSlotIndex, int afterSlotIndex);
-        void receiveItemDropOrder(int unitId, int slotIndex, int x, int y);
-        void receiveItemGiveOrder(int unitId, int slotIndex, int targetUnitId);
-        void receiveRallyPointOrder(const std::list<int> &idList, int tileX, int tileY);
-        void receiveRallyUnitOrder(const std::list<int> &idList, int targetId);
-
-        void receiveCancelTrainOrder(std::list<int> idList, int queueIndex);
-        void receiveSpecialActionOrder(const std::list<int> &idList, int actionIndex);
-
         void updateProjectiles();
-
         void createProjectile(int fromX, int fromY, int toX, int toY, int index, Unit *tribe);
-
         void damageUnitAtPoint(int fromX, int fromY, int x, int y, int damage);
-
         void sendProjectiles(PlayerData *const &playerData);
-
         void cleanProjectiles();
+        void changeUnitsTemplate(Unit *unit, UnitTemplate *newTemplate);
 
     private:
         std::map<int, Unit*> unitMap;
