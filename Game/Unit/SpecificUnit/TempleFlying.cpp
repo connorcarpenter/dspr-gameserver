@@ -46,6 +46,9 @@ namespace DsprGameServer
             {
                 //Land Action End
                 //Land
+                auto newTemplate = this->masterUnit->game->unitTemplateCatalog->templeBuilding;
+                if (!landingZoneIsFree(newTemplate))return;
+
                 this->landing = true;
                 this->animationFrames = 20;
 
@@ -73,29 +76,36 @@ namespace DsprGameServer
             else
             {
                 landing = false;
+
                 auto newTemplate = this->masterUnit->game->unitTemplateCatalog->templeBuilding;
 
-                //check that the space is clear
-                auto newUnitBase = IsoBoxCache::get().getIsoBox(newTemplate->tileWidth, newTemplate->tileHeight);
-
-                for(auto isoBoxCoord : newUnitBase->coordList)
-                {
-                    auto x = this->masterUnit->position->x + isoBoxCoord->x;
-                    auto y = this->masterUnit->position->y + isoBoxCoord->y;
-                    auto tileAtPos = this->masterUnit->game->tileManager->getTileAt(x,y);
-                    if (tileAtPos == nullptr || !tileAtPos->walkable) return;
-
-                    auto unitAtPos = this->masterUnit->game->unitManager->getUnitFromGrid(x,y);
-                    if (unitAtPos != nullptr && unitAtPos != this->masterUnit) return;
-
-                    auto itemAtPos = this->masterUnit->game->itemManager->getItemFromGrid(x,y);
-                    if (itemAtPos != nullptr) return;
-                }
-
                 //transform
-                this->masterUnit->game->unitManager->changeUnitsTemplate(this->masterUnit, newTemplate);
+                if (landingZoneIsFree(newTemplate)) {
+                    this->masterUnit->game->unitManager->changeUnitsTemplate(this->masterUnit, newTemplate);
+                } else {
+                    this->masterUnit->game->unitManager->changeUnitsTemplate(this->masterUnit, this->masterUnit->unitTemplate);
+                }
             }
         }
+    }
+
+    bool TempleFlying::landingZoneIsFree(UnitTemplate* newTemplate) {
+        auto newUnitBase = IsoBoxCache::get().getIsoBox(newTemplate->tileWidth, newTemplate->tileHeight);
+        for(auto isoBoxCoord : newUnitBase->coordList)
+        {
+            auto x = this->masterUnit->position->x + isoBoxCoord->x;
+            auto y = this->masterUnit->position->y + isoBoxCoord->y;
+            auto tileAtPos = this->masterUnit->game->tileManager->getTileAt(x,y);
+            if (tileAtPos == nullptr || !tileAtPos->walkable) return false;
+
+            auto unitAtPos = this->masterUnit->game->unitManager->getUnitFromGrid(x,y);
+            if (unitAtPos != nullptr && unitAtPos != this->masterUnit)  return false;
+
+            auto itemAtPos = this->masterUnit->game->itemManager->getItemFromGrid(x,y);
+            if (itemAtPos != nullptr)  return false;
+        }
+
+        return true;
     }
 }
 

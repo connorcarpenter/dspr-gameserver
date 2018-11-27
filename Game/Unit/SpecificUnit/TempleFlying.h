@@ -20,5 +20,7 @@ namespace DsprGameServer {
         Unit* masterUnit = nullptr;
         bool landing = false;
         int animationFrames = 0;
+
+        bool landingZoneIsFree(UnitTemplate* newTemplate);
     };
 }

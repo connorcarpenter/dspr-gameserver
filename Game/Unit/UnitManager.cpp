@@ -15,6 +15,7 @@
 #include "../IsoBox/IsoBoxCache.h"
 #include "../Item/ItemManager.h"
 #include "../FogManager.h"
+#include <memory>
 
 namespace DsprGameServer
 {
@@ -667,7 +668,7 @@ namespace DsprGameServer
     }
 
     std::shared_ptr<std::set<PlayerData*>> UnitManager::getPlayersAwareOfUnit(Unit* unit) {
-        std::shared_ptr<std::set<PlayerData*>> output = std::make_shared(new std::set<PlayerData*>());
+        std::shared_ptr<std::set<PlayerData*>> output = std::shared_ptr<std::set<PlayerData*>>(new std::set<PlayerData*>());
         for(const auto& mapPair : this->playerToUnitsAwareOfMap)
         {
             std::set<Unit*>* set = mapPair.second;
