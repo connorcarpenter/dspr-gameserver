@@ -38,7 +38,9 @@ namespace DsprGameServer
         UnitOrderType orderType;
         int toX;
         int toY;
-    private:
         int targetId;
+        int variableNumber;
+    private:
+
     };
 }

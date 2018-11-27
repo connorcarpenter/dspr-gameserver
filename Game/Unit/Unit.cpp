@@ -181,22 +181,48 @@ namespace DsprGameServer
         }
     }
 
-    void Unit::updateStanding() {
+    void Unit::updateStanding()
+    {
         //if there's a queued command, do that
         if (this->queuedOrders.size() > 0)
         {
             auto queuedOrder = this->queuedOrders.front();
             this->queuedOrders.pop_front();
 
-            if (queuedOrder.orderType == UnitOrderType::AttackMove)
+            switch(queuedOrder.orderType)
             {
-                auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackMove);
-                auto path = this->game->pathfinder->findPath(this->nextPosition->obj()->x, this->nextPosition->obj()->y, queuedOrder.toX, queuedOrder.toY, false);
-                if (path!= nullptr) {
-                    newOrderGroup->setPath(path);
-                    this->setOrderGroup(newOrderGroup);
-                    this->startPath();
+                case UnitOrderType::AttackMove:
+                {
+                    auto newOrderGroup = std::make_shared<OrderGroup>(this->game, UnitOrderType::AttackMove);
+                    auto path = this->game->pathfinder->findPath(this->nextPosition->obj()->x, this->nextPosition->obj()->y, queuedOrder.toX, queuedOrder.toY, false);
+                    if (path!= nullptr)
+                    {
+                        newOrderGroup->setPath(path);
+                        this->setOrderGroup(newOrderGroup);
+                        this->startPath();
+                    }
                 }
+                    break;
+                case UnitOrderType::SpecialAction:
+                {
+                    if (this->specificUnit != nullptr)
+                    {
+                        switch (queuedOrder.variableNumber)
+                        {
+                            case 1:
+                            {
+                                this->specificUnit->specialAction(queuedOrder.targetId);
+                            }
+                                break;
+                            case 3:
+                            {
+                                this->specificUnit->specialAction(queuedOrder.targetId, queuedOrder.toX, queuedOrder.toX);
+                            }
+                                break;
+                        }
+                    }
+                }
+                    break;
             }
         }
         else

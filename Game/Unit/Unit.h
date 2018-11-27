@@ -101,6 +101,7 @@ namespace DsprGameServer
         Game* game = nullptr;
         std::function<void()> onDeletionFunc = nullptr;
 
+        std::deque<UnitOrder> queuedOrders;
     private:
 
         int timesHaventPushed = 0;
@@ -108,7 +109,6 @@ namespace DsprGameServer
         std::set<Unit*>* blockedEnemyList = nullptr;
         ConstructionQueue* constructionQueue = nullptr;
         Item *wieldedWeapon = nullptr;
-        std::deque<UnitOrder> queuedOrders;
 
         void pushOtherUnit(Unit *otherUnit);
         void getNextTile();
