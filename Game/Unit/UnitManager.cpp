@@ -571,7 +571,8 @@ namespace DsprGameServer
 
             //setup sending the deletions
             int showDeath = (unit->health->obj()->Get() <= 0) ? 1 : 0;
-            this->unitDeletionsToSend.emplace(std::make_pair(unit->id, showDeath));
+            if (unit->sendDeletion)
+                this->unitDeletionsToSend.emplace(std::make_pair(unit->id, showDeath));
 
             //remove this unit from all players aware of it
             for(const auto& playerUnitPair : this->playerToUnitsAwareOfMap)
@@ -744,6 +745,8 @@ namespace DsprGameServer
 
             this->unitMap.insert(std::pair<int, Unit*>(newUnit->id, newUnit));
         };
+
+        unit->sendDeletion = false;
 
         this->game->unitManager->queueUnitForDeletion(unit);
     }

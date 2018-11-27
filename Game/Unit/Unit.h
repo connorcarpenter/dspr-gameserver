@@ -102,6 +102,7 @@ namespace DsprGameServer
         std::function<void()> onDeletionFunc = nullptr;
 
         std::deque<UnitOrder> queuedOrders;
+        bool sendDeletion = true;
     private:
 
         int timesHaventPushed = 0;
@@ -145,5 +146,6 @@ namespace DsprGameServer
         int getDamage();
         void updateWieldedWeapon();
         int getAcquisitionRange();
+
     };
 }
