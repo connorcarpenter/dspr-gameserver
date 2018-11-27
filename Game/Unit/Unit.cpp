@@ -179,6 +179,12 @@ namespace DsprGameServer
         {
             this->constructionQueue->update();
         }
+
+        //specificunit
+        if (this->specificUnit != nullptr)
+        {
+            this->specificUnit->update();
+        }
     }
 
     void Unit::updateStanding()
