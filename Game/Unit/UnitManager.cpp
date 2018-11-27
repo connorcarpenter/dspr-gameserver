@@ -666,6 +666,17 @@ namespace DsprGameServer
         return playerUnitAwareSet->count(unit) != 0;
     }
 
+    std::shared_ptr<std::set<PlayerData*>> UnitManager::getPlayersAwareOfUnit(Unit* unit) {
+        std::shared_ptr<std::set<PlayerData*>> output = std::make_shared(new std::set<PlayerData*>());
+        for(const auto& mapPair : this->playerToUnitsAwareOfMap)
+        {
+            std::set<Unit*>* set = mapPair.second;
+            if (set->count(unit) > 0)
+                output->insert(mapPair.first);
+        }
+        return output;
+    }
+
     void UnitManager::createProjectile(int fromX, int fromY, int toX, int toY, int index, Unit *unit) {
         auto newPrjctl = new Projectile(this->game, fromX, fromY, toX, toY, index, unit);
         this->projectileCreationSet.insert(newPrjctl);

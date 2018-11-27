@@ -34,7 +34,7 @@ namespace DsprGameServer
             {
                 //Lift off
                 this->liftingOff = true;
-                this->animationFrames = 10;
+                this->animationFrames = 20;
             }
                 break;
             default:

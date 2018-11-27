@@ -62,6 +62,8 @@ namespace DsprGameServer {
         void cleanProjectiles();
         void changeUnitsTemplate(Unit *unit, UnitTemplate *newTemplate);
 
+        std::shared_ptr<std::set<PlayerData *>> getPlayersAwareOfUnit(Unit *unit);
+
     private:
         std::map<int, Unit*> unitMap;
         std::set<Projectile*> projectileSet;

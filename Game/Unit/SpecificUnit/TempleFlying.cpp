@@ -9,6 +9,7 @@
 #include "../UnitTemplateCatalog.h"
 #include "../../IsoBox/IsoBoxCache.h"
 #include "../../Item/ItemManager.h"
+#include "../../../GameServer.h"
 
 namespace DsprGameServer
 {
@@ -44,6 +45,34 @@ namespace DsprGameServer
             case 1:
             {
                 //Land Action End
+                //Land
+                this->landing = true;
+                this->animationFrames = 20;
+
+                DsprMessage::UnitSpecialActionMsgV1 unitSpecialActionMsgV1;
+                unitSpecialActionMsgV1.id.set(this->masterUnit->id);
+                unitSpecialActionMsgV1.actionIndex.set(1);
+
+                auto clientMsg = unitSpecialActionMsgV1.getToClientMessage();
+                auto packedMsg = clientMsg->Pack();
+                auto playersAwareOfUnit = this->masterUnit->game->unitManager->getPlayersAwareOfUnit(this->masterUnit);
+                for (auto playerData : *playersAwareOfUnit)
+                    GameServer::get().queueMessage(playerData, packedMsg);
+            }
+                break;
+        }
+    }
+
+    void TempleFlying::update() {
+        if (landing)
+        {
+            if (animationFrames > 0)
+            {
+                animationFrames--;
+            }
+            else
+            {
+                landing = false;
                 auto newTemplate = this->masterUnit->game->unitTemplateCatalog->templeBuilding;
 
                 //check that the space is clear
@@ -66,7 +95,6 @@ namespace DsprGameServer
                 //transform
                 this->masterUnit->game->unitManager->changeUnitsTemplate(this->masterUnit, newTemplate);
             }
-                break;
         }
     }
 }
