@@ -192,4 +192,8 @@ namespace DsprGameServer {
         if (tileThere == nullptr || !tileThere->walkable) return false;
         return true;
     }
+
+    Item *ItemManager::getItemFromGrid(int x, int y) {
+        return this->itemGrid->get(x,y);
+    }
 }

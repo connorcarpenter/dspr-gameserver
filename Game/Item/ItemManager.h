@@ -36,6 +36,8 @@ namespace DsprGameServer {
 
         bool canPlaceItemAtPos(int x, int y);
 
+        Item* getItemFromGrid(int x, int y);
+
         void dropItemFromInventory(int x, int y, Item *item);
 
     private:

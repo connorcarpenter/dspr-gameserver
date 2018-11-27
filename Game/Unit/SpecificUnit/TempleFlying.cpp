@@ -7,6 +7,8 @@
 #include "../OrderGroup.h"
 #include "../UnitManager.h"
 #include "../UnitTemplateCatalog.h"
+#include "../../IsoBox/IsoBoxCache.h"
+#include "../../Item/ItemManager.h"
 
 namespace DsprGameServer
 {
@@ -42,7 +44,27 @@ namespace DsprGameServer
             case 1:
             {
                 //Land Action End
-                this->masterUnit->game->unitManager->changeUnitsTemplate(this->masterUnit, this->masterUnit->game->unitTemplateCatalog->templeBuilding);
+                auto newTemplate = this->masterUnit->game->unitTemplateCatalog->templeBuilding;
+
+                //check that the space is clear
+                auto newUnitBase = IsoBoxCache::get().getIsoBox(newTemplate->tileWidth, newTemplate->tileHeight);
+
+                for(auto isoBoxCoord : newUnitBase->coordList)
+                {
+                    auto x = this->masterUnit->position->x + isoBoxCoord->x;
+                    auto y = this->masterUnit->position->y + isoBoxCoord->y;
+                    auto tileAtPos = this->masterUnit->game->tileManager->getTileAt(x,y);
+                    if (tileAtPos == nullptr || !tileAtPos->walkable) return;
+
+                    auto unitAtPos = this->masterUnit->game->unitManager->getUnitFromGrid(x,y);
+                    if (unitAtPos != nullptr && unitAtPos != this->masterUnit) return;
+
+                    auto itemAtPos = this->masterUnit->game->itemManager->getItemFromGrid(x,y);
+                    if (itemAtPos != nullptr) return;
+                }
+
+                //transform
+                this->masterUnit->game->unitManager->changeUnitsTemplate(this->masterUnit, newTemplate);
             }
                 break;
         }
