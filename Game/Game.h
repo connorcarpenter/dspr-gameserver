@@ -25,6 +25,7 @@ namespace DsprGameServer {
     class ItemManager;
     class ItemTemplateCatalog;
     class ChatManager;
+    class PlaneGenerator;
 
     class Game
     {
@@ -51,9 +52,13 @@ namespace DsprGameServer {
         ChatManager* chatManager = nullptr;
         std::set<PlayerData *> playerDataSet;
         MessageSender* messageSender = nullptr;
+        PlaneGenerator* planeGenerator = nullptr;
+        const int fogState = 1;
 
     private:
 
         void sendPlayerTribeIndex(PlayerData *playerData, DsprGameServer::Tribe *tribe);
+
+
     };
 }

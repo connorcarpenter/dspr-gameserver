@@ -10,6 +10,7 @@
 #include "FogManager.h"
 #include "../PlayerData.h"
 #include "../DsprMessage/ToClientMsg.h"
+#include "PlaneGeneration/PlaneGenerator.h"
 
 namespace DsprGameServer
 {
@@ -21,10 +22,9 @@ namespace DsprGameServer
 
         this->tileGrid = new PtrIsoGrid<Tile*>();
         this->tileGrid->initialize(this->width * 2, this->height * 2);
-        this->initializeTiles();
+        //this->initializeTiles();
 
-        for(int i=0;i<40;i+=1)
-            this->makeRandomWall();
+        this->game->planeGenerator->fill(this->tileGrid);
     }
 
     TileManager::~TileManager()
@@ -122,6 +122,7 @@ namespace DsprGameServer
                 if (fogAmount == 0) return;
 
                 auto tile = this->tileGrid->get(x,y);
+                if (tile == nullptr) return;
                 int frameToSend = (tile->walkable) ? (tile->frame+1) : 0;
 
                 DsprMessage::TileCreateMsgV1 tileCreateMsgV1;

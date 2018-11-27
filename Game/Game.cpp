@@ -17,11 +17,13 @@
 #include "Item/ItemManager.h"
 #include "Item/ItemTemplateCatalog.h"
 #include "ChatManager.h"
+#include "PlaneGeneration/PlaneGenerator.h"
 
 namespace DsprGameServer
 {
     Game::Game()
     {
+        this->planeGenerator = new PlaneGenerator();
         this->tileManager = new TileManager(this, 64, 64);
         AStarPathfinder::setMapWidth(64);
         this->fogManager = new FogManager(this);

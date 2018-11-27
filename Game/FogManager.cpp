@@ -26,6 +26,13 @@ namespace DsprGameServer
         auto newGrid = new PrimIsoGrid<int>();
         newGrid->initialize(this->game->tileManager->width * 2, this->game->tileManager->height * 2);
         this->fogGridMap.emplace(std::make_pair(newTribe, newGrid));
+
+        //this will start off everything being revealed
+        if (this->game->fogState == 1)
+            newGrid->forEachElement([newGrid](int fogAmount, int x, int y)
+                                               {
+                                                   newGrid->set(x,y, 1);
+                                               });
     }
 
     void FogManager::revealFog(Tribe *tribe, int x, int y, int radius)

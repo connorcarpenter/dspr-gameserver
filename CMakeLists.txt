@@ -65,6 +65,8 @@ add_executable(dspr-gameserver
         Game/IsoBox/IsoBoxCache.h Game/IsoBox/IsoBoxCache.cpp
         Game/IsoBox/IsoBox.h Game/IsoBox/IsoBox.cpp
 
+        Game/PlaneGeneration/PlaneGenerator.h Game/PlaneGeneration/PlaneGenerator.cpp
+
         DsprMessage/Main.h
         DsprMessage/ToServerMsg.h DsprMessage/ToServerMsg.cpp
         DsprMessage/ToClientMsg.h DsprMessage/ToClientMsg.cpp
