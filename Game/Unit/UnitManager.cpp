@@ -18,6 +18,7 @@
 #include "../PlaneGeneration/PlaneGenerator.h"
 #include "../Circle/CircleCache.h"
 #include <memory>
+#include "../Item/ItemTemplateCatalog.h"
 
 namespace DsprGameServer
 {
@@ -82,7 +83,11 @@ namespace DsprGameServer
                 {
                     createUnit(fx, fy, this->game->tribeManager->tribeCreep, this->game->unitTemplateCatalog->ashwalker);
                     unitCount--;
-                    if (unitCount == 0)break;
+                    if (unitCount == 0){
+                        //create reward
+                        this->game->itemManager->createItem(fx, fy, this->game->itemTemplateCatalog->getTemplateFromIndex(MathUtils::getRandom(6)));
+                        break;
+                    }
                 }
             }
         }

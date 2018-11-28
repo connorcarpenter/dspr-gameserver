@@ -28,7 +28,7 @@ namespace DsprGameServer {
         MathUtils::seedRandom(std::time(0));
 
         //initial randomization
-        const int scaleDownRatio = 5;
+        const int scaleDownRatio = 3;
         auto finalGrid = new PrimIsoGrid<bool>();
         finalGrid->initialize(((outputGrid->width/scaleDownRatio)/2)*2, ((outputGrid->height/scaleDownRatio)/2)*2);
 

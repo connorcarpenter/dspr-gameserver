@@ -26,7 +26,7 @@ namespace DsprGameServer
         tribeSet.insert(this->tribeB);
         this->tribeB->setEnemy(this->tribeA);
         this->tribeB->setEnemy(this->tribeCreep);
-        this->tribeB->playable = true;
+        this->tribeB->playable = false;
         this->game->fogManager->addTribe(this->tribeB);
 
         tribeSet.insert(this->tribeCreep);

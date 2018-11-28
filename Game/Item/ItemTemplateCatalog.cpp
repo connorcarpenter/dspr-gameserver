@@ -48,6 +48,9 @@ namespace DsprGameServer {
     }
 
     ItemTemplate *ItemTemplateCatalog::getTemplateFromIndex(int index) {
+        if (this == nullptr){
+            int i = 1/0; //duh dude, you need to initialize first!
+        }
         if (this->templateMap.count(index) <= 0) return nullptr;
         return this->templateMap.at(index);
     }

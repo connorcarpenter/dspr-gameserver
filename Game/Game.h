@@ -53,7 +53,7 @@ namespace DsprGameServer {
         std::set<PlayerData *> playerDataSet;
         MessageSender* messageSender = nullptr;
         PlaneGenerator* planeGenerator = nullptr;
-        const int fogState = 1;
+        const int fogState = 0;
 
     private:
 

@@ -23,20 +23,20 @@ namespace DsprGameServer
 {
     Game::Game()
     {
-        AStarPathfinder::setMapWidth(128);
+        AStarPathfinder::setMapWidth(80);
         this->planeGenerator = new PlaneGenerator(this);
-        this->tileManager = new TileManager(this, 128, 128);
+        this->tileManager = new TileManager(this, 80, 80);
         this->fogManager = new FogManager(this);
         this->economyManager = new EconomyManager(this);
         this->tribeManager = new TribeManager(this);
+        this->itemTemplateCatalog = new ItemTemplateCatalog(this);
+        this->itemManager = new ItemManager(this);
+        this->itemManager->initializeFirstItems();
         this->unitTemplateCatalog = new UnitTemplateCatalog();
         this->unitManager = new UnitManager(this);
         this->unitManager->initializeFirstUnits();
         this->pathfinder = new AStarPathfinder(this);
         this->simplePathfinder = new SimplePathfinder(this);
-        this->itemTemplateCatalog = new ItemTemplateCatalog(this);
-        this->itemManager = new ItemManager(this);
-        this->itemManager->initializeFirstItems();
         this->chatManager = new ChatManager(this);
     }
 

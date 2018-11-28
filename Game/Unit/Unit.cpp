@@ -1258,6 +1258,7 @@ namespace DsprGameServer
     }
 
     bool Unit::canAttack() {
+        if (this == nullptr) return false;
         return this->unitTemplate->acquisition > 0;
     }
 

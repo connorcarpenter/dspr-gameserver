@@ -103,6 +103,7 @@ namespace DsprGameServer
         if (playerData == nullptr) return;
 
         auto tile = this->tileGrid->get(x,y);
+        if (tile == nullptr) return;
         int frameToSend = (tile->walkable) ? (tile->frame+1) : 0;
 
         DsprMessage::TileCreateMsgV1 tileCreateMsgV1;

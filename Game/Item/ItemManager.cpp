@@ -45,6 +45,7 @@ namespace DsprGameServer {
     }
     
     void ItemManager::createItem(int x, int y, ItemTemplate *itemTemplate) {
+        if (itemTemplate == nullptr)return;
         Item* newItem = new Item(this->game, getFreeItemId(), x, y, itemTemplate);
         this->itemMap.insert(std::pair<int, Item*>(newItem->id, newItem));
     }
