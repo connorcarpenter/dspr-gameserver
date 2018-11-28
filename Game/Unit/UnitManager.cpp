@@ -60,11 +60,31 @@ namespace DsprGameServer
             }
         }
 
-        createUnit(this->game->planeGenerator->riftLocation.x, this->game->planeGenerator->riftLocation.y, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->templeBuilding);
+        createUnit(this->game->planeGenerator->riftLocation.x, this->game->planeGenerator->riftLocation.y, this->game->tribeManager->neutralTribe, this->game->unitTemplateCatalog->rift);
 
         for (auto manafountPoint : this->game->planeGenerator->manafountSet)
         {
             createUnit(manafountPoint.x, manafountPoint.y, this->game->tribeManager->neutralTribe, this->game->unitTemplateCatalog->manafount);
+        }
+
+        for (auto mobPair : this->game->planeGenerator->mobMap)
+        {
+            int unitCount = mobPair.second;
+            auto findCircle = CircleCache::get().getCircle(128);
+            for(auto circleCoord : findCircle->coordList){
+
+                if (MathUtils::getRandom(20)<15)continue;
+                int fx = circleCoord->x + mobPair.first.x;
+                int fy = circleCoord->y + mobPair.first.y;
+
+                auto tileAt = this->game->tileManager->getTileAt(fx, fy);
+                if (this->unitGrid->get(fx, fy) == nullptr && tileAt!=nullptr && tileAt->walkable)
+                {
+                    createUnit(fx, fy, this->game->tribeManager->tribeCreep, this->game->unitTemplateCatalog->ashwalker);
+                    unitCount--;
+                    if (unitCount == 0)break;
+                }
+            }
         }
 
 //        createUnit((7) * 2, (7) * 2, this->game->tribeManager->neutralTribe, this->game->unitTemplateCatalog->manafount);

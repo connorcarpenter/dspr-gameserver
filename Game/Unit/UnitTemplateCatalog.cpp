@@ -16,6 +16,7 @@ namespace DsprGameServer
         initTempleFlying();
         initManafount();
         initAshwalker();
+        initRift();
     }
 
     UnitTemplateCatalog::~UnitTemplateCatalog()
@@ -57,6 +58,7 @@ namespace DsprGameServer
         this->manafount->tileHeight = 2;
         this->manafount->isInvincible = true;
         this->manafount->isGatherable = true;
+        this->manafount->acquisition = 0;
         this->manafount->createSpecificUnitFunction = [&](Unit* unit) {
             return new Manafount(unit);
         };
@@ -111,5 +113,17 @@ namespace DsprGameServer
         };
 
         this->templateMap.emplace(this->templeFlying->index, this->templeFlying);
+    }
+
+    void UnitTemplateCatalog::initRift() {
+        this->rift = new UnitTemplate(5);
+        this->rift->sight = 0;
+        this->rift->acquisition = 0;
+        this->rift->setWalkSpeed(0,0);
+        this->rift->tileWidth = 5;
+        this->rift->tileHeight = 5;
+        this->rift->isInvincible = true;
+
+        this->templateMap.emplace(this->rift->index, this->rift);
     }
 }

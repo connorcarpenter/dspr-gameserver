@@ -18,6 +18,7 @@ namespace DsprGameServer {
         UnitTemplate* templeFlying = nullptr;
         UnitTemplate* manafount = nullptr;
         UnitTemplate *ashwalker = nullptr;
+        UnitTemplate *rift = nullptr;
     private:
         std::map<int, UnitTemplate*> templateMap;
 
@@ -26,5 +27,6 @@ namespace DsprGameServer {
         void initTempleFlying();
         void initManafount();
         void initAshwalker();
+        void initRift();
     };
 }

@@ -35,6 +35,7 @@ namespace DsprGameServer {
         Point playerStart = DsprGameServer::Point(0, 0);
         Point riftLocation = DsprGameServer::Point(0, 0);
         std::unordered_set<Point> manafountSet;
+        std::unordered_map<Point, int> mobMap;
     private:
 
         Point findPlayerStart();
@@ -59,5 +60,13 @@ namespace DsprGameServer {
         Point insulatePoint(Point point, int insulation);
 
         Point getPointSomeDisFromPoint(Point &point, int distance);
+
+        void emanateDangerFromPoint(PrimIsoGrid<unsigned int> *dGrid, int dMultiplier, Point &point, int limit = -1);
+
+        void emanateDangerFromPoints(PrimIsoGrid<unsigned int> *dGrid, int dMultiplier, std::unordered_set<Point>& set);
+
+        int getAverage(PrimIsoGrid<unsigned int> *dGrid);
+
+        Point getMaxPoint(PrimIsoGrid<unsigned int> *pGrid);
     };
 }

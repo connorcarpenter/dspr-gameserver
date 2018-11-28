@@ -149,6 +149,26 @@ namespace DsprGameServer {
             currentFeatureSet.insert(newManafountPoint);
         }
 
+        //dangermap
+        auto dangerGrid = new PrimIsoGrid<unsigned int>();
+        dangerGrid->initialize(this->planeGrid->width, this->planeGrid->height);
+        this->emanateDangerFromPoint(dangerGrid, 500, this->riftLocation);
+        this->emanateDangerFromPoints(dangerGrid, 200, this->manafountSet);
+        this->emanateDangerFromPoint(dangerGrid, -200, this->playerStart);
+        int averageDanger = this->getAverage(dangerGrid)/10;
+
+        while(true)
+        {
+            Point maxDangerPoint = this->getMaxPoint(dangerGrid);
+            int maxDangerValue = dangerGrid->get(maxDangerPoint.x, maxDangerPoint.y);
+            if (maxDangerValue < averageDanger) break;
+
+            int mobN = MathUtils::getRandom(1,10);
+            this->mobMap.emplace(maxDangerPoint, mobN);
+            this->emanateDangerFromPoint(dangerGrid, -30 * mobN, maxDangerPoint, mobN*10);
+        }
+
+        delete dangerGrid;
     }
 
     Point PlaneGenerator::findPlayerStart() {
@@ -168,6 +188,25 @@ namespace DsprGameServer {
         }
 
         return PlaneGenerator::getFurthestPointFromPoint(middlePoint);
+    }
+
+    Point PlaneGenerator::insulatePoint(Point point, int insulation) {
+        auto findCircle = CircleCache::get().getCircle(insulation);
+        for(auto circleCoord : findCircle->coordList){
+            int fx = point.x + circleCoord->x;
+            int fy = point.y + circleCoord->y;
+            if (!this->planeGrid->get(fx, fy))
+            {
+                int newx = point.x - MathUtils::SignOrZero(circleCoord->x);
+                int newy = point.y - MathUtils::SignOrZero(circleCoord->y);
+                if (this->planeGrid->get(newx,newy))
+                {
+                    point.x = newx; point.y = newy;
+                }
+            }
+        }
+
+        return point;
     }
 
     Point PlaneGenerator::getPointSomeDisFromPoint(Point& point, int distance) {
@@ -290,22 +329,117 @@ namespace DsprGameServer {
         delete heap;
     }
 
-    Point PlaneGenerator::insulatePoint(Point point, int insulation) {
-        auto findCircle = CircleCache::get().getCircle(insulation);
-        for(auto circleCoord : findCircle->coordList){
-            int fx = point.x + circleCoord->x;
-            int fy = point.y + circleCoord->y;
-            if (!this->planeGrid->get(fx, fy))
+    void
+    PlaneGenerator::emanateDangerFromPoint(PrimIsoGrid<unsigned int> *dGrid, int dMultiplier, Point &point, int limit) {
+        auto closedMap = new std::unordered_map<int, PathNode*>();
+        auto openHeap = new std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>();
+        auto openMap = new std::unordered_map<int, PathNode*>();
+        auto nodes = new std::list<PathNode*>();
+
+        //put first node into openHeap/Map
+        auto startNode = new PathNode(point.x, point.y, nullptr, 0);
+        openHeap->push(startNode);
+        openMap->emplace(startNode->getId(), startNode);
+        nodes->push_back(startNode);
+        int lastPlacedId;
+
+        while(openMap->size() > 0)
+        {
+            PathNode* currentNode = openHeap->top(); /*and then delete it*/ openHeap->pop();
+            openMap->erase(currentNode->getId());
+            lastPlacedId = currentNode->getId();
+
+            if (limit > 0)
+                if (currentNode->g >= limit) {
+                    closedMap->emplace(currentNode->getId(), currentNode);
+                    break;
+                }
+
+            //flood outwards
+            std::list<PathNode*>* neighbors = getNeighbors(currentNode);
+            for(auto newNode : *neighbors)
             {
-                int newx = point.x - MathUtils::SignOrZero(circleCoord->x);
-                int newy = point.y - MathUtils::SignOrZero(circleCoord->y);
-                if (this->planeGrid->get(newx,newy))
+                if (closedMap->count(newNode->getId()) != 0)
                 {
-                    point.x = newx; point.y = newy;
+                    delete newNode;
+                    continue;
+                }
+
+                if (openMap->count(newNode->getId()) == 0)
+                {
+                    openHeap->push(newNode);
+                    openMap->emplace(newNode->getId(), newNode);
+                    nodes->push_back(newNode);
+                }
+                else
+                {
+                    delete newNode;
+                    continue;
                 }
             }
+
+            //clean up neighbor list
+            delete neighbors;
+
+            closedMap->emplace(currentNode->getId(), currentNode);
         }
 
-        return point;
+        auto lastTile = closedMap->at(lastPlacedId);
+        float highestG = lastTile->g;
+
+        for(auto tilePair : *closedMap)
+        {
+            auto tile = tilePair.second;
+            auto val = dGrid->get(tile->x, tile->y);
+            auto mod = ((highestG - tile->g)/highestG)*dMultiplier;
+            if ((int) val + mod < 0)
+            {
+                val = 0;
+            } else
+            {
+                val += mod;
+            }
+
+            dGrid->set(tile->x, tile->y, val);
+        }
+
+        cleanUp(nodes, closedMap, openHeap, openMap);
+        return;
     }
+
+    void PlaneGenerator::emanateDangerFromPoints(PrimIsoGrid<unsigned int> *dGrid, int dMultiplier,
+                                                 std::unordered_set<Point>& set) {
+        for (auto point : set)
+            this->emanateDangerFromPoint(dGrid, dMultiplier, point);
+    }
+
+    int PlaneGenerator::getAverage(PrimIsoGrid<unsigned int> *dGrid) {
+        double sum = 0;
+        int n = 0;
+        dGrid->forEachElement([this, &sum, &n](unsigned int danger, int x, int y){
+            if (!this->planeGrid->get(x,y))return;
+            sum += danger;
+            n+=1;
+        });
+        return sum/n;
+    }
+
+    Point PlaneGenerator::getMaxPoint(PrimIsoGrid<unsigned int> *pGrid) {
+        int max = -999999;
+        int maxX, maxY;
+        pGrid->forEachElement([this, &max, &maxX, &maxY](unsigned int danger, int x, int y){
+            if (!this->planeGrid->get(x,y))return;
+            int intDanger = danger;
+            if (intDanger > max)
+            {
+                max = intDanger;
+                maxX = x;
+                maxY = y;
+            }
+        });
+        return Point(maxX, maxY);
+    }
+
 }
+
+
