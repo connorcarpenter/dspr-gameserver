@@ -2,15 +2,9 @@
 // Created by connor on 11/27/18.
 //
 
-#include <unordered_map>
-#include <vector>
-#include <queue>
 #include "PlaneGenerator.h"
-#include "../../PrimIsoGrid.h"
 #include "../../Math/MathUtils.h"
 #include "../Circle/CircleCache.h"
-#include "../../Pathfinding/PathNode.h"
-#include "../TileManager.h"
 
 namespace DsprGameServer {
 
@@ -133,13 +127,34 @@ namespace DsprGameServer {
     }
 
     void PlaneGenerator::finishPlane() {
-        this->playerStart = findPlayerStart();
-        this->riftLocation = PlaneGenerator::getFurthestPointFromPoint(this->playerStart);
+        this->playerStart = insulatePoint(findPlayerStart(), 10);
+        this->riftLocation = insulatePoint(PlaneGenerator::getFurthestPointFromPoint(this->playerStart), 10);
+
+        auto currentFeatureSet = std::unordered_set<Point>();
+        currentFeatureSet.insert(this->playerStart);
+        currentFeatureSet.insert(this->riftLocation);
+
+        //create starting manafount
+        {
+            auto newManafountPoint = insulatePoint(PlaneGenerator::getPointSomeDisFromPoint(this->playerStart, 15), 10);
+            this->manafountSet.insert(newManafountPoint);
+            currentFeatureSet.insert(newManafountPoint);
+        }
+
+        //create "wild" manafounts
+        for(int i=0;i<4;i++)
+        {
+            auto newManafountPoint = insulatePoint(PlaneGenerator::getFurthestPointFromPointSet(currentFeatureSet, 0), 10);
+            this->manafountSet.insert(newManafountPoint);
+            currentFeatureSet.insert(newManafountPoint);
+        }
+
     }
 
     Point PlaneGenerator::findPlayerStart() {
         Point middlePoint = Point(this->planeGrid->width/2,this->planeGrid->height/2);
 
+        //finding nearest tile to middle
         auto findCircle = CircleCache::get().getCircle(128);
         for(auto circleCoord : findCircle->coordList){
             int fx = middlePoint.x + circleCoord->x;
@@ -155,7 +170,19 @@ namespace DsprGameServer {
         return PlaneGenerator::getFurthestPointFromPoint(middlePoint);
     }
 
-    Point PlaneGenerator::getFurthestPointFromPoint(Point startPoint) {
+    Point PlaneGenerator::getPointSomeDisFromPoint(Point& point, int distance) {
+        auto newSet = std::unordered_set<Point>();
+        newSet.insert(point);
+        return getFurthestPointFromPointSet(newSet, distance);
+    }
+
+    Point PlaneGenerator::getFurthestPointFromPoint(Point& point) {
+        auto newSet = std::unordered_set<Point>();
+        newSet.insert(point);
+        return getFurthestPointFromPointSet(newSet);
+    }
+
+    Point PlaneGenerator::getFurthestPointFromPointSet(std::unordered_set<Point> &pointSet, int limit) {
 
         auto closedMap = new std::unordered_map<int, PathNode*>();
         auto openHeap = new std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>();
@@ -163,16 +190,25 @@ namespace DsprGameServer {
         auto nodes = new std::list<PathNode*>();
 
         //put first node into openHeap/Map
-        auto startNode = new PathNode(startPoint.x, startPoint.y, nullptr, 0);
-        openHeap->push(startNode);
-        openMap->emplace(startNode->getId(), startNode);
-        nodes->push_back(startNode);
+        for (auto startingPoint : pointSet) {
+            auto startNode = new PathNode(startingPoint.x, startingPoint.y, nullptr, 0);
+            openHeap->push(startNode);
+            openMap->emplace(startNode->getId(), startNode);
+            nodes->push_back(startNode);
+        }
         int lastPlacedId;
 
         while(openMap->size() > 0)
         {
             PathNode* currentNode = openHeap->top(); /*and then delete it*/ openHeap->pop();
             openMap->erase(currentNode->getId());
+            lastPlacedId = currentNode->getId();
+
+            if (limit > 0)
+                if (currentNode->g >= limit) {
+                    closedMap->emplace(currentNode->getId(), currentNode);
+                    break;
+                }
 
             //flood outwards
             std::list<PathNode*>* neighbors = getNeighbors(currentNode);
@@ -200,13 +236,10 @@ namespace DsprGameServer {
             //clean up neighbor list
             delete neighbors;
 
-            lastPlacedId = currentNode->getId();
             closedMap->emplace(currentNode->getId(), currentNode);
         }
 
         auto lastTile = closedMap->at(lastPlacedId);
-        for(int i=0;i<20;i++)
-            lastTile = lastTile->parent;
         Point output = Point(lastTile->x, lastTile->y);
         cleanUp(nodes, closedMap, openHeap, openMap);
         return output;
@@ -255,5 +288,24 @@ namespace DsprGameServer {
         delete map;
         delete map2;
         delete heap;
+    }
+
+    Point PlaneGenerator::insulatePoint(Point point, int insulation) {
+        auto findCircle = CircleCache::get().getCircle(insulation);
+        for(auto circleCoord : findCircle->coordList){
+            int fx = point.x + circleCoord->x;
+            int fy = point.y + circleCoord->y;
+            if (!this->planeGrid->get(fx, fy))
+            {
+                int newx = point.x - MathUtils::SignOrZero(circleCoord->x);
+                int newy = point.y - MathUtils::SignOrZero(circleCoord->y);
+                if (this->planeGrid->get(newx,newy))
+                {
+                    point.x = newx; point.y = newy;
+                }
+            }
+        }
+
+        return point;
     }
 }

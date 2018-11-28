@@ -62,6 +62,10 @@ namespace DsprGameServer
 
         createUnit(this->game->planeGenerator->riftLocation.x, this->game->planeGenerator->riftLocation.y, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->templeBuilding);
 
+        for (auto manafountPoint : this->game->planeGenerator->manafountSet)
+        {
+            createUnit(manafountPoint.x, manafountPoint.y, this->game->tribeManager->neutralTribe, this->game->unitTemplateCatalog->manafount);
+        }
 
 //        createUnit((7) * 2, (7) * 2, this->game->tribeManager->neutralTribe, this->game->unitTemplateCatalog->manafount);
 //

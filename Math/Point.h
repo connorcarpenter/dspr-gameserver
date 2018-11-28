@@ -5,6 +5,7 @@
 //
 
 #include <string>
+#include "../Pathfinding/AStarPathfinder.h"
 
 namespace DsprGameServer
 {
@@ -24,5 +25,27 @@ namespace DsprGameServer
         std::string serialize();
 
         void Add(int x, int y);
+
+        bool
+        operator ==(const Point & obj) const
+        {
+            if (x == obj.x && y == obj.y)
+                return true;
+            else
+                return false;
+        }
+    };
+}
+
+namespace std
+{
+    template<>
+    struct hash<DsprGameServer::Point>
+    {
+        size_t
+        operator()(const DsprGameServer::Point & obj) const
+        {
+            return hash<int>()(obj.x + (obj.y * DsprGameServer::AStarPathfinder::getMapWidth()));
+        }
     };
 }

@@ -2,16 +2,17 @@
 // Created by connor on 11/27/18.
 //
 
-#include <list>
 #include "../../PtrIsoGrid.h"
 #include "../Tile.h"
 #include "../../PrimIsoGrid.h"
 #include "../../Math/Point.h"
 #include "../../Pathfinding/PathNode.h"
 #include "../Game.h"
+#include <list>
 #include <queue>
 #include <unordered_map>
 #include <bits/unordered_map.h>
+#include <bits/unordered_set.h>
 
 namespace DsprGameServer {
     class PlaneGenerator {
@@ -33,11 +34,13 @@ namespace DsprGameServer {
 
         Point playerStart = DsprGameServer::Point(0, 0);
         Point riftLocation = DsprGameServer::Point(0, 0);
+        std::unordered_set<Point> manafountSet;
     private:
 
         Point findPlayerStart();
 
-        Point getFurthestPointFromPoint(Point point);
+        Point getFurthestPointFromPoint(Point& point);
+        Point getFurthestPointFromPointSet(std::unordered_set<Point> &pointSet, int limit = -1);
 
         std::__cxx11::list<DsprGameServer::PathNode *> *
     getNeighbors(DsprGameServer::PathNode *parent);
@@ -53,5 +56,8 @@ namespace DsprGameServer {
         const float diagonalCost = 3;
         Game *game;
 
+        Point insulatePoint(Point point, int insulation);
+
+        Point getPointSomeDisFromPoint(Point &point, int distance);
     };
 }
