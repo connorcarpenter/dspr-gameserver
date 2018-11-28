@@ -69,5 +69,8 @@ namespace DsprGameServer {
         }
 
 
+        static void seedRandom(int seed) {
+            std::srand(seed);
+        }
     };
 }

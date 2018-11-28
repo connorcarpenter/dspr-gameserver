@@ -23,9 +23,9 @@ namespace DsprGameServer
 {
     Game::Game()
     {
-        this->planeGenerator = new PlaneGenerator();
-        this->tileManager = new TileManager(this, 64, 64);
-        AStarPathfinder::setMapWidth(64);
+        AStarPathfinder::setMapWidth(128);
+        this->planeGenerator = new PlaneGenerator(this);
+        this->tileManager = new TileManager(this, 128, 128);
         this->fogManager = new FogManager(this);
         this->economyManager = new EconomyManager(this);
         this->tribeManager = new TribeManager(this);

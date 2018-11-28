@@ -37,11 +37,11 @@ namespace DsprGameServer {
     }
 
     void ItemManager::initializeFirstItems() {
-        this->createItem((3) * 2, (10) * 2, this->game->itemTemplateCatalog->sling);
-        this->createItem((4) * 2, (10) * 2, this->game->itemTemplateCatalog->club);
-        this->createItem((5) * 2, (10) * 2, this->game->itemTemplateCatalog->helmet);
-        this->createItem((6) * 2, (10) * 2, this->game->itemTemplateCatalog->armor);
-        this->createItem((4) * 2, (11) * 2, this->game->itemTemplateCatalog->shield);
+//        this->createItem((3) * 2, (10) * 2, this->game->itemTemplateCatalog->sling);
+//        this->createItem((4) * 2, (10) * 2, this->game->itemTemplateCatalog->club);
+//        this->createItem((5) * 2, (10) * 2, this->game->itemTemplateCatalog->helmet);
+//        this->createItem((6) * 2, (10) * 2, this->game->itemTemplateCatalog->armor);
+//        this->createItem((4) * 2, (11) * 2, this->game->itemTemplateCatalog->shield);
     }
     
     void ItemManager::createItem(int x, int y, ItemTemplate *itemTemplate) {

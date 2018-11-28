@@ -26,6 +26,23 @@ namespace DsprGameServer
         }
     }
 
+    PathNode::PathNode(int x, int y, PathNode* parent, float parDis)
+    {
+        this->x = x;
+        this->y = y;
+        this->h = 0;
+
+        if (parent == nullptr)
+        {
+            this->g = 0;
+        }
+        else
+        {
+            this->g = parent->g + parDis;
+            this->parent = parent;
+        }
+    }
+
     PathNode::PathNode(PathNode *other)
     {
         this->x = other->x;

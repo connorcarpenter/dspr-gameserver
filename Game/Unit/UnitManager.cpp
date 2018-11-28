@@ -15,6 +15,8 @@
 #include "../IsoBox/IsoBoxCache.h"
 #include "../Item/ItemManager.h"
 #include "../FogManager.h"
+#include "../PlaneGeneration/PlaneGenerator.h"
+#include "../Circle/CircleCache.h"
 #include <memory>
 
 namespace DsprGameServer
@@ -36,12 +38,31 @@ namespace DsprGameServer
     void UnitManager::initializeFirstUnits()
     {
         //red tribe
-        int i = 0;
-        //for (int i = 0; i<3; i++)
-            for (int j = 0; j<3;j++)
-                createUnit((2 + j) * 2, (8 + i) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
+//        int i = 0;
+//        //for (int i = 0; i<3; i++)
+//            for (int j = 0; j<3;j++)
+//                createUnit((2 + j) * 2, (8 + i) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
 
-        createUnit((3) * 2, (3) * 2, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->templeBuilding);
+        createUnit(this->game->planeGenerator->playerStart.x, this->game->planeGenerator->playerStart.y, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->templeBuilding);
+
+        int unitCount = 3;
+        auto findCircle = CircleCache::get().getCircle(128);
+        for(auto circleCoord : findCircle->coordList){
+            int fx = circleCoord->x + this->game->planeGenerator->playerStart.x;
+            int fy = circleCoord->y + this->game->planeGenerator->playerStart.y + 6;
+
+            auto tileAt = this->game->tileManager->getTileAt(fx, fy);
+            if (this->unitGrid->get(fx, fy) == nullptr && tileAt!=nullptr && tileAt->walkable)
+            {
+                createUnit(fx, fy, this->game->tribeManager->tribeA, this->game->unitTemplateCatalog->worker);
+                unitCount--;
+                if (unitCount == 0)break;
+            }
+        }
+
+        createUnit(this->game->planeGenerator->riftLocation.x, this->game->planeGenerator->riftLocation.y, this->game->tribeManager->tribeB, this->game->unitTemplateCatalog->templeBuilding);
+
+
 //        createUnit((7) * 2, (7) * 2, this->game->tribeManager->neutralTribe, this->game->unitTemplateCatalog->manafount);
 //
 //        //ashwalkers

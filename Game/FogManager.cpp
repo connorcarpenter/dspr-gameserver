@@ -31,7 +31,7 @@ namespace DsprGameServer
         if (this->game->fogState == 1)
             newGrid->forEachElement([newGrid](int fogAmount, int x, int y)
                                                {
-                                                   newGrid->set(x,y, 1);
+                                                   newGrid->set(x,y, 2);
                                                });
     }
 

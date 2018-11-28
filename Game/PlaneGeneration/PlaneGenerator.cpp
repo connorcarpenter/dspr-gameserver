@@ -2,42 +2,76 @@
 // Created by connor on 11/27/18.
 //
 
+#include <unordered_map>
+#include <vector>
+#include <queue>
 #include "PlaneGenerator.h"
 #include "../../PrimIsoGrid.h"
 #include "../../Math/MathUtils.h"
+#include "../Circle/CircleCache.h"
+#include "../../Pathfinding/PathNode.h"
+#include "../TileManager.h"
 
 namespace DsprGameServer {
 
+    PlaneGenerator::PlaneGenerator(Game* game) {
+        init();
+        this->game = game;
+    }
+
+    PlaneGenerator::~PlaneGenerator() {
+        if (this->planeGrid != nullptr)
+            delete this->planeGrid;
+    }
+
+    void PlaneGenerator::init() {
+
+    }
+
     void PlaneGenerator::fill(DsprGameServer::PtrIsoGrid<DsprGameServer::Tile *> *outputGrid)
     {
+        //seed
+        MathUtils::seedRandom(std::time(0));
+
         //initial randomization
+        const int scaleDownRatio = 5;
         auto finalGrid = new PrimIsoGrid<bool>();
-        finalGrid->initialize(outputGrid->width, outputGrid->height);
+        finalGrid->initialize(((outputGrid->width/scaleDownRatio)/2)*2, ((outputGrid->height/scaleDownRatio)/2)*2);
 
         finalGrid->forEachCoord([finalGrid](int x, int y){
-           bool val = (MathUtils::getRandom(100) <= 55);
+           bool val = (MathUtils::getRandom(100) <= 60);
             finalGrid->set(x,y,val);
         });
 
-//        //smoothing
-//        for(int i=0;i<5;i++) {
-//            auto nextGrid = new PrimIsoGrid<bool>();
-//            nextGrid->initialize(outputGrid->width, outputGrid->height);
-//            outputGrid->forEachCoord([this, nextGrid, finalGrid](int x, int y) {
-//                auto currentVal = finalGrid->get(x, y);
-//                bool nextVal = currentVal;
-//                int neighbors = this->getNeighbors(finalGrid, x, y);
-//                if (currentVal) {
-//                    if (neighbors < 4) nextVal = false;
-//                } else {
-//                    if (neighbors >= 6) nextVal = true;
-//                }
-//                nextGrid->set(x, y, nextVal);
-//            });
-//
-//            delete finalGrid;
-//            finalGrid = nextGrid;
-//        }
+        //smoothing
+        for(int i=0;i<7;i++) {
+            finalGrid = this->smooth(finalGrid);
+        }
+
+        //scaling
+        auto nextGrid = new PrimIsoGrid<bool>();
+        nextGrid->initialize(outputGrid->width, outputGrid->height);
+        nextGrid->forEachCoord([this, nextGrid, finalGrid](int x, int y) {
+            int nx = x/scaleDownRatio; int ny=y/scaleDownRatio;
+            if (!finalGrid->insideGrid(nx, ny))
+            {
+                if((MathUtils::getRandom(100) <= 50)) {
+                    nx += 1;
+                } else {
+                    ny += 1;
+                }
+            }
+            bool val = finalGrid->get(nx, ny);
+            nextGrid->set(x, y, val);
+        });
+
+        delete finalGrid;
+        finalGrid = nextGrid;
+
+        //smoothing
+        for(int i=0;i<5;i++) {
+            finalGrid = this->smooth(finalGrid);
+        }
 
         //convert to tiles
         outputGrid->forEachCoord([finalGrid, outputGrid](int x, int y){
@@ -58,20 +92,168 @@ namespace DsprGameServer {
            }
         });
 
-        delete finalGrid;
-        int i = 1;
-        i++;
+        this->planeGrid = finalGrid;
+        this->finishPlane();
     }
 
-    int PlaneGenerator::getNeighbors(DsprGameServer::PrimIsoGrid<bool> *grid, int x, int y) {
-        int output = 0;
-        for (int i=-1;i<2;i++)
-            for(int j=-1;j<2;j++)
-            {
-                if (j==0 && i==0)continue;
-                if(grid->get(x+i,y+j)) output+=1;
+
+
+    PrimIsoGrid<bool>* PlaneGenerator::smooth(PrimIsoGrid<bool> *grid) {
+        auto nextGrid = new PrimIsoGrid<bool>();
+        nextGrid->initialize(grid->width, grid->height);
+        grid->forEachCoord([this, nextGrid, grid](int x, int y) {
+            auto currentVal = grid->get(x, y);
+            bool nextVal = currentVal;
+            int neighbors = this->getNeighborCount(grid, x, y);
+            if (currentVal) {
+                if (neighbors < 4) nextVal = false;
+            } else {
+                if (neighbors >= 6) nextVal = true;
             }
+            nextGrid->set(x, y, nextVal);
+        });
+
+        delete grid;
+        return nextGrid;
+    }
+
+    int PlaneGenerator::getNeighborCount(DsprGameServer::PrimIsoGrid<bool> *grid, int x, int y) {
+        int output = 0;
+
+        if(grid->get(x+2,y)) output+=1;
+        if(grid->get(x-2,y)) output+=1;
+        if(grid->get(x,y+2)) output+=1;
+        if(grid->get(x,y-2)) output+=1;
+        if(grid->get(x+1,y+1)) output+=1;
+        if(grid->get(x-1,y-1)) output+=1;
+        if(grid->get(x+1,y-1)) output+=1;
+        if(grid->get(x-1,y+1)) output+=1;
 
         return output;
+    }
+
+    void PlaneGenerator::finishPlane() {
+        this->playerStart = findPlayerStart();
+        this->riftLocation = PlaneGenerator::getFurthestPointFromPoint(this->playerStart);
+    }
+
+    Point PlaneGenerator::findPlayerStart() {
+        Point middlePoint = Point(this->planeGrid->width/2,this->planeGrid->height/2);
+
+        auto findCircle = CircleCache::get().getCircle(128);
+        for(auto circleCoord : findCircle->coordList){
+            int fx = middlePoint.x + circleCoord->x;
+            int fy = middlePoint.y + circleCoord->y;
+            if (this->planeGrid->get(fx, fy))
+            {
+                middlePoint.x = fx;
+                middlePoint.y = fy;
+                break;
+            }
+        }
+
+        return PlaneGenerator::getFurthestPointFromPoint(middlePoint);
+    }
+
+    Point PlaneGenerator::getFurthestPointFromPoint(Point startPoint) {
+
+        auto closedMap = new std::unordered_map<int, PathNode*>();
+        auto openHeap = new std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>();
+        auto openMap = new std::unordered_map<int, PathNode*>();
+        auto nodes = new std::list<PathNode*>();
+
+        //put first node into openHeap/Map
+        auto startNode = new PathNode(startPoint.x, startPoint.y, nullptr, 0);
+        openHeap->push(startNode);
+        openMap->emplace(startNode->getId(), startNode);
+        nodes->push_back(startNode);
+        int lastPlacedId;
+
+        while(openMap->size() > 0)
+        {
+            PathNode* currentNode = openHeap->top(); /*and then delete it*/ openHeap->pop();
+            openMap->erase(currentNode->getId());
+
+            //flood outwards
+            std::list<PathNode*>* neighbors = getNeighbors(currentNode);
+            for(auto newNode : *neighbors)
+            {
+                if (closedMap->count(newNode->getId()) != 0)
+                {
+                    delete newNode;
+                    continue;
+                }
+
+                if (openMap->count(newNode->getId()) == 0)
+                {
+                    openHeap->push(newNode);
+                    openMap->emplace(newNode->getId(), newNode);
+                    nodes->push_back(newNode);
+                }
+                else
+                {
+                    delete newNode;
+                    continue;
+                }
+            }
+
+            //clean up neighbor list
+            delete neighbors;
+
+            lastPlacedId = currentNode->getId();
+            closedMap->emplace(currentNode->getId(), currentNode);
+        }
+
+        auto lastTile = closedMap->at(lastPlacedId);
+        for(int i=0;i<20;i++)
+            lastTile = lastTile->parent;
+        Point output = Point(lastTile->x, lastTile->y);
+        cleanUp(nodes, closedMap, openHeap, openMap);
+        return output;
+    }
+
+    std::list<PathNode *> * PlaneGenerator::getNeighbors(PathNode *parent)
+    {
+        auto neighbors = new std::list<PathNode*>();
+
+        tryAddNeighbor(neighbors, parent, 2, 0, 1);
+        tryAddNeighbor(neighbors, parent, -2, 0, 1);
+        tryAddNeighbor(neighbors, parent, 0, 2, 1);
+        tryAddNeighbor(neighbors, parent, 0, -2, 1);
+
+        tryAddNeighbor(neighbors, parent, 1, 1, 1);
+        tryAddNeighbor(neighbors, parent, -1, -1, 1);
+        tryAddNeighbor(neighbors, parent, 1, -1, 1);
+        tryAddNeighbor(neighbors, parent, -1, 1, 1);
+
+        return neighbors;
+    }
+
+    void PlaneGenerator::tryAddNeighbor(std::list<PathNode *> *neighborList, PathNode *parent, int xAdj, int yAdj, float cost)
+    {
+
+        int x = parent->x + xAdj;
+        int y = parent->y + yAdj;
+        auto tile = this->planeGrid->get(x, y);
+        if (!tile) return;
+        //if (this->game->unitManager->getEndPosAtCoord(x, y)) return;
+
+        auto newPathNode = new PathNode(x, y, parent, cost);
+        neighborList->push_front(newPathNode);
+    };
+
+    void PlaneGenerator::cleanUp(std::list<PathNode *> *nodes,
+                                   std::unordered_map<int, PathNode*>* map,
+                                   std::priority_queue<PathNode*, std::vector<PathNode*>, PathNodeComparator>* heap,
+                                   std::unordered_map<int, PathNode*>* map2) {
+        for (auto node : *nodes)
+        {
+            delete node;
+        }
+        delete nodes;
+
+        delete map;
+        delete map2;
+        delete heap;
     }
 }
