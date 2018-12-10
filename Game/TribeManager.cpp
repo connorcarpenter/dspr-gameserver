@@ -5,6 +5,7 @@
 #include "TribeManager.h"
 #include "FogManager.h"
 #include "../PlayerData.h"
+#include "VisionProfile.h"
 
 namespace DsprGameServer
 {
@@ -12,21 +13,21 @@ namespace DsprGameServer
     {
         this->game = game;
 
+        auto playerVisionProfile = std::make_shared<VisionProfile>();
+
         this->neutralTribe = new Tribe(game, 0);
-        this->tribeA = new Tribe(game, 1);
-        this->tribeB = new Tribe(game, 2);
+        this->tribeA = new Tribe(game, 1, playerVisionProfile);
+        this->tribeB = new Tribe(game, 2, playerVisionProfile);
         this->tribeCreep = new Tribe(game, 3);
 
         tribeSet.insert(this->tribeA);
-        this->tribeA->setEnemy(this->tribeB);
         this->tribeA->setEnemy(this->tribeCreep);
         this->tribeA->playable = true;
         this->game->fogManager->addTribe(this->tribeA);
 
         tribeSet.insert(this->tribeB);
-        this->tribeB->setEnemy(this->tribeA);
         this->tribeB->setEnemy(this->tribeCreep);
-        this->tribeB->playable = false;
+        this->tribeB->playable = true;
         this->game->fogManager->addTribe(this->tribeB);
 
         tribeSet.insert(this->tribeCreep);
@@ -69,5 +70,11 @@ namespace DsprGameServer
 
     Tribe *TribeManager::getTribeFromPlayer(PlayerData *playerData) {
         return this->playerToTribeMap.at(playerData);
+    }
+
+    bool TribeManager::areTribesEnemies(Tribe *tribeA, Tribe *tribeB) {
+        if (tribeA->isEnemiesWith(tribeB))return true;
+        if (tribeB->isEnemiesWith(tribeA))return true;
+        return false;
     }
 }

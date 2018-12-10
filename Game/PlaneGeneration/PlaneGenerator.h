@@ -32,7 +32,8 @@ namespace DsprGameServer {
 
         void finishPlane();
 
-        Point playerStart = DsprGameServer::Point(0, 0);
+        Point tribeAStart = DsprGameServer::Point(0, 0);
+        Point tribeBStart = DsprGameServer::Point(0, 0);
         Point riftLocation = DsprGameServer::Point(0, 0);
         std::unordered_set<Point> manafountSet;
         std::unordered_map<Point, int> mobMap;

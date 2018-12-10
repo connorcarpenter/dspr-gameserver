@@ -8,6 +8,7 @@
 #include <map>
 #include "Game.h"
 #include "Tribe.h"
+#include "VisionProfile.h"
 
 namespace DsprGameServer
 {
@@ -29,6 +30,8 @@ namespace DsprGameServer
         void freeTribeFromPlayer(Tribe *tribe, PlayerData *playerData);
 
         Tribe* getTribeFromPlayer(PlayerData* playerData);
+
+        bool areTribesEnemies(Tribe *tribeA, Tribe *tribeB);
 
     private:
         DsprGameServer::Game* game = nullptr;

@@ -90,7 +90,7 @@ namespace DsprGameServer {
 
     void OrderGroup::setTargetUnit(Unit *targetUnit) {
         if (targetUnit == nullptr){
-            this->targetUnitId = -1;
+            this->targetUnitId = 0;
         }else {
             this->targetUnitId = targetUnit->id;
             this->lastTargetPosition.Set(targetUnit->position);

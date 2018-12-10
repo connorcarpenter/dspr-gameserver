@@ -23,16 +23,21 @@ namespace DsprGameServer
 
     void FogManager::addTribe(DsprGameServer::Tribe *newTribe)
     {
-        auto newGrid = new PrimIsoGrid<int>();
-        newGrid->initialize(this->game->tileManager->width * 2, this->game->tileManager->height * 2);
-        this->fogGridMap.emplace(std::make_pair(newTribe, newGrid));
+        if (this->fogGridMap.count(newTribe->getVisionProfile()) == 0)
+        {
+            auto newGrid = new PrimIsoGrid<int>();
+            newGrid->initialize(this->game->tileManager->width * 2, this->game->tileManager->height * 2);
+            this->fogGridMap.emplace(std::make_pair(newTribe->getVisionProfile(), newGrid));
 
-        //this will start off everything being revealed
-        if (this->game->fogState == 1)
-            newGrid->forEachElement([newGrid](int fogAmount, int x, int y)
-                                               {
-                                                   newGrid->set(x,y, 2);
-                                               });
+            //this will start off everything being revealed
+            if (this->game->fogState == 1)
+            {
+                newGrid->forEachElement([newGrid](int fogAmount, int x, int y)
+                {
+                    newGrid->set(x, y, 2);
+                });
+            }
+        }
     }
 
     void FogManager::revealFog(Tribe *tribe, int x, int y, int radius)
@@ -50,7 +55,7 @@ namespace DsprGameServer
         if (tribe == nullptr)return;
         if (tribe->isNeutral())return;
 
-        auto fogGrid = this->fogGridMap.at(tribe);
+        auto fogGrid = this->fogGridMap.at(tribe->getVisionProfile());
 
         auto sightCircle = CircleCache::get().getCircle(radius);
 
@@ -66,7 +71,7 @@ namespace DsprGameServer
             if (reveal && currentFogAmount == 0)
             {
                 currentFogAmount += 2;
-                this->game->tileManager->sendTileToPlayer(x,y, tribe->playerData);
+                sendTileToPlayers(x, y, tribe->getVisionProfile());
             }
             else
             {
@@ -93,15 +98,20 @@ namespace DsprGameServer
     }
 
     int FogManager::getFogAmount(Tribe *tribe, int x, int y) {
-        auto fogGrid = this->fogGridMap.at(tribe);
+        auto fogGrid = this->fogGridMap.at(tribe->getVisionProfile());
 
         return fogGrid->get(x,y);
     }
 
     void FogManager::forEachFogTile(Tribe* tribe, const std::function<void(int fogAmount, int x, int y)>& elFunc){
         if (tribe == nullptr)return;
-        auto fogGrid = this->fogGridMap.at(tribe);
+        auto fogGrid = this->fogGridMap.at(tribe->getVisionProfile());
         fogGrid->forEachElement(elFunc);
+    }
+
+    void FogManager::sendTileToPlayers(int x, int y, VisionProfile *visionProfile) {
+        for (auto tribe : visionProfile->getTribes())
+            this->game->tileManager->sendTileToPlayer(x,y, tribe->playerData);
     }
 }
 

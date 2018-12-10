@@ -21,6 +21,7 @@
 #include "../Item/ItemManager.h"
 #include "../../DsprMessage/ToClientMsg.h"
 #include "../../DsprMessage/Main.h"
+#include "../TribeManager.h"
 
 namespace DsprGameServer
 {
@@ -926,8 +927,7 @@ namespace DsprGameServer
             if(!this->game->fogManager->tileIsClear(this->tribe, this->position->x + circleCoord->x, this->position->y + circleCoord->y)) continue;
             auto unitAtPosition = this->getUnitAtPosition(this->position->x + circleCoord->x, this->position->y + circleCoord->y);
             if (unitAtPosition == nullptr)continue;
-            if (unitAtPosition->tribe->isNeutral())continue;
-            if (unitAtPosition->tribe == this->tribe)continue;
+            if (!this->game->tribeManager->areTribesEnemies(this->tribe, unitAtPosition->tribe)) continue;
             if (this->blockedEnemyList != nullptr)
                 if (this->blockedEnemyList->count(unitAtPosition) > 0)
                     continue;

@@ -6,6 +6,7 @@
 
 #include <map>
 #include <functional>
+#include "VisionProfile.h"
 
 namespace DsprGameServer
 {
@@ -34,12 +35,13 @@ namespace DsprGameServer
 
     private:
 
-        std::map<Tribe*, PrimIsoGrid<int>*> fogGridMap;
+        std::map<VisionProfile*, PrimIsoGrid<int>*> fogGridMap;
         Game* game = nullptr;
 
         void updateFog(Tribe* tribe, int x, int y, int radius, bool reveal);
         int getFogAmount(Tribe* tribe, int x, int y);
 
 
+        void sendTileToPlayers(int x, int y, VisionProfile *pProfile);
     };
 }

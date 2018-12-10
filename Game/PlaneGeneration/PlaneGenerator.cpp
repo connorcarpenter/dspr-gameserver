@@ -127,16 +127,22 @@ namespace DsprGameServer {
     }
 
     void PlaneGenerator::finishPlane() {
-        this->playerStart = insulatePoint(findPlayerStart(), 10);
-        this->riftLocation = insulatePoint(PlaneGenerator::getFurthestPointFromPoint(this->playerStart), 10);
+        this->tribeAStart = insulatePoint(findPlayerStart(), 10);
+        this->riftLocation = insulatePoint(PlaneGenerator::getFurthestPointFromPoint(this->tribeAStart), 10);
 
         auto currentFeatureSet = std::unordered_set<Point>();
-        currentFeatureSet.insert(this->playerStart);
+        currentFeatureSet.insert(this->tribeAStart);
         currentFeatureSet.insert(this->riftLocation);
+
+        //create player B starting spot
+        {
+            this->tribeBStart = insulatePoint(PlaneGenerator::getPointSomeDisFromPoint(this->tribeAStart, 12), 10);
+            currentFeatureSet.insert(this->tribeBStart);
+        }
 
         //create starting manafount
         {
-            auto newManafountPoint = insulatePoint(PlaneGenerator::getPointSomeDisFromPoint(this->playerStart, 15), 10);
+            auto newManafountPoint = insulatePoint(PlaneGenerator::getPointSomeDisFromPoint(this->tribeAStart, 25), 10);
             this->manafountSet.insert(newManafountPoint);
             currentFeatureSet.insert(newManafountPoint);
         }
@@ -154,7 +160,7 @@ namespace DsprGameServer {
         dangerGrid->initialize(this->planeGrid->width, this->planeGrid->height);
         this->emanateDangerFromPoint(dangerGrid, 500, this->riftLocation);
         this->emanateDangerFromPoints(dangerGrid, 200, this->manafountSet);
-        this->emanateDangerFromPoint(dangerGrid, -200, this->playerStart);
+        this->emanateDangerFromPoint(dangerGrid, -200, this->tribeAStart);
         int averageDanger = this->getAverage(dangerGrid)/10;
 
         while(true)

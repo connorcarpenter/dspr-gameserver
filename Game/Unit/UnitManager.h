@@ -85,5 +85,6 @@ namespace DsprGameServer {
         int getFreeUnitId();
 
 
+        void initializePlayerTribeUnits(Point pointStart, Tribe *tribe);
     };
 }
