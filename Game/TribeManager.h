@@ -12,6 +12,14 @@
 
 namespace DsprGameServer
 {
+    enum TribeStatus
+    {
+        Player,
+        Ally,
+        Neutral,
+        Enemy
+    };
+
     class TribeManager
     {
     public:
@@ -32,6 +40,8 @@ namespace DsprGameServer
         Tribe* getTribeFromPlayer(PlayerData* playerData);
 
         bool areTribesEnemies(Tribe *tribeA, Tribe *tribeB);
+
+        void sendTribeData(PlayerData *playerData);
 
     private:
         DsprGameServer::Game* game = nullptr;

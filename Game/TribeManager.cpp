@@ -6,6 +6,8 @@
 #include "FogManager.h"
 #include "../PlayerData.h"
 #include "VisionProfile.h"
+#include "../DsprMessage/ToClientMsg.h"
+#include "../GameServer.h"
 
 namespace DsprGameServer
 {
@@ -22,18 +24,24 @@ namespace DsprGameServer
 
         tribeSet.insert(this->tribeA);
         this->tribeA->setEnemy(this->tribeCreep);
+        this->tribeA->setAlly(this->tribeB);
         this->tribeA->playable = true;
         this->game->fogManager->addTribe(this->tribeA);
 
         tribeSet.insert(this->tribeB);
         this->tribeB->setEnemy(this->tribeCreep);
+        this->tribeB->setAlly(this->tribeA);
         this->tribeB->playable = true;
         this->game->fogManager->addTribe(this->tribeB);
 
         tribeSet.insert(this->tribeCreep);
+        this->tribeCreep->playable = false;
         this->tribeCreep->setEnemy(this->tribeA);
         this->tribeCreep->setEnemy(this->tribeB);
         this->game->fogManager->addTribe(this->tribeCreep);
+
+        tribeSet.insert(this->neutralTribe);
+        this->neutralTribe->playable = false;
     }
 
     TribeManager::~TribeManager()
@@ -42,8 +50,6 @@ namespace DsprGameServer
         {
             delete tribe;
         }
-
-        delete this->neutralTribe;
     }
 
     Tribe *TribeManager::getFreeTribe() {
@@ -76,5 +82,37 @@ namespace DsprGameServer
         if (tribeA->isEnemiesWith(tribeB))return true;
         if (tribeB->isEnemiesWith(tribeA))return true;
         return false;
+    }
+
+    void TribeManager::sendTribeData(PlayerData *playerData)
+    {
+        Tribe* playerTribe = playerData->getTribe();
+        for(Tribe* tribe : tribeSet)
+        {
+            DsprMessage::TribeSetMsgV1 tribeSetMsgV1;
+            tribeSetMsgV1.tribeIndex.set(tribe->index);
+            if (playerTribe == tribe)
+            {
+                tribeSetMsgV1.status.set((unsigned int) TribeStatus::Player);
+            }
+            else
+            if (playerTribe->isAlliesWith(tribe))
+            {
+                tribeSetMsgV1.status.set((unsigned int) TribeStatus::Ally);
+            }
+            else
+            if (playerTribe->isEnemiesWith(tribe))
+            {
+                tribeSetMsgV1.status.set((unsigned int) TribeStatus::Enemy);
+            }
+            else
+            {
+                tribeSetMsgV1.status.set((unsigned int) TribeStatus::Neutral);
+            }
+
+            auto clientMsg = tribeSetMsgV1.getToClientMessage();
+            auto packedMsg = clientMsg->Pack();
+            GameServer::get().queueMessage(playerData, packedMsg);
+        }
     }
 }

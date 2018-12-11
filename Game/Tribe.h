@@ -22,6 +22,7 @@ namespace DsprGameServer
 
         ~Tribe();
         void setEnemy(Tribe* otherTribe);
+        void setAlly(Tribe *otherTribe);
         int index = 0;
         PlayerData* playerData = nullptr;
         bool isNeutral();
@@ -30,10 +31,14 @@ namespace DsprGameServer
         VisionProfile *getVisionProfile();
 
         bool isEnemiesWith(Tribe *otherTribe);
+        bool isAlliesWith(Tribe *otherTribe);
 
     private:
         std::set<Tribe*> enemies;
+        std::set<Tribe*> allies;
         Game *game = nullptr;
         std::shared_ptr<VisionProfile> visionProfile = nullptr;
+
+
     };
 }

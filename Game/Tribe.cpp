@@ -36,6 +36,10 @@ namespace DsprGameServer
         this->enemies.insert(otherTribe);
     }
 
+    void Tribe::setAlly(Tribe* otherTribe) {
+        this->allies.insert(otherTribe);
+    }
+
     bool Tribe::isNeutral() {
         return game->tribeManager->neutralTribe->index == index;
     }
@@ -46,5 +50,9 @@ namespace DsprGameServer
 
     bool Tribe::isEnemiesWith(Tribe *otherTribe) {
         return this->enemies.count(otherTribe) != 0;
+    }
+
+    bool Tribe::isAlliesWith(Tribe *otherTribe) {
+        return this->allies.count(otherTribe) != 0;
     }
 }

@@ -99,7 +99,7 @@ namespace DsprGameServer
 
         auto freeTribe = this->tribeManager->getFreeTribe();
         this->tribeManager->assignTribeToPlayer(freeTribe, playerData);
-        this->sendPlayerTribeIndex(playerData, freeTribe);
+        this->tribeManager->sendTribeData(playerData);
 
         this->tileManager->sendGrid(playerData);
 
@@ -117,13 +117,5 @@ namespace DsprGameServer
         this->tribeManager->freeTribeFromPlayer(playerData->getTribe(), playerData);
         this->unitManager->removePlayer(playerData);
         this->itemManager->removePlayer(playerData);
-    }
-
-    void Game::sendPlayerTribeIndex(PlayerData *playerData, Tribe *tribe) {
-        DsprMessage::TribeSetMsgV1 tribeSetMsgV1;
-        tribeSetMsgV1.tribeIndex.set(tribe->index);
-        auto clientMsg = tribeSetMsgV1.getToClientMessage();
-        auto packedMsg = clientMsg->Pack();
-        GameServer::get().queueMessage(playerData, packedMsg);
     }
 }

@@ -34,6 +34,7 @@ add_executable(dspr-gameserver
         Game/FogManager.h Game/FogManager.cpp
         Game/EconomyManager.h Game/EconomyManager.cpp
         Game/ChatManager.h Game/ChatManager.cpp
+        Game/VisionProfile.h Game/VisionProfile.cpp
 
         Game/Item/Item.h Game/Item/Item.cpp
         Game/Item/ItemManager.h Game/Item/ItemManager.cpp
