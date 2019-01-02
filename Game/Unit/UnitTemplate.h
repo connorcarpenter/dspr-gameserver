@@ -43,5 +43,6 @@ namespace DsprGameServer
         bool hasRallyPoint = false;
 
         std::function<SpecificUnit*(Unit* unit)> createSpecificUnitFunction = nullptr;
+        int manaCost = 0;
     };
 }

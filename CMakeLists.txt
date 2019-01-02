@@ -75,6 +75,7 @@ add_executable(dspr-gameserver
         DsprMessage/Array.h DsprMessage/Array.cpp
         DsprMessage/CStr.h DsprMessage/CStr.cpp
         DsprMessage/CharVector.h DsprMessage/CharVector.cpp
+        DsprMessage/msg_debug.h
 
         Math/Point.h Math/Point.cpp
         Math/FloatPoint.h Math/FloatPoint.cpp

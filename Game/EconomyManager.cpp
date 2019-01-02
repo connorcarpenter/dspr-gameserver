@@ -43,7 +43,7 @@ namespace DsprGameServer
         //syncedVar->dirty();
         this->playerToPopMaxMap.emplace(tribe, syncedVar);
 
-        syncedVar = new Synced<Int>("mana", new Int(0));
+        syncedVar = new Synced<Int>("mana", new Int(100));
         //syncedVar->dirty();
         this->playerToManaMap.emplace(tribe, syncedVar);
     }

@@ -5,6 +5,7 @@
 #include <stack>
 #include "ConstructionQueue.h"
 #include "Unit.h"
+#include "../EconomyManager.h"
 
 namespace DsprGameServer
 {
@@ -31,6 +32,13 @@ namespace DsprGameServer
             auto front = unitQueue.front();
             if (front != nullptr && index != i) {
                 newStack.push(front);
+            }
+            if (index == i)
+            {
+                auto theUnit = unitQueue.front();
+                auto playerMana = this->masterUnit->game->economyManager->getMana(this->masterUnit->tribe);
+                playerMana += theUnit->manaCost;
+                this->masterUnit->game->economyManager->setMana(this->masterUnit->tribe, playerMana);
             }
             unitQueue.pop();
 

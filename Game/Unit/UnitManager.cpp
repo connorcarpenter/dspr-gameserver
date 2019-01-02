@@ -19,6 +19,7 @@
 #include "../Circle/CircleCache.h"
 #include <memory>
 #include "../Item/ItemTemplateCatalog.h"
+#include "../EconomyManager.h"
 
 namespace DsprGameServer
 {
@@ -72,7 +73,8 @@ namespace DsprGameServer
                     unitCount--;
                     if (unitCount == 0){
                         //create reward
-                        this->game->itemManager->createItem(fx, fy, this->game->itemTemplateCatalog->getTemplateFromIndex(MathUtils::getRandom(6)));
+                        auto itemIndex = (MathUtils::getRandom(0,2)<1) ? 0 : 2;
+                        this->game->itemManager->createItem(fx, fy, this->game->itemTemplateCatalog->getTemplateFromIndex(itemIndex));
                         break;
                     }
                 }
@@ -355,6 +357,10 @@ namespace DsprGameServer
                 if (unit->unitTemplate->buildableUnits == nullptr) continue;
                 if (unit->unitTemplate->buildableUnits->count(unitTemplateIndex) == 0) continue;
                 auto unitTemplate = this->game->unitTemplateCatalog->getTemplateFromIndex(unitTemplateIndex);
+                auto playersMana = game->economyManager->getMana(unit->tribe);
+                if (playersMana < unitTemplate->manaCost) continue;
+                playersMana -= unitTemplate->manaCost;
+                game->economyManager->setMana(unit->tribe, playersMana);
                 unit->trainUnit(unitTemplate);
             }
     }
